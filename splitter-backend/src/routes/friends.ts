@@ -312,8 +312,13 @@ router.get(
         console.log("GET /friends/search empty query");
         return res.json([]);
       }
-      const user = await prisma.user.findUnique({
-        where: { uniqueId: q },
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { uniqueId: q },
+            { email: q },
+          ],
+        },
         select: userPublicSelect,
       });
       const result = user

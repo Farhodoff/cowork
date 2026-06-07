@@ -716,8 +716,13 @@ router.post(
       if (!uniqueId)
         return res.status(400).json({ error: "uniqueId is required" });
 
-      const user = await prisma.user.findUnique({
-        where: { uniqueId },
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { uniqueId },
+            { email: uniqueId },
+          ],
+        },
         select: { id: true },
       });
       if (!user) return res.status(404).json({ error: "User not found" });
