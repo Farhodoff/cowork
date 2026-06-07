@@ -11,7 +11,8 @@ import {
   Bell, 
   Plus, 
   Receipt,
-  Clock
+  Clock,
+  Sparkles
 } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -223,6 +224,7 @@ export default function HomePage() {
 
   const openGroups = () => router.push('/tabs/groups');
   const onScan = () => router.push('/tabs/scan-receipt');
+  const onMagicSplit = () => router.push('/tabs/sessions/participants');
   const openAllSessions = () => router.push('/tabs/sessions/history');
 
   const recent = useMemo<SessionHistoryEntry[]>(() => sessions.slice(0, 3), [sessions]);
@@ -407,27 +409,27 @@ export default function HomePage() {
                 </YStack>
               </XStack>
 
-              {/* Add Expense */}
+              {/* Magic Split */}
               <XStack
                 flex={1}
                 height={68}
                 borderRadius={18}
-                backgroundColor="rgba(16, 185, 129, 0.06)"
+                backgroundColor="rgba(138, 43, 226, 0.06)"
                 alignItems="center"
                 padding="$3"
                 marginLeft="$2"
-                onPress={openGroups}
+                onPress={onMagicSplit}
                 pressStyle={{ opacity: 0.8 }}
               >
-                <Circle size={40} backgroundColor="#10B981" ai="center" jc="center" marginRight="$2">
-                  <Plus size={20} color="white" />
+                <Circle size={40} backgroundColor="#8A2BE2" ai="center" jc="center" marginRight="$2">
+                  <Sparkles size={20} color="white" />
                 </Circle>
                 <YStack>
                   <Text fontSize={14} fontWeight="700" color="$gray12">
-                    Add Expense
+                    Magic Split
                   </Text>
                   <Text fontSize={10} color="$gray9">
-                    Manual entry
+                    Smart split
                   </Text>
                 </YStack>
               </XStack>
