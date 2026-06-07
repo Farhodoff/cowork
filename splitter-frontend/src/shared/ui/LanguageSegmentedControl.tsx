@@ -8,12 +8,20 @@ interface LanguageSegmentedControlProps {
   onChange: (code: LanguageCode) => void;
   // опционально: локализованные подписи
   getLabel?: (code: LanguageCode, fallback: string) => string;
+  activeBgColor?: string;
+  activeTextColor?: any;
+  inactiveTextColor?: any;
+  bg?: any;
 }
 
 export function LanguageSegmentedControl({
   value,
   onChange,
   getLabel,
+  activeBgColor = 'white',
+  activeTextColor = '$gray12',
+  inactiveTextColor = '$gray11',
+  bg = '$gray3',
 }: LanguageSegmentedControlProps) {
   const options = LANGUAGE_OPTIONS;
   const selectedIndex = Math.max(0, options.findIndex((o) => o.code === value));
@@ -54,7 +62,7 @@ export function LanguageSegmentedControl({
         onLayout={onLayout}
         position="relative"
         ai="center"
-        bg="$gray3"
+        bg={bg}
         br="$10"
         padding={padding}
         height={height + padding * 2}
@@ -68,10 +76,10 @@ export function LanguageSegmentedControl({
               height,
               width: segmentWidth,
               borderRadius: 999,
-              backgroundColor: 'white',
+              backgroundColor: activeBgColor,
               transform: [{ translateX: thumbAnim }],
               // тонкая рамка и тень для объёма
-              borderWidth: 1,
+              borderWidth: activeBgColor === 'white' ? 1 : 0,
               borderColor: '#D4D4D8',
               shadowColor: '#000',
               shadowOpacity: 0.06,
@@ -107,7 +115,7 @@ export function LanguageSegmentedControl({
                 fontSize={13}
                 fontWeight="700"
                 // цвета читаемые и контрастные
-                color={active ? '$gray12' : '$gray11'}
+                color={active ? activeTextColor : inactiveTextColor}
               >
                 {label}
               </Text>

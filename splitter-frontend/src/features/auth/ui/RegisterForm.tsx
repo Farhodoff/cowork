@@ -3,7 +3,7 @@ import { useRouter, Link } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { YStack, XStack, Text } from 'tamagui';
+import { YStack, XStack, Text, View } from 'tamagui';
 import { useTranslation } from 'react-i18next';
 import { Alert, Pressable } from 'react-native';
 import { Button } from '@/shared/ui/Button';
@@ -15,6 +15,7 @@ import { register as registerUser, RegisterRequest, getCurrentUser } from '../ap
 import { saveToken } from '@/shared/lib/utils/token-storage';
 import { useAppStore } from '@/shared/lib/stores/app-store';
 import { User, Mail, Lock } from '@tamagui/lucide-icons';
+import { LanguageSegmentedControl } from '@/shared/ui/LanguageSegmentedControl';
 
 const schema = z.object({
   username: z.string().min(2, 'Username must be at least 2 characters'),
@@ -31,6 +32,8 @@ export default function RegisterForm() {
     defaultValues: { username: '', email: '', password: '' },
   });
   const setAuth = useAppStore((s) => s.setAuth);
+  const language = useAppStore((s) => s.language);
+  const setLanguage = useAppStore((s) => s.setLanguage);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,8 +65,22 @@ export default function RegisterForm() {
   return (
     <ScreenFormContainer>
       <YStack space="$5" width="100%">
+        {/* Language Selector */}
+        <XStack justifyContent="center" alignItems="center" marginTop="$2" marginBottom="$-2">
+          <View width={180}>
+            <LanguageSegmentedControl
+              value={language}
+              onChange={(code) => setLanguage(code)}
+              bg="#F3F4F6"
+              activeBgColor="#2ECC71"
+              activeTextColor="white"
+              inactiveTextColor="#6B7280"
+            />
+          </View>
+        </XStack>
+
         {/* Brand Icon & Header */}
-        <YStack alignItems="center" space="$2" marginTop="$4">
+        <YStack alignItems="center" space="$2" marginTop="$2">
           <YStack
             width={64}
             height={64}
