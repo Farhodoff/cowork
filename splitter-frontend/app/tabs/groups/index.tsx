@@ -1,22 +1,34 @@
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
-import { Scan } from '@tamagui/lucide-icons';
+import { Plus, Users } from '@tamagui/lucide-icons';
 import {
   YStack,
-  Paragraph,
   Card,
   XStack,
   Spinner,
-  Separator,
   View,
   Button,
+  Text,
+  ScrollView,
 } from 'tamagui';
 
 import { useGroupsStore } from '@/features/groups/model/groups.store';
 import type { GroupMember } from '@/features/groups/api/groups.api';
 import UserAvatar from '@/shared/ui/UserAvatar';
-import Fab from '@/shared/ui/Fab';
+
+function getRelativeTime(dateString?: string) {
+  if (!dateString) return 'Recently';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays <= 1) return 'Today';
+  if (diffDays === 2) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays - 1} days ago`;
+  const diffWeeks = Math.floor(diffDays / 7);
+  return `${diffWeeks} weeks ago`;
+}
 
 function AvatarStack({
   members,
@@ -31,10 +43,8 @@ function AvatarStack({
   const total = typeof totalCount === 'number' ? totalCount : list.length;
   const shownMembers = list.slice(0, Math.min(max, list.length));
   const hasMembers = shownMembers.length > 0;
-  const placeholderCount = hasMembers ? 0 : Math.min(total, max);
-  const extra = Math.max(0, total - (hasMembers ? shownMembers.length : placeholderCount));
 
-  if (!hasMembers && placeholderCount === 0) {
+  if (!hasMembers) {
     return null;
   }
 
@@ -43,36 +53,42 @@ function AvatarStack({
     return source.trim().charAt(0).toUpperCase() || 'U';
   };
 
+  const getBgColor = (label: string) => {
+    const colors = ['#F97316', '#06B6D4', '#8B5CF6', '#EC4899', '#3B82F6', '#10B981'];
+    const charCode = (label.charCodeAt(0) || 0) % colors.length;
+    return colors[charCode];
+  };
+
   return (
     <XStack ai="center">
-      {shownMembers.map((member, index) => (
-        <View key={`${member.uniqueId ?? 'member'}-${index}`} ml={index === 0 ? 0 : -10}>
-          <UserAvatar
-            uri={member.avatarUrl ?? member.user?.avatarUrl ?? undefined}
-            label={labelFor(member)}
-            size={34}
-            textSize={14}
-            backgroundColor="$gray5"
-          />
-        </View>
-      ))}
-      {!hasMembers &&
-        Array.from({ length: placeholderCount }).map((_, index) => (
-          <View key={`placeholder-${index}`} w={34} h={34} br={17} bg="$gray5" ml={index === 0 ? 0 : -10} />
-        ))}
-      {extra > 0 && (
+      {shownMembers.map((member, index) => {
+        const label = labelFor(member);
+        const bg = getBgColor(label);
+        return (
+          <View key={`${member.uniqueId ?? 'member'}-${index}`} ml={index === 0 ? 0 : -8}>
+            <UserAvatar
+              uri={member.avatarUrl ?? member.user?.avatarUrl ?? undefined}
+              label={label}
+              size={28}
+              textSize={12}
+              backgroundColor={bg}
+            />
+          </View>
+        );
+      })}
+      {total > shownMembers.length && (
         <View
           w={28}
           h={28}
           br={14}
-          bg="$gray8"
+          bg="#9CA3AF"
           ai="center"
           jc="center"
-          ml={hasMembers || placeholderCount > 0 ? -10 : 0}
+          ml={-8}
         >
-          <Paragraph size="$1" col="white">
-            +{extra}
-          </Paragraph>
+          <Text fontSize={11} fontWeight="700" color="white">
+            +{total - shownMembers.length}
+          </Text>
         </View>
       )}
     </XStack>
@@ -103,9 +119,9 @@ export default function GroupsListScreen() {
             ? apiCount
             : members.length;
 
-        const countLabel = t('groups.list.members', { count: memberCount });
         const groupName = group.name ?? t('groups.common.untitled', 'Group');
         const emptyMembersLabel = t('groups.list.members_zero', 'No members yet');
+        const relativeTime = getRelativeTime((group as any).createdAt);
 
         return (
           <Card
@@ -117,23 +133,35 @@ export default function GroupsListScreen() {
                 params: { groupId: String(group.id) },
               } as never)
             }
-            h={62}
-            br={12}
+            bg="white"
+            br={16}
+            p="$4"
             bw={1}
-            bc="$gray5"
-            px="$4"
-            ai="center"
-            jc="center"
+            bc="#F3F4F6"
+            shadowColor="#000"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.03}
+            shadowRadius={8}
+            elevation={2}
+            gap="$2.5"
           >
-            <XStack w="100%" jc="space-between" ai="center">
-              <YStack>
-                <Paragraph fow="700" fos={16}>
-                  {groupName}
-                </Paragraph>
-                <Paragraph size={12} col="$gray10">
-                  {memberCount === 0 ? emptyMembersLabel : countLabel}
-                </Paragraph>
-              </YStack>
+            <XStack jc="space-between" ai="center">
+              <Text fontSize={18} fontWeight="700" color="#111827">
+                {groupName}
+              </Text>
+              <View bg="#EBFDF5" px="$2.5" py="$1" br={12}>
+                <Text fontSize={13} fontWeight="600" color="#10B981">
+                  Settled
+                </Text>
+              </View>
+            </XStack>
+
+            <Text fontSize={14} color="#6B7280" mt={-2}>
+              {memberCount === 0 ? emptyMembersLabel : `${memberCount} members • ${relativeTime}`}
+            </Text>
+
+            <XStack ai="center" gap="$2.5" mt="$1">
+              <Users size={16} color="#9CA3AF" />
               <AvatarStack members={members} totalCount={memberCount} />
             </XStack>
           </Card>
@@ -142,44 +170,53 @@ export default function GroupsListScreen() {
     [counts, groups, router, t]
   );
 
-  if (loading && hasNoGroups) {
-    return (
-      <YStack f={1} ai="center" jc="center">
-        <Spinner />
-      </YStack>
-    );
-  }
-
   return (
-    <YStack f={1} p="$4" gap="$3" bg="$background">
-      <Paragraph fow="700" fos="$7">
-        {t('groups.title', 'Groups')}
-      </Paragraph>
-      <Separator />
-
-      <XStack jc="flex-end" ai="center">
+    <YStack f={1} bg="#F9FAFB" px="$4">
+      {/* Custom Header Row */}
+      <XStack jc="space-between" ai="center" mt="$4" mb="$3">
+        <Text fontSize={32} fontWeight="800" color="#111827">
+          {t('groups.title', 'Groups')}
+        </Text>
         <Button
-          onPress={() =>
-            router.push({ pathname: '/tabs/scan-invite', params: { from: 'groups-index' } } as never)
-          }
-          size="$3"
-          borderRadius="$3"
-          theme="active"
-          icon={<Scan size={18} />}
+          onPress={() => router.push('/tabs/groups/create' as never)}
+          w={42}
+          h={42}
+          br={21}
+          bg="#4F46E5"
+          pressStyle={{ bg: '#4338CA', scale: 0.95 }}
+          ai="center"
+          jc="center"
+          p={0}
         >
-          {t('groups.actions.scanInvite', 'Scan invite')}
+          <Plus size={24} color="white" />
         </Button>
       </XStack>
 
-      {error && <Paragraph col="$red10">{error}</Paragraph>}
-
-      {hasNoGroups ? (
-        <Paragraph col="$gray10">{t('groups.empty', 'No groups yet. Tap + to create.')}</Paragraph>
-      ) : (
-        <YStack gap="$3">{cards}</YStack>
+      {error && (
+        <View bg="#FEE2E2" p="$3" br={12} mb="$3">
+          <Text color="#B91C1C" fontSize={14}>
+            {error}
+          </Text>
+        </View>
       )}
 
-      <Fab onPress={() => router.push('/tabs/groups/create' as never)} />
+      {loading && hasNoGroups ? (
+        <YStack f={1} ai="center" jc="center">
+          <Spinner size="large" color="#4F46E5" />
+        </YStack>
+      ) : hasNoGroups ? (
+        <YStack f={1} ai="center" jc="center" gap="$3">
+          <Text color="#6B7280" fontSize={16} textAlign="center">
+            {t('groups.empty', 'No groups yet. Tap + to create.')}
+          </Text>
+        </YStack>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false} f={1}>
+          <YStack gap="$3" pb="$4">
+            {cards}
+          </YStack>
+        </ScrollView>
+      )}
     </YStack>
   );
 }
