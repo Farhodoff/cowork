@@ -4,8 +4,9 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { YStack, XStack, Button, Paragraph, Input, Text, Spinner } from 'tamagui';
-import { ChevronLeft, AlertTriangle, Camera as CameraIcon } from '@tamagui/lucide-icons';
+import { ChevronLeft, AlertTriangle, Camera as CameraIcon, Image as ImageIcon } from '@tamagui/lucide-icons';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 
 import {
   useReceiptSessionStore,
@@ -32,6 +33,7 @@ function guessMime(uri?: string): string {
 
 export default function ScanReceiptScreen() {
   const [perm, requestPerm] = useCameraPermissions();
+  const [mediaPermission, requestMediaPermission] = ImagePicker.useMediaLibraryPermissions();
   const isFocused = useIsFocused();
   const router = useRouter();
 
@@ -136,6 +138,72 @@ export default function ScanReceiptScreen() {
     }
   }, [cameraRef, parsing, sessionName, setSessionNameStore, setCapture, parseReceipt, language, router]);
 
+  const handleGalleryPick = useCallback(async () => {
+    if (parsing) return;
+    try {
+      setLocalError(null);
+
+      if (!mediaPermission?.granted) {
+        const response = await requestMediaPermission();
+        if (!response.granted) {
+          throw new Error('Gallery access permission is required to upload a receipt.');
+        }
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.8,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      if (!asset.uri) {
+        throw new Error('Could not read the selected image URI.');
+      }
+
+      const targetWidth = asset.width ? Math.min(asset.width, 1280) : undefined;
+      const manipResult = await manipulateAsync(
+        asset.uri,
+        targetWidth ? [{ resize: { width: targetWidth } }] : [],
+        { compress: 0.45, format: SaveFormat.JPEG, base64: true }
+      );
+
+      if (!manipResult?.base64) {
+        throw new Error('Failed to prepare the selected photo for upload.');
+      }
+
+      const preparedName = sessionName.trim() || getDefaultSessionName();
+      const capture: CapturedReceiptImage = {
+        uri: manipResult.uri ?? asset.uri,
+        base64: manipResult.base64,
+        mimeType: 'image/jpeg',
+        width: manipResult.width ?? asset.width ?? 0,
+        height: manipResult.height ?? asset.height ?? 0,
+      };
+
+      setSessionNameStore(preparedName);
+      setCapture(capture);
+
+      await parseReceipt({
+        sessionName: preparedName,
+        language,
+        image: {
+          data: capture.base64,
+          mimeType: capture.mimeType,
+        },
+      });
+
+      router.push('/tabs/sessions/participants');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong while choosing the receipt';
+      setLocalError(message);
+    }
+  }, [parsing, mediaPermission, requestMediaPermission, sessionName, setSessionNameStore, setCapture, parseReceipt, language, router]);
+
   const useMock = useCallback(() => {
     router.push({
       pathname: '/tabs/sessions/participants',
@@ -237,6 +305,7 @@ export default function ScanReceiptScreen() {
 
           <XStack ai="center" jc="space-between" gap="$3">
             <Button
+              flex={1}
               size="$3"
               borderRadius="$3"
               theme="gray"
@@ -247,6 +316,7 @@ export default function ScanReceiptScreen() {
               Cancel
             </Button>
             <Button
+              flex={1}
               size="$3"
               borderRadius="$3"
               theme="active"
@@ -254,9 +324,23 @@ export default function ScanReceiptScreen() {
               disabled={disableAction}
               icon={parsing ? undefined : <CameraIcon size={18} color="white" />}
             >
-              {parsing ? 'Processing...' : 'Scan receipt'}
+              {parsing ? 'Processing...' : 'Take photo'}
             </Button>
           </XStack>
+
+          <Button
+            size="$3"
+            borderRadius="$3"
+            theme="active"
+            variant="outlined"
+            onPress={handleGalleryPick}
+            disabled={parsing}
+            icon={parsing ? undefined : <ImageIcon size={18} color="white" />}
+            borderColor="white"
+            color="white"
+          >
+            {parsing ? 'Processing...' : 'Upload from gallery'}
+          </Button>
 
           <Button size="$2" borderRadius="$3" theme="gray" variant="outlined" onPress={useMock} disabled={parsing}>
             Use mock receipt
