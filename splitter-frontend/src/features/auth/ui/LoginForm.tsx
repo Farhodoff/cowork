@@ -14,7 +14,7 @@ import PasswordInput from '@/shared/ui/PasswordInput';
 import { login, LoginRequest, getCurrentUser } from '../api';
 import { saveToken } from '@/shared/lib/utils/token-storage';
 import { useAppStore } from '@/shared/lib/stores/app-store';
-import { Mail, Lock, Chrome, Apple } from '@tamagui/lucide-icons';
+import { Mail, Lock } from '@tamagui/lucide-icons';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -138,57 +138,7 @@ export default function LoginForm() {
           </YStack>
         </Card>
 
-        {/* Or continue with */}
-        <XStack alignItems="center" space="$3" marginVertical="$2" justifyContent="center">
-          <YStack flex={1} height={1} backgroundColor="$gray4" />
-          <Text fontSize="$3" color="$gray9" fontWeight="500">
-            {t('auth.orContinueWith', 'Or continue with')}
-          </Text>
-          <YStack flex={1} height={1} backgroundColor="$gray4" />
-        </XStack>
 
-        {/* Social Buttons */}
-        <XStack space="$3" width="100%">
-          {/* Google Button */}
-          <XStack
-            flex={1}
-            height={52}
-            borderWidth={1}
-            borderColor="$gray6"
-            borderRadius={14}
-            alignItems="center"
-            justifyContent="center"
-            space="$2"
-            backgroundColor="$white1"
-            pressStyle={{ scale: 0.97 }}
-            onPress={() => {}}
-          >
-            <Chrome size={20} color="$gray12" />
-            <Text fontWeight="600" fontSize="$4" color="$gray12">
-              Google
-            </Text>
-          </XStack>
-
-          {/* Apple Button */}
-          <XStack
-            flex={1}
-            height={52}
-            borderWidth={1}
-            borderColor="$gray6"
-            borderRadius={14}
-            alignItems="center"
-            justifyContent="center"
-            space="$2"
-            backgroundColor="$white1"
-            pressStyle={{ scale: 0.97 }}
-            onPress={() => {}}
-          >
-            <Apple size={20} color="$gray12" />
-            <Text fontWeight="600" fontSize="$4" color="$gray12">
-              Apple
-            </Text>
-          </XStack>
-        </XStack>
 
         {/* Footer (Sign Up link) */}
         <XStack justifyContent="center" space="$2" marginTop="$3">
