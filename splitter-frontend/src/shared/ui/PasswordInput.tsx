@@ -13,6 +13,7 @@ type Props = {
   required?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   textInputProps?: any; // дополнительные пропсы TextInput при необходимости
+  leftAdornment?: React.ReactNode;
 };
 
 export default function PasswordInput({
@@ -24,6 +25,7 @@ export default function PasswordInput({
   required,
   autoCapitalize = 'none',
   textInputProps,
+  leftAdornment,
 }: Props) {
   const [show, setShow] = useState(false);
 
@@ -52,6 +54,7 @@ export default function PasswordInput({
         error={error}
         required={required}
         rightAdornment={eye}
+        leftAdornment={leftAdornment}
         // по умолчанию глушим подсказки автозаполнения, можно переопределить через textInputProps
         textInputProps={{
           autoComplete: 'off',         // Android/iOS

@@ -1,0 +1,168 @@
+
+> receipt-splitter-frontend@1.0.0 web
+> expo start --web
+
+env: load .env
+env: export EXPO_PUBLIC_API_URL API_TIMEOUT DEBUG_API
+Starting project at /Users/farhod/Desktop/github/cowork/splitter-frontend
+Starting Metro Bundler
+The following packages should be updated for best compatibility with the installed expo version:
+  expo@54.0.32 - expected version: ~54.0.35
+  expo-file-system@19.0.21 - expected version: ~19.0.23
+  expo-font@14.0.11 - expected version: ~14.0.12
+  expo-image-picker@17.0.10 - expected version: ~17.0.11
+  expo-linking@8.0.11 - expected version: ~8.0.12
+  expo-localization@17.0.8 - expected version: ~17.0.9
+  expo-router@6.0.22 - expected version: ~6.0.24
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+| [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+| [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Web ./index.ts ▓▓░░░░░░░░░░░░░░ 14.5% ( 8/21)
+λ node_modules/expo-router/node/render.js ▓░░░░░░░░░░░░░░░ 11.1% (10/38)
+| [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+| [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+| [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+| [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Web ./index.ts ▓▓▓░░░░░░░░░░░░░ 20.1% ( 79/176)
+λ node_modules/expo-router/node/render.js ▓▓▓░░░░░░░░░░░░░ 18.8% (127/293)
+|  🐥 [tamagui]  [33mnative[0m invite                     ·   10 found   ·    0 opt   ·    0 flat  5514ms 
+Web ./index.ts ▓▓▓░░░░░░░░░░░░░ 20.1% ( 79/176)
+λ node_modules/expo-router/node/render.js ▓▓▓░░░░░░░░░░░░░ 18.8% (127/293)
+|  🐥 [tamagui]  [33mnative[0m index                      ·   10 found   ·    0 opt   ·    0 flat  5572ms 
+|  🐥 [tamagui]  [33mnative[0m search                     ·   12 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   24 found   ·    0 opt   ·    0 flat  5980ms 
+|  🐥 [tamagui]  [33mnative[0m [groupId]                  ·   47 found   ·    0 opt   ·    0 flat    23ms 
+|  🐥 [tamagui]  [33mnative[0m requests                   ·   28 found   ·    0 opt   ·    0 flat  5921ms 
+|  🐥 [tamagui]  [33mnative[0m activity                   ·   16 found   ·    0 opt   ·    0 flat     9ms 
+|  🐥 [tamagui]  [33mnative[0m create                     ·   24 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m invite                     ·   13 found   ·    0 opt   ·    0 flat    14ms 
+|  🐥 [tamagui]  [33mnative[0m _layout                    ·   10 found   ·    0 opt   ·    0 flat     6ms 
+|  🐥 [tamagui]  [33mnative[0m scan-invite                ·   16 found   ·    0 opt   ·    0 flat     6ms 
+|  🐥 [tamagui]  [33mnative[0m analytics                  ·   31 found   ·    0 opt   ·    0 flat    11ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   27 found   ·    0 opt   ·    0 flat    18ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   20 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m scan-receipt               ·   22 found   ·    0 opt   ·    0 flat     6ms 
+|  🐥 [tamagui]  [33mnative[0m finish                     ·   46 found   ·    0 opt   ·    0 flat     5ms 
+|  🐥 [tamagui]  [33mnative[0m profile                    ·   36 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m [historyId]                ·   24 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   19 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m participants               ·   25 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m settings                   ·   16 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m items-split                ·  128 found   ·    0 opt   ·    0 flat     9ms 
+|  🐥 [tamagui]  [33mnative[0m ScreenContainer            ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m InviteQR                   ·    6 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m RegisterForm               ·   19 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m LoginForm                  ·   18 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m FriendListItem             ·    6 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m Fab                        ·    1 found   ·    0 opt   ·    0 flat     0ms 
+|  🐥 [tamagui]  [33mnative[0m Button                     ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m UserAvatar                 ·    2 found   ·    0 opt   ·    0 flat     0ms 
+|  🐥 [tamagui]  [33mnative[0m Input                      ·    6 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m PasswordInput              ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m LanguageSegmentedContr     ·    3 found   ·    0 opt   ·    0 flat     0ms 
+Web ./index.ts ▓▓▓▓▓▓░░░░░░░░░░ 39.3% (148/236)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓░░░░░░░░░░ 40.6% ( 395/2374)
+|  🐥 [tamagui]  [33mnative[0m Card                       ·    1 found   ·    0 opt   ·    0 flat     0ms 
+Web ./index.ts ▓▓▓▓▓▓▓░░░░░░░░░ 46.9% (261/396)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓░░░░░░░ 57.6% (1980/2609)
+|  🐥 [tamagui]  [33mnative[0m index                      ·   24 found   ·    0 opt   ·    0 flat     6ms 
+|  🐥 [tamagui]  [33mnative[0m analytics                  ·   31 found   ·    0 opt   ·    0 flat     7ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   10 found   ·    0 opt   ·    0 flat     9ms 
+|  🐥 [tamagui]  [33mnative[0m invite                     ·   10 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m activity                   ·   16 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m scan-receipt               ·   22 found   ·    0 opt   ·    0 flat     8ms 
+|  🐥 [tamagui]  [33mnative[0m search                     ·   12 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m _layout                    ·   10 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m create                     ·   24 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m scan-invite                ·   16 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m requests                   ·   28 found   ·    0 opt   ·    0 flat     8ms 
+|  🐥 [tamagui]  [33mnative[0m [groupId]                  ·   47 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m items-split                ·  128 found   ·    0 opt   ·    0 flat    16ms 
+|  🐥 [tamagui]  [33mnative[0m participants               ·   25 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   27 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   19 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m profile                    ·   36 found   ·    0 opt   ·    0 flat     9ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   20 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m invite                     ·   13 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m [historyId]                ·   24 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m finish                     ·   46 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m settings                   ·   16 found   ·    0 opt   ·    0 flat     2ms 
+Web ./index.ts ▓▓▓▓▓▓▓▓▓░░░░░░░ 58.0% (428/562)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 86.3% (2611/2855)
+|  🐥 [tamagui]  [33mnative[0m LoginForm                  ·   18 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m RegisterForm               ·   19 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m FriendListItem             ·    6 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m Button                     ·    1 found   ·    0 opt   ·    0 flat     0ms 
+|  🐥 [tamagui]  [33mnative[0m ScreenContainer            ·    1 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m Fab                        ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m UserAvatar                 ·    2 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m PasswordInput              ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m Input                      ·    6 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m LanguageSegmentedContr     ·    3 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m InviteQR                   ·    6 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m Card                       ·    1 found   ·    0 opt   ·    0 flat     2ms 
+Web ./index.ts ▓▓▓▓▓▓▓▓▓▓░░░░░░ 63.7% ( 791/2693)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 91.2% (2989/3130)
+Web ./index.ts ▓▓▓▓▓▓▓▓▓▓░░░░░░ 63.7% (2053/2693)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 91.4% (3041/3181)
+Web ./index.ts ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 87.3% (2806/3066)
+λ node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 93.9% (3238/3415)
+λ Bundled 32904ms node_modules/expo-router/node/render.js (3519 modules)
+Web ./index.ts ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (3416/3416)
+"shadow*" style props are deprecated. Use "boxShadow".
+[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
+λ  WARN  [Layout children]: Too many screens defined. Route "scan-invite" is extraneous. 
+Web Bundled 35328ms index.ts (3416 modules)
+Web ./index.ts ▓▓▓▓▓▓▓▓░░░░░░░░ 53.8% (252/370)
+|  🐥 [tamagui]  [33mnative[0m index                      ·   24 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m _layout                    ·   10 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   10 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m activity                   ·   16 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m create                     ·   24 found   ·    0 opt   ·    0 flat     5ms 
+|  🐥 [tamagui]  [33mnative[0m scan-invite                ·   16 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m profile                    ·   36 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   27 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m participants               ·   25 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m [historyId]                ·   24 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m settings                   ·   16 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m requests                   ·   28 found   ·    0 opt   ·    0 flat    15ms 
+|  🐥 [tamagui]  [33mnative[0m scan-receipt               ·   22 found   ·    0 opt   ·    0 flat     8ms 
+|  🐥 [tamagui]  [33mnative[0m Button                     ·    1 found   ·    0 opt   ·    0 flat     4ms 
+|  🐥 [tamagui]  [33mnative[0m analytics                  ·   31 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m LoginForm                  ·   18 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m Fab                        ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m items-split                ·  128 found   ·    0 opt   ·    0 flat    14ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   19 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m UserAvatar                 ·    2 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m Input                      ·    6 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m ScreenContainer            ·    1 found   ·    0 opt   ·    0 flat     5ms 
+|  🐥 [tamagui]  [33mnative[0m LanguageSegmentedContr     ·    3 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m PasswordInput              ·    1 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m Card                       ·    1 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m invite                     ·   10 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m search                     ·   12 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m [groupId]                  ·   47 found   ·    0 opt   ·    0 flat     2ms 
+|  🐥 [tamagui]  [33mnative[0m index                      ·   20 found   ·    0 opt   ·    0 flat     3ms 
+|  🐥 [tamagui]  [33mnative[0m invite                     ·   13 found   ·    0 opt   ·    0 flat     1ms 
+|  🐥 [tamagui]  [33mnative[0m finish                     ·   46 found   ·    0 opt   ·    0 flat    11ms 
+Web ./index.ts ▓▓▓▓▓▓▓▓░░░░░░░░ 55.3% ( 908/2867)
+|  🐥 [tamagui]  [33mnative[0m FriendListItem             ·    6 found   ·    0 opt   ·    0 flat     1ms 
+Web ./index.ts ▓▓▓▓▓▓▓▓░░░░░░░░ 55.3% (2040/2906)
+|  🐥 [tamagui]  [33mnative[0m RegisterForm               ·   19 found   ·    0 opt   ·    0 flat    12ms 
+|  🐥 [tamagui]  [33mnative[0m InviteQR                   ·    6 found   ·    0 opt   ·    0 flat     6ms 
+Web ./index.ts ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 87.5% (2913/3130)
+Web Bundled 14228ms index.ts (3418 modules)
+λ Bundled 128ms node_modules/expo-router/node/render.js (1 module)
+Web ./index.ts ░░░░░░░░░░░░░░░░  0.0% (0/1)
+"shadow*" style props are deprecated. Use "boxShadow".
+[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
+Web Bundled 1095ms index.ts (1 module)
+Web ./index.ts ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 147ms node_modules/expo-router/node/render.js (1 module)
+"shadow*" style props are deprecated. Use "boxShadow".
+[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
+λ  WARN  [Layout children]: Too many screens defined. Route "scan-invite" is extraneous. 
+Web Bundled 1631ms index.ts (1 module)
+Web Bundled 98ms index.ts (1 module)
