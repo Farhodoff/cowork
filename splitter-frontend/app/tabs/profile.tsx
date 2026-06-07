@@ -1,13 +1,28 @@
-﻿import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, KeyboardAvoidingView, Platform, ScrollView, TextInputProps } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { Alert, Animated, KeyboardAvoidingView, Platform, TextInputProps } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
-import { YStack, XStack, Text, Button, Separator, Spinner } from 'tamagui';
-import { Copy, LogOut, Upload, RotateCcw, CheckCircle, User as UserIcon, Mail, Lock, Edit3, X, Check, Languages } from '@tamagui/lucide-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { YStack, XStack, Text, Button, Separator, Spinner, Card, View, ScrollView } from 'tamagui';
+import {
+  Copy,
+  LogOut,
+  Upload,
+  RotateCcw,
+  CheckCircle,
+  User as UserIcon,
+  Mail,
+  Lock,
+  Edit3,
+  X,
+  Check,
+  Languages,
+  ChevronRight,
+  HelpCircle,
+  Settings as SettingsIcon,
+  ArrowLeft,
+} from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
-import { ScreenContainer } from '@/shared/ui/ScreenContainer';
 import UserAvatar from '@/shared/ui/UserAvatar';
 import Input from '@/shared/ui/Input';
 import PasswordInput from '@/shared/ui/PasswordInput';
@@ -15,6 +30,9 @@ import { useAppStore } from '@/shared/lib/stores/app-store';
 import { changePassword, resetAvatar, updateEmail, updateUsername, uploadAvatar } from '@/features/auth/api';
 import { LANGUAGE_OPTIONS, type LanguageCode } from '@/shared/config/languages';
 import { LanguageSegmentedControl } from '@/shared/ui/LanguageSegmentedControl';
+import { useGroupsStore } from '@/features/groups/model/groups.store';
+import { useFriendsStore } from '@/features/friends/model/friends.store';
+import { useSessionsHistoryStore } from '@/features/sessions/model/history.store';
 
 type SuccessKey = 'avatar' | 'password';
 type StatusState = 'idle' | 'saving' | 'success';
@@ -41,7 +59,7 @@ function SectionCard({ title, icon, children, successTrigger = 0 }: SectionCardP
       borderRadius={16}
       padding="$4"
       gap="$3"
-      backgroundColor="$background"
+      backgroundColor="white"
       position="relative"
     >
       <XStack ai="center" jc="space-between">
@@ -134,7 +152,7 @@ function InfoRow({ label, value, onCopy }: InfoRowProps) {
           {value || '—'}
         </Text>
         {onCopy && (
-          <Button size="$2" variant="outlined" icon={<Copy size={16} color="$gray11" />} onPress={onCopy}>
+          <Button size="$2.5" variant="outlined" icon={<Copy size={14} color="$gray11" />} onPress={onCopy}>
             {t('profile.actions.copy', 'Copy')}
           </Button>
         )}
@@ -266,14 +284,75 @@ function EditableFieldRow({
   );
 }
 
+interface MenuItemProps {
+  label: string;
+  icon: React.ReactNode;
+  iconBg: string;
+  onPress: () => void;
+  textColor?: string;
+  hideChevron?: boolean;
+}
+
+function MenuItem({ label, icon, iconBg, onPress, textColor = '#111827', hideChevron = false }: MenuItemProps) {
+  return (
+    <Card
+      pressStyle={{ scale: 0.98 }}
+      onPress={onPress}
+      bg="white"
+      br={16}
+      p="$4"
+      bw={1}
+      bc="#F3F4F6"
+      shadowColor="#000"
+      shadowOffset={{ width: 0, height: 1 }}
+      shadowOpacity={0.01}
+      shadowRadius={4}
+    >
+      <XStack jc="space-between" ai="center">
+        <XStack ai="center" gap="$3.5">
+          <View w={38} h={38} br={10} bg={iconBg} ai="center" jc="center">
+            {icon}
+          </View>
+          <Text fontSize={16} fontWeight="600" color={textColor}>
+            {label}
+          </Text>
+        </XStack>
+        {!hideChevron && (
+          <ChevronRight size={20} color="#9CA3AF" />
+        )}
+      </XStack>
+    </Card>
+  );
+}
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout, setUser } = useAppStore();
 
-  // language from store
   const language = useAppStore((s) => s.language);
   const { t } = useTranslation();
   const setLanguage = useAppStore((s) => s.setLanguage);
+
+  // Active Sub-screen State
+  const [activeSubScreen, setActiveSubScreen] = useState<'edit' | 'settings' | 'help' | null>(null);
+
+  // Stats Stores
+  const { fetchGroups, groups } = useGroupsStore();
+  const { fetchAll: fetchFriends, friends } = useFriendsStore();
+  const { fetchHistory, count: expensesCount } = useSessionsHistoryStore();
+
+  useEffect(() => {
+    fetchGroups();
+    fetchFriends();
+    fetchHistory();
+  }, [fetchGroups, fetchFriends, fetchHistory]);
+
+  const joinDateLabel = useMemo(() => {
+    if (!(user as any)?.createdAt) return 'Member since Jun 2026';
+    const date = new Date((user as any).createdAt);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `Member since ${months[date.getMonth()]} ${date.getFullYear()}`;
+  }, [user]);
 
   const guestLabel = t('profile.labels.guest', 'Guest');
   const notAvailableLabel = t('profile.labels.notAvailable', 'N/A');
@@ -701,189 +780,449 @@ export default function ProfileScreen() {
 
   const isResetDisabled = isResettingAvatar || (!user?.avatarUrl && !previewUri);
 
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.select({ ios: 0, android: 0 }) ?? 0}
-      >
-        <ScrollView
-          style={{ flex: 1, backgroundColor: 'white' }}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32, backgroundColor: 'white' }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <ScreenContainer>
-            <YStack gap="$3" pb="$6">
-              {/* Avatar */}
-              <SectionCard
-                title={avatarTitle}
-                icon={<Upload size={18} color="$gray11" />}
-                successTrigger={successCounters.avatar}
-              >
-                <YStack ai="center" gap="$3">
-                  <UserAvatar
-                    uri={previewUri ?? undefined}
-                    label={displayName.slice(0, 1).toUpperCase()}
-                    size={96}
-                    textSize={34}
-                  />
-                  <Text fontSize={12} color="$gray10">
-                    {avatarHint}
-                  </Text>
-                  <XStack gap="$2" w="100%">
-                    <Button
-                      flex={1}
-                      size="$3"
-                      bg="$green9"
-                      color="white"
-                      icon={<Upload size={18} color="white" />}
-                      disabled={isSavingAvatar}
-                      onPress={handlePickFromLibrary}
-                    >
-                      {isSavingAvatar ? avatarUploadingLabel : avatarUploadLabel}
-                    </Button>
-                    <Button
-                      flex={1}
-                      size="$3"
-                      variant="outlined"
-                      icon={<RotateCcw size={18} color="$gray11" />}
-                      disabled={isResetDisabled}
-                      onPress={handleResetAvatar}
-                    >
-                      {isResettingAvatar ? avatarResettingLabel : avatarResetLabel}
-                    </Button>
-                  </XStack>
-                </YStack>
-              </SectionCard>
+  // Sub-screens conditional rendering
+  if (activeSubScreen === 'edit') {
+    return (
+      <YStack f={1} bg="#F9FAFB">
+        <View bg="#4F46E5" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
+          <XStack ai="center" mt="$2">
+            <Button
+              onPress={() => setActiveSubScreen(null)}
+              circular
+              size="$3.5"
+              bg="rgba(255,255,255,0.15)"
+              pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
+              borderWidth={0}
+              icon={<ArrowLeft color="white" size={20} />}
+            />
+            <Text color="white" fontSize={22} fontWeight="700" ml="$3">
+              {t('profile.info.editTitle', 'Edit Profile')}
+            </Text>
+          </XStack>
+        </View>
 
-              {/* Language */}
-              <SectionCard
-                title={t('settings.language.title', 'Language')}
-                icon={<Languages size={18} color="$gray11" />}
-              >
-                <YStack gap="$2">
-                  <Text fontSize={12} color="$gray9">
-                    {t('settings.language.description', 'Choose the language used across the app.')}
-                  </Text>
+        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
+          {/* Avatar Upload */}
+          <SectionCard
+            title={avatarTitle}
+            icon={<Upload size={18} color="#4F46E5" />}
+            successTrigger={successCounters.avatar}
+          >
+            <YStack ai="center" gap="$3">
+              <UserAvatar
+                uri={previewUri ?? undefined}
+                label={displayName.slice(0, 1).toUpperCase()}
+                size={96}
+                textSize={34}
+                backgroundColor="#EC4899"
+              />
+              <Text fontSize={12} color="$gray10" textAlign="center">
+                {avatarHint}
+              </Text>
+              <XStack gap="$2" w="100%">
+                <Button
+                  flex={1}
+                  size="$3.5"
+                  bg="#4F46E5"
+                  color="white"
+                  pressStyle={{ bg: '#4338CA' }}
+                  icon={<Upload size={16} color="white" />}
+                  disabled={isSavingAvatar}
+                  onPress={handlePickFromLibrary}
+                >
+                  <Text color="white" fontWeight="600">{isSavingAvatar ? avatarUploadingLabel : avatarUploadLabel}</Text>
+                </Button>
+                <Button
+                  flex={1}
+                  size="$3.5"
+                  variant="outlined"
+                  icon={<RotateCcw size={16} color="$gray11" />}
+                  disabled={isResetDisabled}
+                  onPress={handleResetAvatar}
+                >
+                  {isResettingAvatar ? avatarResettingLabel : avatarResetLabel}
+                </Button>
+              </XStack>
+            </YStack>
+          </SectionCard>
 
-                  <LanguageSegmentedControl
-                    value={language}
-                    onChange={(code) => setLanguage(code)}
-                    getLabel={(code, fallback) => t(`settings.language.options.${code}`, fallback)}
-                  />
-                </YStack>
-              </SectionCard>
+          {/* User Info */}
+          <SectionCard title={userInfoTitle} icon={<UserIcon size={18} color="#4F46E5" />}>
+            <EditableFieldRow
+              label={usernameLabel}
+              value={user?.username ?? ''}
+              draft={usernameDraft}
+              setDraft={setUsernameDraft}
+              placeholder={usernamePlaceholder}
+              isEditing={isEditingUsername}
+              onStartEdit={() => setIsEditingUsername(true)}
+              onCancelEdit={() => {
+                setUsernameDraft(user?.username ?? '');
+                setIsEditingUsername(false);
+                setUsernameError(null);
+              }}
+              onSave={handleSaveUsername}
+              status={usernameStatus}
+              error={usernameError}
+              onCopy={() => handleCopy(usernameLabel, user?.username)}
+            />
+            <Separator />
+            <EditableFieldRow
+              label={emailLabel}
+              value={user?.email ?? ''}
+              draft={emailDraft}
+              setDraft={setEmailDraft}
+              placeholder={emailPlaceholder}
+              isEditing={isEditingEmail}
+              onStartEdit={() => setIsEditingEmail(true)}
+              onCancelEdit={() => {
+                setEmailDraft(user?.email ?? '');
+                setIsEditingEmail(false);
+                setEmailError(null);
+              }}
+              onSave={handleSaveEmail}
+              status={emailStatus}
+              error={emailError}
+              onCopy={() => handleCopy(emailLabel, user?.email)}
+              textInputProps={{ keyboardType: 'email-address', autoCapitalize: 'none', autoCorrect: false }}
+            />
+            <Separator />
+            <InfoRow
+              label={userIdLabel}
+              value={userId || notAvailableLabel}
+              onCopy={() => handleCopy(userIdLabel, userId)}
+            />
+          </SectionCard>
+        </ScrollView>
+      </YStack>
+    );
+  }
 
+  if (activeSubScreen === 'settings') {
+    return (
+      <YStack f={1} bg="#F9FAFB">
+        <View bg="#4F46E5" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
+          <XStack ai="center" mt="$2">
+            <Button
+              onPress={() => setActiveSubScreen(null)}
+              circular
+              size="$3.5"
+              bg="rgba(255,255,255,0.15)"
+              pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
+              borderWidth={0}
+              icon={<ArrowLeft color="white" size={20} />}
+            />
+            <Text color="white" fontSize={22} fontWeight="700" ml="$3">
+              {t('settings.title', 'Settings')}
+            </Text>
+          </XStack>
+        </View>
 
-              {/* User info */}
-              <SectionCard title={userInfoTitle} icon={<UserIcon size={18} color="$gray11" />}>
-                <EditableFieldRow
-                  label={usernameLabel}
-                  value={user?.username ?? ''}
-                  draft={usernameDraft}
-                  setDraft={setUsernameDraft}
-                  placeholder={usernamePlaceholder}
-                  isEditing={isEditingUsername}
-                  onStartEdit={() => setIsEditingUsername(true)}
-                  onCancelEdit={() => {
-                    setUsernameDraft(user?.username ?? '');
-                    setIsEditingUsername(false);
-                    setUsernameError(null);
-                  }}
-                  onSave={handleSaveUsername}
-                  status={usernameStatus}
-                  error={usernameError}
-                  onCopy={() => handleCopy(usernameLabel, user?.username)}
-                />
-                <Separator />
-                <EditableFieldRow
-                  label={emailLabel}
-                  value={user?.email ?? ''}
-                  draft={emailDraft}
-                  setDraft={setEmailDraft}
-                  placeholder={emailPlaceholder}
-                  isEditing={isEditingEmail}
-                  onStartEdit={() => setIsEditingEmail(true)}
-                  onCancelEdit={() => {
-                    setEmailDraft(user?.email ?? '');
-                    setIsEditingEmail(false);
-                    setEmailError(null);
-                  }}
-                  onSave={handleSaveEmail}
-                  status={emailStatus}
-                  error={emailError}
-                  onCopy={() => handleCopy(emailLabel, user?.email)}
-                  textInputProps={{ keyboardType: 'email-address', autoCapitalize: 'none', autoCorrect: false }}
-                />
-                <Separator />
-                <InfoRow
-                  label={userIdLabel}
-                  value={userId || notAvailableLabel}
-                  onCopy={() => handleCopy(userIdLabel, userId)}
-                />
-              </SectionCard>
+        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
+          {/* Language */}
+          <SectionCard
+            title={t('settings.language.title', 'Language')}
+            icon={<Languages size={18} color="#4F46E5" />}
+          >
+            <YStack gap="$2">
+              <Text fontSize={12} color="$gray9">
+                {t('settings.language.description', 'Choose the language used across the app.')}
+              </Text>
 
-              {/* Password */}
-              <SectionCard
-                title={passwordTitle}
-                icon={<Lock size={18} color="$gray11" />}
-                successTrigger={successCounters.password}
-              >
-                <YStack gap="$3">
-                  <PasswordInput
-                    label={currentPasswordLabel}
-                    value={currentPassword}
-                    onChangeText={setCurrentPassword}
-                    placeholder={currentPasswordPlaceholder}
-                    textInputProps={{ returnKeyType: 'next' }}
-                  />
-                  <PasswordInput
-                    label={newPasswordLabel}
-                    value={newPassword}
-                    onChangeText={setNewPassword}
-                    placeholder={newPasswordPlaceholder}
-                    textInputProps={{ returnKeyType: 'next' }}
-                  />
-                  <Text fontSize={12} color="$gray10">
-                    {passwordRequirements}
-                  </Text>
-                  <PasswordInput
-                    label={confirmPasswordLabel}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    placeholder={confirmPasswordPlaceholder}
-                    error={passwordError || undefined}
-                    textInputProps={{ returnKeyType: 'done' }}
-                  />
-                  <Button
-                    size="$3"
-                    bg="$green9"
-                    color="white"
-                    disabled={isChangingPassword}
-                    onPress={handleChangePassword}
-                  >
-                    {isChangingPassword ? passwordUpdatingLabel : passwordSubmitLabel}
-                  </Button>
-                </YStack>
-              </SectionCard>
+              <LanguageSegmentedControl
+                value={language}
+                onChange={(code) => setLanguage(code)}
+                getLabel={(code, fallback) => t(`settings.language.options.${code}`, fallback)}
+              />
+            </YStack>
+          </SectionCard>
 
-              {/* Logout */}
+          {/* Password Change */}
+          <SectionCard
+            title={passwordTitle}
+            icon={<Lock size={18} color="#4F46E5" />}
+            successTrigger={successCounters.password}
+          >
+            <YStack gap="$3">
+              <PasswordInput
+                label={currentPasswordLabel}
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+                placeholder={currentPasswordPlaceholder}
+                textInputProps={{ returnKeyType: 'next' }}
+              />
+              <PasswordInput
+                label={newPasswordLabel}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                placeholder={newPasswordPlaceholder}
+                textInputProps={{ returnKeyType: 'next' }}
+              />
+              <Text fontSize={12} color="$gray10">
+                {passwordRequirements}
+              </Text>
+              <PasswordInput
+                label={confirmPasswordLabel}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholder={confirmPasswordPlaceholder}
+                error={passwordError || undefined}
+                textInputProps={{ returnKeyType: 'done' }}
+              />
               <Button
-                size="$3"
-                bg="$red4"
-                color="$red11"
-                hoverStyle={{ bg: '$red5' }}
-                pressStyle={{ bg: '$red6' }}
-                icon={<LogOut size={18} color="$red11" />}
-                onPress={handleLogout}
+                size="$4"
+                bg="#4F46E5"
+                color="white"
+                pressStyle={{ bg: '#4338CA' }}
+                disabled={isChangingPassword}
+                onPress={handleChangePassword}
+                br={12}
               >
-                {logoutLabel}
+                <Text color="white" fontWeight="700">
+                  {isChangingPassword ? passwordUpdatingLabel : passwordSubmitLabel}
+                </Text>
               </Button>
             </YStack>
-          </ScreenContainer>
+          </SectionCard>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </YStack>
+    );
+  }
+
+  if (activeSubScreen === 'help') {
+    return (
+      <YStack f={1} bg="#F9FAFB">
+        <View bg="#4F46E5" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
+          <XStack ai="center" mt="$2">
+            <Button
+              onPress={() => setActiveSubScreen(null)}
+              circular
+              size="$3.5"
+              bg="rgba(255,255,255,0.15)"
+              pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
+              borderWidth={0}
+              icon={<ArrowLeft color="white" size={20} />}
+            />
+            <Text color="white" fontSize={22} fontWeight="700" ml="$3">
+              {t('profile.help.title', 'Help & Support')}
+            </Text>
+          </XStack>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
+          <Card bg="white" br={16} p="$4" bw={1} bc="#F3F4F6">
+            <YStack gap="$3">
+              <Text fontSize={18} fontWeight="700" color="#111827">
+                Splitter App Support
+              </Text>
+              <Text fontSize={14} color="#4B5563" lh={20}>
+                Welcome to Splitter! If you need any assistance with splitting receipts, managing groups, or adding friends, please feel free to reach out.
+              </Text>
+              <Separator />
+              <YStack gap="$1.5">
+                <Text fontSize={13} color="#6B7280">
+                  Support Email
+                </Text>
+                <Text fontSize={15} fontWeight="600" color="#4F46E5">
+                  support@splitter.io
+                </Text>
+              </YStack>
+              <YStack gap="$1.5">
+                <Text fontSize={13} color="#6B7280">
+                  Version
+                </Text>
+                <Text fontSize={15} fontWeight="600" color="#111827">
+                  1.0.0 (Production)
+                </Text>
+              </YStack>
+            </YStack>
+          </Card>
+        </ScrollView>
+      </YStack>
+    );
+  }
+
+  // Main Dashboard View (activeSubScreen === null)
+  return (
+    <YStack f={1} bg="#F9FAFB">
+      {/* Curved Blue Header */}
+      <View
+        bg="#4F46E5"
+        pt="$5"
+        pb="$6"
+        px="$4"
+        borderBottomLeftRadius={30}
+        borderBottomRightRadius={30}
+      >
+        <Text color="white" fontSize={32} fontWeight="800" mt="$2">
+          {t('profile.title', 'Profile')}
+        </Text>
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        f={1}
+        bg="#F9FAFB"
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
+        {/* Profile Summary Card */}
+        <Card
+          bg="white"
+          br={18}
+          p="$4"
+          mx="$4"
+          mt={-24}
+          shadowColor="#000"
+          shadowOffset={{ width: 0, height: 4 }}
+          shadowOpacity={0.06}
+          shadowRadius={10}
+          bw={1}
+          bc="#F3F4F6"
+          gap="$3.5"
+        >
+          <XStack ai="center" gap="$4">
+            {previewUri ? (
+              <UserAvatar
+                uri={previewUri}
+                label={displayName.slice(0, 1).toUpperCase()}
+                size={68}
+                textSize={24}
+                backgroundColor="#EC4899"
+              />
+            ) : (
+              <View
+                w={68}
+                h={68}
+                br={34}
+                bg="#EC4899"
+                ai="center"
+                jc="center"
+              >
+                <Text fontSize={26} fontWeight="800" color="white">
+                  {displayName.slice(0, 1).toUpperCase()}
+                </Text>
+              </View>
+            )}
+
+            <YStack>
+              <Text fontSize={20} fontWeight="800" color="#111827">
+                {displayName}
+              </Text>
+              <Text fontSize={14} color="#6B7280" mt="$1">
+                {joinDateLabel}
+              </Text>
+            </YStack>
+          </XStack>
+
+          <Separator bc="#F3F4F6" />
+
+          <XStack ai="center" gap="$2.5" px="$1">
+            <Mail size={18} color="#6B7280" />
+            <Text fontSize={15} color="#4B5563" fontWeight="500">
+              {user?.email || 'No email associated'}
+            </Text>
+          </XStack>
+        </Card>
+
+        {/* Stats Row */}
+        <XStack gap="$3" px="$4" mt="$4" jc="space-between">
+          <View
+            f={1}
+            bg="white"
+            br={16}
+            p="$3"
+            ai="center"
+            jc="center"
+            bw={1}
+            bc="#F3F4F6"
+            shadowColor="#000"
+            shadowOffset={{ width: 0, height: 1 }}
+            shadowOpacity={0.01}
+            shadowRadius={4}
+          >
+            <Text fontSize={22} fontWeight="800" color="#111827">
+              {groups.length}
+            </Text>
+            <Text fontSize={13} color="#6B7280" mt="$1">
+              Groups
+            </Text>
+          </View>
+
+          <View
+            f={1}
+            bg="white"
+            br={16}
+            p="$3"
+            ai="center"
+            jc="center"
+            bw={1}
+            bc="#F3F4F6"
+            shadowColor="#000"
+            shadowOffset={{ width: 0, height: 1 }}
+            shadowOpacity={0.01}
+            shadowRadius={4}
+          >
+            <Text fontSize={22} fontWeight="800" color="#111827">
+              {expensesCount}
+            </Text>
+            <Text fontSize={13} color="#6B7280" mt="$1">
+              Expenses
+            </Text>
+          </View>
+
+          <View
+            f={1}
+            bg="white"
+            br={16}
+            p="$3"
+            ai="center"
+            jc="center"
+            bw={1}
+            bc="#F3F4F6"
+            shadowColor="#000"
+            shadowOffset={{ width: 0, height: 1 }}
+            shadowOpacity={0.01}
+            shadowRadius={4}
+          >
+            <Text fontSize={22} fontWeight="800" color="#111827">
+              {friends.length}
+            </Text>
+            <Text fontSize={13} color="#6B7280" mt="$1">
+              Friends
+            </Text>
+          </View>
+        </XStack>
+
+        {/* Menu Items List */}
+        <YStack gap="$3" px="$4" mt="$4">
+          <MenuItem
+            label={t('profile.menu.edit', 'Edit Profile')}
+            icon={<UserIcon size={18} color="#4F46E5" />}
+            iconBg="rgba(79, 70, 229, 0.08)"
+            onPress={() => setActiveSubScreen('edit')}
+          />
+          <MenuItem
+            label={t('profile.menu.settings', 'Settings')}
+            icon={<SettingsIcon size={18} color="#4F46E5" />}
+            iconBg="rgba(79, 70, 229, 0.08)"
+            onPress={() => setActiveSubScreen('settings')}
+          />
+          <MenuItem
+            label={t('profile.menu.help', 'Help & Support')}
+            icon={<HelpCircle size={18} color="#4F46E5" />}
+            iconBg="rgba(79, 70, 229, 0.08)"
+            onPress={() => setActiveSubScreen('help')}
+          />
+          <MenuItem
+            label={logoutLabel}
+            icon={<LogOut size={18} color="#EF4444" />}
+            iconBg="#FEF2F2"
+            onPress={handleLogout}
+            textColor="#EF4444"
+            hideChevron
+          />
+        </YStack>
+      </ScrollView>
+    </YStack>
   );
 }
