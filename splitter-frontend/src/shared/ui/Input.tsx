@@ -16,6 +16,9 @@ export type CustomInputProps = {
   /** Иконка/кнопка справа (например, «глаз»). */
   rightAdornment?: ReactNode;
 
+  /** Иконка слева inside input */
+  leftAdornment?: ReactNode;
+
   /** Любые нативные пропсы TextInput (returnKeyType, autoComplete и т.п.). */
   textInputProps?: Partial<TextInputProps>;
 };
@@ -31,6 +34,7 @@ export function Input({
   error,
   required,
   rightAdornment,
+  leftAdornment,
   textInputProps,
 }: CustomInputProps) {
   return (
@@ -43,6 +47,21 @@ export function Input({
       )}
 
       <XStack position="relative" w="100%">
+        {leftAdornment && (
+          <XStack
+            position="absolute"
+            left={14}
+            top={0}
+            bottom={0}
+            ai="center"
+            jc="center"
+            zIndex={10}
+            pointerEvents="box-none"
+          >
+            {leftAdornment}
+          </XStack>
+        )}
+
         <TInput
           w="100%"      // >>> всегда на полную ширину строки
           f={1}         // >>> растягивается внутри строки
@@ -52,15 +71,16 @@ export function Input({
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           secureTextEntry={secureTextEntry}
-          // запас под адорнмент справа
-          paddingRight={rightAdornment ? 44 : undefined}
-          borderRadius="$4"
+          // запас под адорнменты
+          paddingLeft={leftAdornment ? 44 : 16}
+          paddingRight={rightAdornment ? 44 : 16}
+          borderRadius={14}
           borderWidth={1}
           borderColor={error ? '$red8' : '$gray7'}
           backgroundColor="$white1"
-          height="$4"
+          height={52}
           fontSize="$4"
-          focusStyle={{ borderColor: error ? '$red8' : '$green9' }}
+          focusStyle={{ borderColor: error ? '$red8' : '#4F46E5' }}
           {...textInputProps}
         />
 
@@ -72,6 +92,7 @@ export function Input({
             bottom={0}
             ai="center"
             jc="center"
+            zIndex={10}
             pointerEvents="box-none"
           >
             {rightAdornment}

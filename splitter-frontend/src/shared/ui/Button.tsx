@@ -18,19 +18,19 @@ export const Button: React.FC<CustomButtonProps> = ({
 }) => {
   const getStyles = () => {
     const baseStyles = {
-      borderRadius: '$4',
+      borderRadius: 14,
       pressStyle: { scale: 0.97 },
     }
 
     const sizeStyles = {
       small: { height: '$3', paddingHorizontal: '$4' },
       medium: { height: '$4', paddingHorizontal: '$6' },
-      large: { height: '$5', paddingHorizontal: '$8' },
+      large: { height: 52, paddingHorizontal: '$8' }, // taller
     }
 
     const variantStyles = {
       primary: {
-        backgroundColor: disabled ? '$gray8' : '#2ECC71',
+        backgroundColor: disabled ? '$gray8' : '#4F46E5',
         color: '#FFFFFF',
       },
       secondary: {
@@ -40,8 +40,8 @@ export const Button: React.FC<CustomButtonProps> = ({
       outline: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: disabled ? '$gray8' : '$green10',
-        color: disabled ? '$gray8' : '$green10',
+        borderColor: disabled ? '$gray8' : '#4F46E5',
+        color: disabled ? '$gray8' : '#4F46E5',
       }
     }
 

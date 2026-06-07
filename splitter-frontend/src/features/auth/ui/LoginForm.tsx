@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { YStack, XStack, Text } from 'tamagui';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'react-native';
+import { Alert, Pressable } from 'react-native';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Card } from '@/shared/ui/Card';
@@ -14,7 +14,7 @@ import PasswordInput from '@/shared/ui/PasswordInput';
 import { login, LoginRequest, getCurrentUser } from '../api';
 import { saveToken } from '@/shared/lib/utils/token-storage';
 import { useAppStore } from '@/shared/lib/stores/app-store';
-import { Mail, Lock } from '@tamagui/lucide-icons';
+import { Mail, Lock, Chrome, Apple } from '@tamagui/lucide-icons';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -60,50 +60,46 @@ export default function LoginForm() {
 
   return (
     <ScreenFormContainer>
-      <YStack space="$6">
-        {/* Header */}
-        <YStack alignItems="center" space="$4">
-          <Text fontSize="$8" fontWeight="900" color="$gray12">
+      <YStack space="$5" width="100%">
+        {/* Brand Icon & Header */}
+        <YStack alignItems="center" space="$2" marginTop="$4">
+          <YStack
+            width={64}
+            height={64}
+            backgroundColor="#4F46E5"
+            borderRadius={18}
+            alignItems="center"
+            justifyContent="center"
+            marginBottom="$2"
+            elevation={2}
+          >
+            <Text fontSize={32}>💰</Text>
+          </YStack>
+          <Text fontSize={30} fontWeight="800" color="$gray12">
             {t('auth.signIn', 'Sign In')}
           </Text>
           <Text fontSize="$4" color="$gray10" textAlign="center">
-            {t('auth.signInDesc', 'Welcome back! Please sign in to continue')}
+            {t('auth.signInDesc', 'Sign in to continue splitting bills')}
           </Text>
         </YStack>
 
         {/* Form Card */}
-        <Card>
-          <YStack space="$5">
+        <Card padding="$5">
+          <YStack space="$4">
             {/* Email */}
             <Controller
               control={control}
               name="email"
               render={({ field: { onChange, value } }) => (
-                <XStack space="$3" alignItems="flex-start">
-                  <YStack
-                    width={40}
-                    height={40}
-                    backgroundColor="$gray3"
-                    borderRadius="$6"
-                    alignItems="center"
-                    justifyContent="center"
-                    marginTop="$6"
-                  >
-                    <Mail size={20} color="$gray11" />
-                  </YStack>
-                  <YStack flex={1}>
-                    <Input
-                      label={t('auth.email', 'Email')}
-                      placeholder={t('auth.emailPlaceholder', 'Enter your email')}
-                      value={value}
-                      onChangeText={onChange}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      error={errors.email?.message}
-                      required
-                    />
-                  </YStack>
-                </XStack>
+                <Input
+                  placeholder={t('auth.email', 'Email')}
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  error={errors.email?.message}
+                  leftAdornment={<Mail size={20} color="rgba(0,0,0,0.35)" />}
+                />
               )}
             />
 
@@ -112,42 +108,28 @@ export default function LoginForm() {
               control={control}
               name="password"
               render={({ field: { onChange, value } }) => (
-                <XStack space="$3" alignItems="flex-start">
-                  <YStack
-                    width={40}
-                    height={40}
-                    backgroundColor="$gray3"
-                    borderRadius="$6"
-                    alignItems="center"
-                    justifyContent="center"
-                    marginTop="$6"
-                  >
-                    <Lock size={20} color="$gray11" />
-                  </YStack>
-                  <YStack flex={1}>
-                    <PasswordInput
-                      label={t('auth.password', 'Password')}
-                      placeholder={t('auth.passwordPlaceholder', 'Enter your password')}
-                      value={value}
-                      onChangeText={onChange}
-                      error={errors.password?.message}
-                      required
-                    />
-                  </YStack>
-                </XStack>
+                <PasswordInput
+                  placeholder={t('auth.password', 'Password')}
+                  value={value}
+                  onChangeText={onChange}
+                  error={errors.password?.message}
+                  leftAdornment={<Lock size={20} color="rgba(0,0,0,0.35)" />}
+                />
               )}
             />
 
-            {/* Forgot */}
-            <XStack justifyContent="flex-end">
-              <Text fontSize="$3" color="#2ECC71" fontWeight="500">
-                {t('auth.forgotPassword', 'Forgot Password?')}
-              </Text>
+            {/* Forgot Password */}
+            <XStack justifyContent="flex-end" marginTop="$-1">
+              <Pressable onPress={() => {}}>
+                <Text fontSize="$3" color="#4F46E5" fontWeight="600">
+                  {t('auth.forgotPassword', 'Forgot password?')}
+                </Text>
+              </Pressable>
             </XStack>
 
             {/* Submit */}
             <Button
-              title={isLoading ? t('common.loading', 'Loading...') : t('auth.signIn', 'Sign In')}
+              title={isLoading ? t('common.loading', 'Signing In...') : t('auth.signIn', 'Sign In')}
               variant="primary"
               size="large"
               onPress={handleSubmit(onSubmit)}
@@ -156,20 +138,71 @@ export default function LoginForm() {
           </YStack>
         </Card>
 
-        {/* Footer */}
-        <YStack alignItems="center" space="$3">
-          <XStack alignItems="center" space="$1">
-            <YStack width={80} height={1} backgroundColor="$gray6" />
-            <Text fontSize="$3" color="$gray9" paddingHorizontal="$3">
-              {t('auth.noAccount', "Don't have an account?")}
+        {/* Or continue with */}
+        <XStack alignItems="center" space="$3" marginVertical="$2" justifyContent="center">
+          <YStack flex={1} height={1} backgroundColor="$gray4" />
+          <Text fontSize="$3" color="$gray9" fontWeight="500">
+            {t('auth.orContinueWith', 'Or continue with')}
+          </Text>
+          <YStack flex={1} height={1} backgroundColor="$gray4" />
+        </XStack>
+
+        {/* Social Buttons */}
+        <XStack space="$3" width="100%">
+          {/* Google Button */}
+          <XStack
+            flex={1}
+            height={52}
+            borderWidth={1}
+            borderColor="$gray6"
+            borderRadius={14}
+            alignItems="center"
+            justifyContent="center"
+            space="$2"
+            backgroundColor="$white1"
+            pressStyle={{ scale: 0.97 }}
+            onPress={() => {}}
+          >
+            <Chrome size={20} color="$gray12" />
+            <Text fontWeight="600" fontSize="$4" color="$gray12">
+              Google
             </Text>
-            <YStack width={80} height={1} backgroundColor="$gray6" />
           </XStack>
 
+          {/* Apple Button */}
+          <XStack
+            flex={1}
+            height={52}
+            borderWidth={1}
+            borderColor="$gray6"
+            borderRadius={14}
+            alignItems="center"
+            justifyContent="center"
+            space="$2"
+            backgroundColor="$white1"
+            pressStyle={{ scale: 0.97 }}
+            onPress={() => {}}
+          >
+            <Apple size={20} color="$gray12" />
+            <Text fontWeight="600" fontSize="$4" color="$gray12">
+              Apple
+            </Text>
+          </XStack>
+        </XStack>
+
+        {/* Footer (Sign Up link) */}
+        <XStack justifyContent="center" space="$2" marginTop="$3">
+          <Text fontSize="$4" color="$gray10">
+            {t('auth.noAccount', "Don't have an account?")}
+          </Text>
           <Link href="/register" asChild>
-            <Button title={t('auth.createAccount', 'Create Account')} variant="outline" size="medium" />
+            <Pressable>
+              <Text fontSize="$4" color="#4F46E5" fontWeight="700">
+                {t('auth.signUp', 'Sign Up')}
+              </Text>
+            </Pressable>
           </Link>
-        </YStack>
+        </XStack>
       </YStack>
     </ScreenFormContainer>
   );
