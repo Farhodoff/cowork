@@ -1,11 +1,11 @@
 // app/tabs/_layout.tsx
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, View } from 'tamagui';
-import { Home, Settings, Bell, ChevronLeft } from '@tamagui/lucide-icons';
+import { Home, Settings, Bell, ChevronLeft, Users, Scan, Contact, User as UserIcon } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
 import { AppState } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -105,6 +105,100 @@ function GlobalTabsHeader(props: any) {
   );
 }
 
+function CustomTabBar({ state }: any) {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  // Find active route index based on active route name
+  const currentRouteName = state.routes[state.index]?.name || '';
+
+  const activeIndex = useMemo(() => {
+    if (currentRouteName === 'index') return 0;
+    if (currentRouteName.startsWith('groups')) return 1;
+    if (currentRouteName.startsWith('scan-receipt')) return 2;
+    if (currentRouteName.startsWith('friends')) return 3;
+    if (currentRouteName.startsWith('profile')) return 4;
+    return 0;
+  }, [currentRouteName]);
+
+  const tabs = [
+    { key: 'home', label: 'Home', route: '/tabs', icon: Home },
+    { key: 'groups', label: 'Groups', route: '/tabs/groups', icon: Users },
+    { key: 'scan', label: 'Scan', route: '/tabs/scan-receipt', icon: Scan, isSpecial: true },
+    { key: 'contacts', label: 'Contacts', route: '/tabs/friends', icon: Contact },
+    { key: 'profile', label: 'Profile', route: '/tabs/profile', icon: UserIcon },
+  ];
+
+  return (
+    <XStack
+      bg="white"
+      pt="$2.5"
+      pb={Math.max(insets.bottom, 12)}
+      px="$2"
+      borderTopWidth={1}
+      borderTopColor="#F3F4F6"
+      shadowColor="#000"
+      shadowOffset={{ width: 0, height: -4 }}
+      shadowOpacity={0.03}
+      shadowRadius={8}
+      elevation={8}
+      jc="space-between"
+      ai="center"
+    >
+      {tabs.map((tab, idx) => {
+        const isActive = activeIndex === idx;
+        const Icon = tab.icon;
+        const activeColor = '#4F46E5';
+        const inactiveColor = '#9CA3AF';
+
+        if (tab.isSpecial) {
+          return (
+            <Pressable
+              key={tab.key}
+              onPress={() => router.push(tab.route as any)}
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <YStack ai="center" gap="$1" mt={-4}>
+                <View
+                  w={48}
+                  h={48}
+                  br={24}
+                  bg="rgba(79, 70, 229, 0.08)"
+                  ai="center"
+                  jc="center"
+                  pressStyle={{ scale: 0.95 }}
+                >
+                  <Icon size={26} color={activeColor} />
+                </View>
+                <View w={4} h={4} br={2} bg={isActive ? activeColor : 'transparent'} />
+              </YStack>
+            </Pressable>
+          );
+        }
+
+        return (
+          <Pressable
+            key={tab.key}
+            onPress={() => router.push(tab.route as any)}
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <YStack ai="center" gap="$1">
+              <Icon size={22} color={isActive ? activeColor : inactiveColor} />
+              <Text
+                fontSize={12}
+                fontWeight={isActive ? '700' : '500'}
+                color={isActive ? activeColor : inactiveColor}
+              >
+                {tab.label}
+              </Text>
+            </YStack>
+          </Pressable>
+        );
+      })}
+    </XStack>
+  );
+}
+
 export default function TabLayout() {
   const { user } = useAppStore();
   const { t } = useTranslation();
@@ -129,46 +223,54 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         header: (props) => <GlobalTabsHeader {...props} />,
-        tabBarStyle: { display: 'none' },
       }}
     >
-      {/* Home & Settings tabs (hidden from bar) */}
+      {/* 5 Main Tab Screens */}
       <Tabs.Screen
         name="index"
         options={{
-          href: null,
           title: homeTitle,
           tabBarLabel: homeLabel,
-          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="groups/index"
+        options={{
+          title: groupsTitle,
+        }}
+      />
+      <Tabs.Screen
+        name="scan-receipt"
+        options={{
+          title: scanReceiptTitle,
+        }}
+      />
+      <Tabs.Screen
+        name="friends/index"
+        options={{
+          title: t('friends.title', 'Friends'),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: profileTitle,
+        }}
+      />
+
+      {/* Hidden Sub-routes */}
       <Tabs.Screen
         name="settings"
         options={{
           href: null,
           title: settingsTitle,
-          tabBarLabel: settingsTitle,
-          tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
         }}
       />
-
-      <Tabs.Screen
-        name="profile"
-        options={{
-          href: null,
-          title: profileTitle,
-        }}
-      />
-
-      {/* Friends stack (hidden) */}
-      <Tabs.Screen name="friends/index" options={{ href: null, title: t('friends.title', 'Friends') }} />
       <Tabs.Screen name="friends/search" options={{ href: null, title: t('friends.search', 'Search') }} />
       <Tabs.Screen name="friends/requests" options={{ href: null, title: t('friends.requests', 'Requests') }} />
-
-      {/* HIDDEN: Groups */}
-      <Tabs.Screen name="groups/index"   options={{ href: null, title: groupsTitle }} />
       <Tabs.Screen name="groups/create"  options={{ href: null, title: newGroupTitle }} />
       <Tabs.Screen name="groups/[groupId]" options={{ href: null, title: groupDetailsTitle }} />
 
@@ -176,13 +278,11 @@ export default function TabLayout() {
       <Tabs.Screen name="friends/invite" options={{ href: null, title: friendQrTitle }} />
       <Tabs.Screen name="groups/invite" options={{ href: null, title: groupQrTitle }} />
 
-      <Tabs.Screen name="scan-receipt" options={{ href: null, title: scanReceiptTitle }} />
       <Tabs.Screen name="sessions/participants" options={{ href: null, title: participantsTitle }} />
       <Tabs.Screen name="sessions/items-split" options={{ href: null, title: itemsSplitTitle }} />
       <Tabs.Screen name="sessions/finish" options={{ href: null, title: finishTitle }} />
       <Tabs.Screen name="sessions/history/index" options={{ href: null, title: historyTitle }} />
       <Tabs.Screen name="sessions/history/[historyId]" options={{ href: null, title: historyDetailsTitle }} />
-
     </Tabs>
   );
 }
