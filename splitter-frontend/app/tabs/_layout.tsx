@@ -48,10 +48,6 @@ function GlobalTabsHeader(props: any) {
     routeName.startsWith('sessions');
   const onBackToHome = () => router.replace({ pathname: '/tabs' });
 
-  useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
-
   useFocusEffect(
     useCallback(() => {
       fetchAll();

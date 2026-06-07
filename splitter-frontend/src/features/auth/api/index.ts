@@ -1,11 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import { getToken } from '@/shared/lib/utils/token-storage';
 import { emitUnauthorized } from '@/shared/api/auth-events';
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 500000,
+  timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -76,11 +76,13 @@ apiClient.interceptors.response.use(
         default:
           throw new Error(serverMsg || `Request failed (${status})`);
       }
+    } else if (error.code === 'ECONNABORTED' || String(error.message).toLowerCase().includes('timeout')) {
+      throw new Error('Request timed out. Please check your network or API server.');
     } else if (error.request) {
       if (String(error.message).toLowerCase().includes('network')) {
         throw new Error('Network error. Please check your connection.');
       }
-      throw new Error('No response received. Possible CORS issue.');
+      throw new Error('No response received. Possible CORS issue or unreachable API server.');
     }
 
     throw new Error('Unexpected error while performing the request.');
