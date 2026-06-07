@@ -1113,15 +1113,6 @@ export default function ProfileScreen() {
               </Text>
             </YStack>
           </XStack>
-
-          <Separator bc="#F3F4F6" />
-
-          <XStack ai="center" gap="$2.5" px="$1">
-            <Mail size={18} color="#6B7280" />
-            <Text fontSize={15} color="#4B5563" fontWeight="500">
-              {user?.email || 'No email associated'}
-            </Text>
-          </XStack>
         </Card>
 
         {/* Stats Row */}
@@ -1192,6 +1183,155 @@ export default function ProfileScreen() {
             </Text>
           </View>
         </XStack>
+
+        {/* User Information Card */}
+        <Card
+          bg="white"
+          br={18}
+          p="$4"
+          mx="$4"
+          mt="$4"
+          shadowColor="#000"
+          shadowOffset={{ width: 0, height: 4 }}
+          shadowOpacity={0.03}
+          shadowRadius={8}
+          bw={1}
+          bc="#F3F4F6"
+          gap="$3"
+        >
+          {/* Header */}
+          <XStack ai="center" gap="$2" mb="$1">
+            <UserIcon size={18} color="#6B7280" />
+            <Text fontSize={16} fontWeight="700" color="#111827">
+              User information
+            </Text>
+          </XStack>
+
+          {/* Username Field */}
+          <YStack gap="$1">
+            <XStack jc="space-between" ai="center">
+              <Text fontSize={13} color="#9CA3AF" fontWeight="500">
+                Username
+              </Text>
+              <XStack gap="$2">
+                <Button
+                  unstyled
+                  onPress={() => handleCopy('Username', user?.username)}
+                  flexDirection="row"
+                  ai="center"
+                  gap="$1.5"
+                  bw={1}
+                  bc="#E5E7EB"
+                  br={8}
+                  px="$2.5"
+                  py="$1.5"
+                  bg="white"
+                  pressStyle={{ bg: '#F9FAFB' }}
+                >
+                  <Copy size={13} color="#374151" />
+                  <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
+                </Button>
+                <Button
+                  unstyled
+                  onPress={() => setActiveSubScreen('edit')}
+                  ai="center"
+                  jc="center"
+                  bw={1}
+                  bc="#E5E7EB"
+                  br={8}
+                  px="$2.5"
+                  py="$1.5"
+                  bg="white"
+                  pressStyle={{ bg: '#F9FAFB' }}
+                >
+                  <Edit3 size={13} color="#374151" />
+                </Button>
+              </XStack>
+            </XStack>
+            <Text fontSize={17} fontWeight="600" color="#111827">
+              {user?.username || '—'}
+            </Text>
+          </YStack>
+
+          <Separator bc="#F3F4F6" />
+
+          {/* Email Field */}
+          <YStack gap="$1">
+            <XStack jc="space-between" ai="center">
+              <Text fontSize={13} color="#9CA3AF" fontWeight="500">
+                Email
+              </Text>
+              <XStack gap="$2">
+                <Button
+                  unstyled
+                  onPress={() => handleCopy('Email', user?.email)}
+                  flexDirection="row"
+                  ai="center"
+                  gap="$1.5"
+                  bw={1}
+                  bc="#E5E7EB"
+                  br={8}
+                  px="$2.5"
+                  py="$1.5"
+                  bg="white"
+                  pressStyle={{ bg: '#F9FAFB' }}
+                >
+                  <Copy size={13} color="#374151" />
+                  <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
+                </Button>
+                <Button
+                  unstyled
+                  onPress={() => setActiveSubScreen('edit')}
+                  ai="center"
+                  jc="center"
+                  bw={1}
+                  bc="#E5E7EB"
+                  br={8}
+                  px="$2.5"
+                  py="$1.5"
+                  bg="white"
+                  pressStyle={{ bg: '#F9FAFB' }}
+                >
+                  <Edit3 size={13} color="#374151" />
+                </Button>
+              </XStack>
+            </XStack>
+            <Text fontSize={17} fontWeight="600" color="#111827">
+              {user?.email || '—'}
+            </Text>
+          </YStack>
+
+          <Separator bc="#F3F4F6" />
+
+          {/* User ID Field */}
+          <YStack gap="$1">
+            <XStack jc="space-between" ai="center">
+              <Text fontSize={13} color="#9CA3AF" fontWeight="500">
+                User ID
+              </Text>
+              <Button
+                unstyled
+                onPress={() => handleCopy('User ID', userId)}
+                flexDirection="row"
+                ai="center"
+                gap="$1.5"
+                bw={1}
+                bc="#E5E7EB"
+                br={8}
+                px="$2.5"
+                py="$1.5"
+                bg="white"
+                pressStyle={{ bg: '#F9FAFB' }}
+              >
+                <Copy size={13} color="#374151" />
+                <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
+              </Button>
+            </XStack>
+            <Text fontSize={17} fontWeight="600" color="#111827">
+              {userId ? (userId.startsWith('#') ? userId : `#${userId}`) : '—'}
+            </Text>
+          </YStack>
+        </Card>
 
         {/* Menu Items List */}
         <YStack gap="$3" px="$4" mt="$4">
