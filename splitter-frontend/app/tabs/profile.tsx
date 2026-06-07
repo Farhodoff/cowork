@@ -54,8 +54,8 @@ interface SectionCardProps {
 function SectionCard({ title, icon, children, successTrigger = 0 }: SectionCardProps) {
   return (
     <YStack
-      borderWidth={1}
-      borderColor="$gray5"
+      borderWidth={0.5}
+      borderColor="#E5E7EB"
       borderRadius={16}
       padding="$4"
       gap="$3"
@@ -301,12 +301,9 @@ function MenuItem({ label, icon, iconBg, onPress, textColor = '#111827', hideChe
       bg="white"
       br={16}
       p="$4"
-      bw={1}
-      bc="#F3F4F6"
-      shadowColor="#000"
-      shadowOffset={{ width: 0, height: 1 }}
-      shadowOpacity={0.01}
-      shadowRadius={4}
+      bw={0.5}
+      bc="#E5E7EB"
+      shadowOpacity={0}
     >
       <XStack jc="space-between" ai="center">
         <XStack ai="center" gap="$3.5">
@@ -784,7 +781,7 @@ export default function ProfileScreen() {
   if (activeSubScreen === 'edit') {
     return (
       <YStack f={1} bg="#F9FAFB">
-        <View bg="#4F46E5" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
+        <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
           <XStack ai="center" mt="$2">
             <Button
               onPress={() => setActiveSubScreen(null)}
@@ -805,7 +802,7 @@ export default function ProfileScreen() {
           {/* Avatar Upload */}
           <SectionCard
             title={avatarTitle}
-            icon={<Upload size={18} color="#4F46E5" />}
+            icon={<Upload size={18} color="#312E81" />}
             successTrigger={successCounters.avatar}
           >
             <YStack ai="center" gap="$3">
@@ -814,7 +811,7 @@ export default function ProfileScreen() {
                 label={displayName.slice(0, 1).toUpperCase()}
                 size={96}
                 textSize={34}
-                backgroundColor="#EC4899"
+                backgroundColor="#4E788F"
               />
               <Text fontSize={12} color="$gray10" textAlign="center">
                 {avatarHint}
@@ -823,9 +820,9 @@ export default function ProfileScreen() {
                 <Button
                   flex={1}
                   size="$3.5"
-                  bg="#4F46E5"
+                  bg="#312E81"
                   color="white"
-                  pressStyle={{ bg: '#4338CA' }}
+                  pressStyle={{ bg: '#1E1B4B' }}
                   icon={<Upload size={16} color="white" />}
                   disabled={isSavingAvatar}
                   onPress={handlePickFromLibrary}
@@ -847,7 +844,7 @@ export default function ProfileScreen() {
           </SectionCard>
 
           {/* User Info */}
-          <SectionCard title={userInfoTitle} icon={<UserIcon size={18} color="#4F46E5" />}>
+          <SectionCard title={userInfoTitle} icon={<UserIcon size={18} color="#312E81" />}>
             <EditableFieldRow
               label={usernameLabel}
               value={user?.username ?? ''}
@@ -901,7 +898,7 @@ export default function ProfileScreen() {
   if (activeSubScreen === 'settings') {
     return (
       <YStack f={1} bg="#F9FAFB">
-        <View bg="#4F46E5" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
+        <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
           <XStack ai="center" mt="$2">
             <Button
               onPress={() => setActiveSubScreen(null)}
@@ -922,7 +919,7 @@ export default function ProfileScreen() {
           {/* Language */}
           <SectionCard
             title={t('settings.language.title', 'Language')}
-            icon={<Languages size={18} color="#4F46E5" />}
+            icon={<Languages size={18} color="#312E81" />}
           >
             <YStack gap="$2">
               <Text fontSize={12} color="$gray9">
@@ -940,7 +937,7 @@ export default function ProfileScreen() {
           {/* Password Change */}
           <SectionCard
             title={passwordTitle}
-            icon={<Lock size={18} color="#4F46E5" />}
+            icon={<Lock size={18} color="#312E81" />}
             successTrigger={successCounters.password}
           >
             <YStack gap="$3">
@@ -971,9 +968,9 @@ export default function ProfileScreen() {
               />
               <Button
                 size="$4"
-                bg="#4F46E5"
+                bg="#312E81"
                 color="white"
-                pressStyle={{ bg: '#4338CA' }}
+                pressStyle={{ bg: '#1E1B4B' }}
                 disabled={isChangingPassword}
                 onPress={handleChangePassword}
                 br={12}
@@ -992,7 +989,7 @@ export default function ProfileScreen() {
   if (activeSubScreen === 'help') {
     return (
       <YStack f={1} bg="#F9FAFB">
-        <View bg="#4F46E5" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
+        <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
           <XStack ai="center" mt="$2">
             <Button
               onPress={() => setActiveSubScreen(null)}
@@ -1010,9 +1007,9 @@ export default function ProfileScreen() {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
-          <Card bg="white" br={16} p="$4" bw={1} bc="#F3F4F6">
+          <Card bg="white" br={16} p="$4" bw={0.5} bc="#E5E7EB" shadowOpacity={0}>
             <YStack gap="$3">
-              <Text fontSize={18} fontWeight="700" color="#111827">
+              <Text fontSize={18} fontWeight="700" color="#1A1A1A">
                 Splitter App Support
               </Text>
               <Text fontSize={14} color="#4B5563" lh={20}>
@@ -1023,7 +1020,7 @@ export default function ProfileScreen() {
                 <Text fontSize={13} color="#6B7280">
                   Support Email
                 </Text>
-                <Text fontSize={15} fontWeight="600" color="#4F46E5">
+                <Text fontSize={15} fontWeight="600" color="#312E81">
                   support@splitter.io
                 </Text>
               </YStack>
@@ -1031,7 +1028,7 @@ export default function ProfileScreen() {
                 <Text fontSize={13} color="#6B7280">
                   Version
                 </Text>
-                <Text fontSize={15} fontWeight="600" color="#111827">
+                <Text fontSize={15} fontWeight="600" color="#1A1A1A">
                   1.0.0 (Production)
                 </Text>
               </YStack>
@@ -1047,7 +1044,7 @@ export default function ProfileScreen() {
     <YStack f={1} bg="#F9FAFB">
       {/* Curved Blue Header */}
       <View
-        bg="#4F46E5"
+        bg="#312E81"
         pt="$5"
         pb="$6"
         px="$4"
@@ -1073,11 +1070,11 @@ export default function ProfileScreen() {
           mx="$4"
           mt={-24}
           shadowColor="#000"
-          shadowOffset={{ width: 0, height: 4 }}
-          shadowOpacity={0.06}
-          shadowRadius={10}
-          bw={1}
-          bc="#F3F4F6"
+          shadowOffset={{ width: 0, height: 2 }}
+          shadowOpacity={0.01}
+          shadowRadius={6}
+          bw={0.5}
+          bc="#E5E7EB"
           gap="$3.5"
         >
           <XStack ai="center" gap="$4">
@@ -1087,14 +1084,14 @@ export default function ProfileScreen() {
                 label={displayName.slice(0, 1).toUpperCase()}
                 size={68}
                 textSize={24}
-                backgroundColor="#EC4899"
+                backgroundColor="#4E788F"
               />
             ) : (
               <View
                 w={68}
                 h={68}
                 br={34}
-                bg="#EC4899"
+                bg="#4E788F"
                 ai="center"
                 jc="center"
               >
@@ -1105,7 +1102,7 @@ export default function ProfileScreen() {
             )}
 
             <YStack>
-              <Text fontSize={20} fontWeight="800" color="#111827">
+              <Text fontSize={20} fontWeight="800" color="#1A1A1A">
                 {displayName}
               </Text>
               <Text fontSize={14} color="#6B7280" mt="$1">
@@ -1119,19 +1116,15 @@ export default function ProfileScreen() {
         <XStack gap="$3" px="$4" mt="$4" jc="space-between">
           <View
             f={1}
-            bg="white"
+            bg="#F5F6F8"
             br={16}
             p="$3"
             ai="center"
             jc="center"
-            bw={1}
-            bc="#F3F4F6"
-            shadowColor="#000"
-            shadowOffset={{ width: 0, height: 1 }}
-            shadowOpacity={0.01}
-            shadowRadius={4}
+            bw={0.5}
+            bc="#E5E7EB"
           >
-            <Text fontSize={22} fontWeight="800" color="#111827">
+            <Text fontSize={22} fontWeight="800" color="#312E81">
               {groups.length}
             </Text>
             <Text fontSize={13} color="#6B7280" mt="$1">
@@ -1141,19 +1134,15 @@ export default function ProfileScreen() {
 
           <View
             f={1}
-            bg="white"
+            bg="#F5F6F8"
             br={16}
             p="$3"
             ai="center"
             jc="center"
-            bw={1}
-            bc="#F3F4F6"
-            shadowColor="#000"
-            shadowOffset={{ width: 0, height: 1 }}
-            shadowOpacity={0.01}
-            shadowRadius={4}
+            bw={0.5}
+            bc="#E5E7EB"
           >
-            <Text fontSize={22} fontWeight="800" color="#111827">
+            <Text fontSize={22} fontWeight="800" color="#312E81">
               {expensesCount}
             </Text>
             <Text fontSize={13} color="#6B7280" mt="$1">
@@ -1163,19 +1152,15 @@ export default function ProfileScreen() {
 
           <View
             f={1}
-            bg="white"
+            bg="#F5F6F8"
             br={16}
             p="$3"
             ai="center"
             jc="center"
-            bw={1}
-            bc="#F3F4F6"
-            shadowColor="#000"
-            shadowOffset={{ width: 0, height: 1 }}
-            shadowOpacity={0.01}
-            shadowRadius={4}
+            bw={0.5}
+            bc="#E5E7EB"
           >
-            <Text fontSize={22} fontWeight="800" color="#111827">
+            <Text fontSize={22} fontWeight="800" color="#312E81">
               {friends.length}
             </Text>
             <Text fontSize={13} color="#6B7280" mt="$1">
@@ -1192,17 +1177,17 @@ export default function ProfileScreen() {
           mx="$4"
           mt="$4"
           shadowColor="#000"
-          shadowOffset={{ width: 0, height: 4 }}
-          shadowOpacity={0.03}
-          shadowRadius={8}
-          bw={1}
-          bc="#F3F4F6"
-          gap="$3"
+          shadowOffset={{ width: 0, height: 2 }}
+          shadowOpacity={0.01}
+          shadowRadius={6}
+          bw={0.5}
+          bc="#E5E7EB"
+          gap="$3.5"
         >
           {/* Header */}
           <XStack ai="center" gap="$2" mb="$1">
             <UserIcon size={18} color="#6B7280" />
-            <Text fontSize={16} fontWeight="700" color="#111827">
+            <Text fontSize={16} fontWeight="700" color="#1A1A1A">
               User information
             </Text>
           </XStack>
@@ -1248,9 +1233,11 @@ export default function ProfileScreen() {
                 </Button>
               </XStack>
             </XStack>
-            <Text fontSize={17} fontWeight="600" color="#111827">
-              {user?.username || '—'}
-            </Text>
+            <View bg="#F5F6F8" br={10} p="$3" mt="$1">
+              <Text fontSize={15} fontWeight="600" color="#1A1A1A">
+                {user?.username || '—'}
+              </Text>
+            </View>
           </YStack>
 
           <Separator bc="#F3F4F6" />
@@ -1296,9 +1283,11 @@ export default function ProfileScreen() {
                 </Button>
               </XStack>
             </XStack>
-            <Text fontSize={17} fontWeight="600" color="#111827">
-              {user?.email || '—'}
-            </Text>
+            <View bg="#F5F6F8" br={10} p="$3" mt="$1">
+              <Text fontSize={15} fontWeight="600" color="#1A1A1A">
+                {user?.email || '—'}
+              </Text>
+            </View>
           </YStack>
 
           <Separator bc="#F3F4F6" />
@@ -1327,9 +1316,11 @@ export default function ProfileScreen() {
                 <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
               </Button>
             </XStack>
-            <Text fontSize={17} fontWeight="600" color="#111827">
-              {userId ? (userId.startsWith('#') ? userId : `#${userId}`) : '—'}
-            </Text>
+            <View bg="#F5F6F8" br={10} p="$3" mt="$1">
+              <Text fontSize={15} fontWeight="600" color="#1A1A1A">
+                {userId ? (userId.startsWith('#') ? userId : `#${userId}`) : '—'}
+              </Text>
+            </View>
           </YStack>
         </Card>
 
@@ -1337,20 +1328,20 @@ export default function ProfileScreen() {
         <YStack gap="$3" px="$4" mt="$4">
           <MenuItem
             label={t('profile.menu.edit', 'Edit Profile')}
-            icon={<UserIcon size={18} color="#4F46E5" />}
-            iconBg="rgba(79, 70, 229, 0.08)"
+            icon={<UserIcon size={18} color="#312E81" />}
+            iconBg="rgba(49, 46, 129, 0.08)"
             onPress={() => setActiveSubScreen('edit')}
           />
           <MenuItem
             label={t('profile.menu.settings', 'Settings')}
-            icon={<SettingsIcon size={18} color="#4F46E5" />}
-            iconBg="rgba(79, 70, 229, 0.08)"
+            icon={<SettingsIcon size={18} color="#312E81" />}
+            iconBg="rgba(49, 46, 129, 0.08)"
             onPress={() => setActiveSubScreen('settings')}
           />
           <MenuItem
             label={t('profile.menu.help', 'Help & Support')}
-            icon={<HelpCircle size={18} color="#4F46E5" />}
-            iconBg="rgba(79, 70, 229, 0.08)"
+            icon={<HelpCircle size={18} color="#312E81" />}
+            iconBg="rgba(49, 46, 129, 0.08)"
             onPress={() => setActiveSubScreen('help')}
           />
           <MenuItem

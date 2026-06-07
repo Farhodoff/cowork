@@ -148,7 +148,7 @@ function CustomTabBar({ state }: any) {
       {tabs.map((tab, idx) => {
         const isActive = activeIndex === idx;
         const Icon = tab.icon;
-        const activeColor = '#4F46E5';
+        const activeColor = '#312E81';
         const inactiveColor = '#9CA3AF';
 
         if (tab.isSpecial) {
@@ -163,7 +163,7 @@ function CustomTabBar({ state }: any) {
                   w={48}
                   h={48}
                   br={24}
-                  bg="rgba(79, 70, 229, 0.08)"
+                  bg="rgba(49, 46, 129, 0.08)"
                   ai="center"
                   jc="center"
                   pressStyle={{ scale: 0.95 }}
