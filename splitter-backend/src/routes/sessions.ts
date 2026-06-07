@@ -873,19 +873,29 @@ router.get(
       const entries = await prisma.sessionHistoryEntry.findMany({
         where: whereFilter,
         orderBy: { finalizedAt: "desc" },
+        include: { session: { select: { groupId: true } } },
         ...(fetchAll ? {} : { take: limit }),
       });
 
-      const response = entries.map((entry) => ({
-        sessionId: entry.sessionId,
-        sessionName: entry.sessionName,
-        finalizedAt: entry.finalizedAt.toISOString(),
-        grandTotal: entry.grandTotal.toNumber(),
-        currency: entry.currency,
-        participantUniqueIds: entry.participantUniqueIds,
-        isCreator: entry.creatorId === requesterId,
-        payload: entry.payload,
-      }));
+      const response = entries.map((entry) => {
+        const payloadObj = typeof entry.payload === "string"
+          ? JSON.parse(entry.payload)
+          : (entry.payload as Record<string, any>);
+
+        return {
+          sessionId: entry.sessionId,
+          sessionName: entry.sessionName,
+          finalizedAt: entry.finalizedAt.toISOString(),
+          grandTotal: entry.grandTotal.toNumber(),
+          currency: entry.currency,
+          participantUniqueIds: entry.participantUniqueIds,
+          isCreator: entry.creatorId === requesterId,
+          payload: {
+            ...payloadObj,
+            groupId: entry.session?.groupId ?? null,
+          },
+        };
+      });
 
       return res.json({
         scope: fetchAll ? "all" : "latest",

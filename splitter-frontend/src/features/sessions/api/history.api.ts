@@ -46,6 +46,7 @@ export type SessionHistoryPayload = {
   finalizedAt?: string;
   sessionName?: string;
   currency?: string;
+  groupId?: number | null;
 };
 
 /** Сырая запись, как приходит с сервера */
