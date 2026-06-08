@@ -14,7 +14,7 @@ import { changePassword, updateUsername } from '@/features/auth/api';
 import { LANGUAGE_OPTIONS, type LanguageCode } from '@/shared/config/languages';
 
 export default function SettingsScreen() {
-  const { user, setUser, language, setLanguage } = useAppStore();
+  const { user, setUser, language, setLanguage, theme: appTheme, setTheme: setAppTheme } = useAppStore();
   const { t } = useTranslation();
   const theme = useTheme();
   const bg = theme.background?.get() || '#FFFFFF';
@@ -192,6 +192,39 @@ export default function SettingsScreen() {
                       />
                     );
                   })}
+                </XStack>
+              </YStack>
+
+              <Separator />
+
+              {/* THEME */}
+              <YStack space="$3">
+                <Text fontSize={16} fontWeight="600">
+                  {t('settings.theme.title', 'Appearance')}
+                </Text>
+                <Text fontSize={14} color="$gray10">
+                  {t('settings.theme.description', 'Choose between Light and Dark mode.')}
+                </Text>
+
+                <XStack
+                  space="$2"
+                  backgroundColor="$gray3"
+                  borderRadius="$8"
+                  padding="$1"
+                  flexWrap="wrap"
+                >
+                  <Button
+                    title={t('settings.theme.options.light', 'Light')}
+                    variant={appTheme === 'light' ? 'primary' : 'outline'}
+                    size="small"
+                    onPress={() => setAppTheme('light')}
+                  />
+                  <Button
+                    title={t('settings.theme.options.dark', 'Dark')}
+                    variant={appTheme === 'dark' ? 'primary' : 'outline'}
+                    size="small"
+                    onPress={() => setAppTheme('dark')}
+                  />
                 </XStack>
               </YStack>
 

@@ -196,6 +196,14 @@
         "ja": "Yapon tili",
         "uz": "O'zbek tili"
       }
+    },
+    "theme": {
+      "title": "Tashqi ko'rinish",
+      "description": "Mavzu rejimini (yorug' yoki qorong'u) tanlang.",
+      "options": {
+        "light": "Yorug' mavzu",
+        "dark": "Qorong'u mavzu"
+      }
     }
   }
 }
