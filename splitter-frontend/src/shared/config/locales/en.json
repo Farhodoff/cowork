@@ -43,7 +43,8 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "continue": "Continue",
-    "back": "Back"
+    "back": "Back",
+    "delete": "Delete"
   },
   "friends": {
     "title": "Friends",
@@ -195,7 +196,9 @@
     "unitsAssigned": "{{count}} unit(s) assigned",
     "perUnit": "Per unit:",
     "assigned": "assigned",
-    "unit": "1x"
+    "unit": "1x",
+    "addItem": "Add Item",
+    "addNewItem": "Add new item"
   },
   "settings": {
     "language": {

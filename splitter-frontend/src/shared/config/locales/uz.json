@@ -41,7 +41,8 @@
     "cancel": "Bekor qilish",
     "confirm": "Tasdiqlash",
     "continue": "Davom etish",
-    "back": "Orqaga"
+    "back": "Orqaga",
+    "delete": "O'chirish"
   },
   "home": {
     "header": {
@@ -182,7 +183,9 @@
     "unitsAssigned": "{{count}} birlik biriktirildi",
     "perUnit": "Birlik narxi:",
     "assigned": "biriktirildi",
-    "unit": "1x"
+    "unit": "1x",
+    "addItem": "Tovar qo'shish",
+    "addNewItem": "Yangi tovar qo'shish"
   },
   "settings": {
     "language": {

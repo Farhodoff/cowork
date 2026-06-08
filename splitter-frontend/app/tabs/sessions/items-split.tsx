@@ -139,6 +139,19 @@ export default function ItemsSplitScreen() {
   const [editing, setEditing] = useState<Editing>(null);
   const [detailsEditing, setDetailsEditing] = useState<Item | null>(null); // New state for editing details
 
+  const handleAddNewItem = () => {
+    const newItem: Item = {
+      id: `manual-${Date.now()}`,
+      name: '',
+      price: 0,
+      quantity: 1,
+      assignedTo: [],
+      perPersonCount: {},
+      splitMode: 'equal',
+    };
+    setDetailsEditing(newItem);
+  };
+
   // Magic AI Split states
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
@@ -918,6 +931,29 @@ export default function ItemsSplitScreen() {
               );
             })}
           </YStack>
+
+          {/* Add Item Button */}
+          <Button
+            unstyled
+            onPress={handleAddNewItem}
+            mt="$3"
+            h={44}
+            br={10}
+            bg="$color1"
+            borderWidth={0.5}
+            borderColor="$gray6"
+            ai="center"
+            jc="center"
+            pressStyle={{ scale: 0.98, bg: '$backgroundPress' }}
+            animation="quick"
+          >
+            <XStack ai="center" gap="$2">
+              <Plus size={16} color="$gray11" />
+              <Text fontWeight="600" color="$gray11">
+                {t('splitSession.addItem')}
+              </Text>
+            </XStack>
+          </Button>
         </YStack >
       </ScrollView >
 
@@ -1288,13 +1324,36 @@ export default function ItemsSplitScreen() {
                 f={1}
                 bg="#2ECC71"
                 onPress={() => {
-                  commitItems((prev) => prev.map(i => i.id === detailsEditing.id ? detailsEditing : i));
+                  commitItems((prev) => {
+                    const exists = prev.some(i => i.id === detailsEditing.id);
+                    if (exists) {
+                      return prev.map(i => i.id === detailsEditing.id ? detailsEditing : i);
+                    } else {
+                      return [...prev, detailsEditing];
+                    }
+                  });
                   setDetailsEditing(null);
                 }}
               >
                 <Text color="white" fontWeight="600">{t('splitSession.save')}</Text>
               </Button>
             </XStack>
+
+            {items.some(i => i.id === detailsEditing.id) && (
+              <Button
+                bg="$red5"
+                borderColor="$red7"
+                borderWidth={0.5}
+                pressStyle={{ opacity: 0.8, scale: 0.98 }}
+                animation="quick"
+                onPress={() => {
+                  commitItems((prev) => prev.filter(i => i.id !== detailsEditing.id));
+                  setDetailsEditing(null);
+                }}
+              >
+                <Text color="$red10" fontWeight="600">{t('common.delete')}</Text>
+              </Button>
+            )}
           </YStack>
         </YStack>
       )}

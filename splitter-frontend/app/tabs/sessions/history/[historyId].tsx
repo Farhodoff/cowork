@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { YStack, XStack, Text, ScrollView, Button } from 'tamagui';
+import { Share } from 'react-native';
 
 import UserAvatar from '@/shared/ui/UserAvatar';
 import { useSessionsHistoryStore } from '@/features/sessions/model/history.store';
@@ -116,6 +117,30 @@ export default function HistoryDetailsScreen() {
     bill?.payload?.totals?.currency ||
     DEFAULT_CURRENCY;
 
+  const handleShare = async () => {
+    if (!bill) return;
+    try {
+      const title = bill.sessionName || 'Hisob';
+      let message = `📊 **${title}**\n`;
+      message += `Sana: ${formatSessionDate(bill.finalizedAt || bill.createdAt)}\n`;
+      message += `Jami summa: ${fmtCurrency(bill.grandTotal ?? 0, currency)}\n\n`;
+      
+      message += `Taqsimot:\n`;
+      participants.forEach(({ participant, amount }) => {
+        message += `• ${participant.username}: ${fmtCurrency(amount, currency)}\n`;
+      });
+      
+      message += `\nReceipt Splitter orqali ulashildi`;
+      
+      await Share.share({
+        message,
+        title,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   if (!bill && loading) {
     return (
       <YStack f={1} bg="$background" ai="center" jc="center">
@@ -146,9 +171,25 @@ export default function HistoryDetailsScreen() {
       >
         <YStack w={358} gap="$3">
           <Text fontSize={24} fontWeight="700">{bill.sessionName || 'Hisob'}</Text>
-          <Button unstyled alignSelf="flex-start" onPress={() => router.back()}>
-            <Text color="#2ECC71">{'< Ortga'}</Text>
-          </Button>
+          <XStack jc="space-between" ai="center">
+            <Button unstyled alignSelf="flex-start" onPress={() => router.back()} hitSlop={12}>
+              <Text color="#2ECC71">{'< Ortga'}</Text>
+            </Button>
+            <Button
+              unstyled
+              bg="$color1"
+              borderWidth={0.5}
+              borderColor="$gray6"
+              borderRadius={8}
+              px="$3"
+              py="$1.5"
+              onPress={handleShare}
+              pressStyle={{ scale: 0.98, bg: '$backgroundPress' }}
+              animation="quick"
+            >
+              <Text color="$gray11" fontSize={13} fontWeight="600">Share</Text>
+            </Button>
+          </XStack>
           <Text fontSize={14} color="$gray10">
             {`${formatSessionDate(bill.finalizedAt || bill.createdAt)} ${BULLET} ${(bill.participants ?? []).length} ishtirokchi`}
           </Text>
