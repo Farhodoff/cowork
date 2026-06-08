@@ -203,7 +203,7 @@ export default function SettingsScreen() {
                   {t('settings.theme.title', 'Appearance')}
                 </Text>
                 <Text fontSize={14} color="$gray10">
-                  {t('settings.theme.description', 'Choose between Light and Dark mode.')}
+                  {t('settings.theme.description', 'Choose between Light, Dark, or System theme.')}
                 </Text>
 
                 <XStack
@@ -224,6 +224,12 @@ export default function SettingsScreen() {
                     variant={appTheme === 'dark' ? 'primary' : 'outline'}
                     size="small"
                     onPress={() => setAppTheme('dark')}
+                  />
+                  <Button
+                    title={t('settings.theme.options.system', 'System')}
+                    variant={appTheme === 'system' ? 'primary' : 'outline'}
+                    size="small"
+                    onPress={() => setAppTheme('system')}
                   />
                 </XStack>
               </YStack>

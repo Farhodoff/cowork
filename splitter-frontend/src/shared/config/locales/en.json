@@ -212,10 +212,11 @@
     },
     "theme": {
       "title": "Appearance",
-      "description": "Choose between Light and Dark mode.",
+      "description": "Choose between Light, Dark, or System theme.",
       "options": {
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "system": "System"
       }
     }
   }

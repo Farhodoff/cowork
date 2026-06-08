@@ -199,10 +199,11 @@
     },
     "theme": {
       "title": "Tashqi ko'rinish",
-      "description": "Mavzu rejimini (yorug' yoki qorong'u) tanlang.",
+      "description": "Mavzu rejimini (yorug', qorong'u yoki tizim) tanlang.",
       "options": {
         "light": "Yorug' mavzu",
-        "dark": "Qorong'u mavzu"
+        "dark": "Qorong'u mavzu",
+        "system": "Tizim mavzusi"
       }
     }
   }
