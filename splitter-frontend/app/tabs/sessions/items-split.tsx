@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Pressable } from 'react-native';
+import { Pressable, Alert } from 'react-native';
 import { YStack, XStack, Text, Button, Circle, ScrollView, Spinner, Input, Sheet } from 'tamagui';
 import { Users as UsersIcon, Check, Plus, Minus, Package as PackageIcon, Pencil, Sparkles, X, Mic, Square } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,7 @@ import type { FinalizeReceiptItemPayload, FinalizeTotalsByItem, FinalizeTotalsBy
 import { buildLocalFinalization } from '@/features/receipt/model/receipt-calculator';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
+import { convertItemPrice } from '@/shared/lib/utils/currency';
 
 // ===== Types =====
 type Participant = { uniqueId: string; username: string };
@@ -115,10 +116,14 @@ export default function ItemsSplitScreen() {
   const setLastFinishPayload = useReceiptSessionStore((s) => s.setLastFinishPayload);
 
   const storeCurrency = useReceiptSessionStore((s) => s.currency);
+  const setStoreCurrency = useReceiptSessionStore((s) => s.setCurrency);
 
   const fmtCurrency = useCallback((n: number) => {
     const currency = storeCurrency || 'UZS';
-    return `${currency} ${Math.round(n).toLocaleString('en-US')}`;
+    if (currency === 'UZS') {
+      return `${currency} ${Math.round(n).toLocaleString('en-US')}`;
+    }
+    return `${currency} ${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }, [storeCurrency]);
 
   const getCurrencyParts = useCallback((n: number) => {
@@ -126,6 +131,47 @@ export default function ItemsSplitScreen() {
     const [currency, ...rest] = formatted.split(' ');
     return { currency, amount: rest.join(' ') || '0' };
   }, [fmtCurrency]);
+
+  const [currencySheetOpen, setCurrencySheetOpen] = useState(false);
+
+  const handleConvertCurrency = (targetCurrency: string, shouldConvertPrices: boolean) => {
+    if (shouldConvertPrices && storeCurrency !== targetCurrency) {
+      const converted = storeItems.map((item) => {
+        const newUnitPrice = convertItemPrice(item.unitPrice, storeCurrency, targetCurrency);
+        return {
+          ...item,
+          unitPrice: newUnitPrice,
+          totalPrice: newUnitPrice * item.quantity,
+        };
+      });
+      setStoreItems(converted);
+    }
+    setStoreCurrency(targetCurrency);
+  };
+
+  const onCurrencySelect = (targetCurrency: string) => {
+    setCurrencySheetOpen(false);
+    if (targetCurrency === storeCurrency) return;
+
+    Alert.alert(
+      t('splitSession.changeCurrency', 'Change Currency'),
+      `Do you want to convert the item prices from ${storeCurrency} to ${targetCurrency} automatically?`,
+      [
+        {
+          text: 'Convert prices',
+          onPress: () => handleConvertCurrency(targetCurrency, true),
+        },
+        {
+          text: 'Just change symbol',
+          onPress: () => handleConvertCurrency(targetCurrency, false),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
 
   const [items, setLocalItems] = useState<Item[]>([]);
 
@@ -764,9 +810,27 @@ export default function ItemsSplitScreen() {
       <YStack bg="$background" p="$4" pb="$2">
         <XStack w="100%" ai="center" jc="space-between" mb="$3">
           <YStack ai="flex-start">
-            <Text fontSize={16} fontWeight="700">
-              {t('splitSession.orders')}
-            </Text>
+            <XStack ai="center" gap="$2">
+              <Text fontSize={16} fontWeight="700">
+                {t('splitSession.orders')}
+              </Text>
+              <Button
+                unstyled
+                bg="$backgroundPress"
+                px="$2"
+                py="$0.5"
+                br={8}
+                borderWidth={0.5}
+                borderColor="$borderColor"
+                onPress={() => setCurrencySheetOpen(true)}
+                pressStyle={{ scale: 0.95 }}
+                animation="quick"
+              >
+                <Text fontSize={12} fontWeight="600" color="#312E81">
+                  {storeCurrency} ▾
+                </Text>
+              </Button>
+            </XStack>
             <Text fontSize={12} color="$gray10">
               {sessionReceiptId ?? 'N/A'}
             </Text>
@@ -1440,6 +1504,47 @@ export default function ItemsSplitScreen() {
             </Text>
           </Button>
 
+        </Sheet.Frame>
+      </Sheet>
+
+      {/* Currency Selection Sheet */}
+      <Sheet
+        modal
+        open={currencySheetOpen}
+        onOpenChange={setCurrencySheetOpen}
+        snapPoints={[35]}
+        dismissOnSnapToBottom
+        animation="quick"
+      >
+        <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
+        <Sheet.Frame ai="center" jc="flex-start" p="$4" bg="$color1" pb={insets.bottom + 20}>
+          <Sheet.Handle />
+          <Text fontSize={18} fontWeight="700" mb="$4" mt="$2">
+            Select Currency
+          </Text>
+          <XStack flexWrap="wrap" gap="$3" jc="center" w="100%">
+            {['UZS', 'USD', 'EUR', 'RUB', 'JPY'].map((cur) => {
+              const active = cur === storeCurrency;
+              return (
+                <Button
+                  key={cur}
+                  onPress={() => onCurrencySelect(cur)}
+                  w={90}
+                  h={42}
+                  borderRadius={10}
+                  borderWidth={active ? 1.5 : 0.5}
+                  borderColor={active ? '#312E81' : '$borderColor'}
+                  backgroundColor={active ? 'rgba(49, 46, 129, 0.08)' : 'transparent'}
+                  pressStyle={{ scale: 0.98 }}
+                  animation="quick"
+                >
+                  <Text fontSize={14} fontWeight="600" color={active ? '#312E81' : '$gray11'}>
+                    {cur}
+                  </Text>
+                </Button>
+              );
+            })}
+          </XStack>
         </Sheet.Frame>
       </Sheet>
 
