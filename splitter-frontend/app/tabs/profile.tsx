@@ -55,11 +55,11 @@ function SectionCard({ title, icon, children, successTrigger = 0 }: SectionCardP
   return (
     <YStack
       borderWidth={0.5}
-      borderColor="#E5E7EB"
+      borderColor="$borderColor"
       borderRadius={16}
       padding="$4"
       gap="$3"
-      backgroundColor="white"
+      backgroundColor="$color1"
       position="relative"
     >
       <XStack ai="center" jc="space-between">
@@ -293,16 +293,16 @@ interface MenuItemProps {
   hideChevron?: boolean;
 }
 
-function MenuItem({ label, icon, iconBg, onPress, textColor = '#111827', hideChevron = false }: MenuItemProps) {
+function MenuItem({ label, icon, iconBg, onPress, textColor, hideChevron = false }: MenuItemProps) {
   return (
     <Card
       pressStyle={{ scale: 0.98 }}
       onPress={onPress}
-      bg="white"
+      bg="$color1"
       br={16}
       p="$4"
       bw={0.5}
-      bc="#E5E7EB"
+      bc="$borderColor"
       shadowOpacity={0}
     >
       <XStack jc="space-between" ai="center">
@@ -310,7 +310,7 @@ function MenuItem({ label, icon, iconBg, onPress, textColor = '#111827', hideChe
           <View w={38} h={38} br={10} bg={iconBg} ai="center" jc="center">
             {icon}
           </View>
-          <Text fontSize={16} fontWeight="600" color={textColor}>
+          <Text fontSize={16} fontWeight="600" color={textColor || '$color'}>
             {label}
           </Text>
         </XStack>
@@ -780,7 +780,7 @@ export default function ProfileScreen() {
   // Sub-screens conditional rendering
   if (activeSubScreen === 'edit') {
     return (
-      <YStack f={1} bg="#F9FAFB">
+      <YStack f={1} bg="$background">
         <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
           <XStack ai="center" mt="$2">
             <Button
@@ -798,7 +798,7 @@ export default function ProfileScreen() {
           </XStack>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
+        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="$background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
           {/* Avatar Upload */}
           <SectionCard
             title={avatarTitle}
@@ -897,7 +897,7 @@ export default function ProfileScreen() {
 
   if (activeSubScreen === 'settings') {
     return (
-      <YStack f={1} bg="#F9FAFB">
+      <YStack f={1} bg="$background">
         <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
           <XStack ai="center" mt="$2">
             <Button
@@ -915,7 +915,7 @@ export default function ProfileScreen() {
           </XStack>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
+        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="$background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
           {/* Language */}
           <SectionCard
             title={t('settings.language.title', 'Language')}
@@ -988,7 +988,7 @@ export default function ProfileScreen() {
 
   if (activeSubScreen === 'help') {
     return (
-      <YStack f={1} bg="#F9FAFB">
+      <YStack f={1} bg="$background">
         <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
           <XStack ai="center" mt="$2">
             <Button
@@ -1006,8 +1006,8 @@ export default function ProfileScreen() {
           </XStack>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="#F9FAFB" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
-          <Card bg="white" br={16} p="$4" bw={0.5} bc="#E5E7EB" shadowOpacity={0}>
+        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="$background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
+          <Card bg="$color1" br={16} p="$4" bw={0.5} bc="$borderColor" shadowOpacity={0}>
             <YStack gap="$3">
               <Text fontSize={18} fontWeight="700" color="#1A1A1A">
                 Splitter App Support
@@ -1041,7 +1041,7 @@ export default function ProfileScreen() {
 
   // Main Dashboard View (activeSubScreen === null)
   return (
-    <YStack f={1} bg="#F9FAFB">
+    <YStack f={1} bg="$background">
       {/* Curved Blue Header */}
       <View
         bg="#312E81"
@@ -1059,12 +1059,12 @@ export default function ProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         f={1}
-        bg="#F9FAFB"
+        bg="$background"
         contentContainerStyle={{ paddingBottom: 30 }}
       >
         {/* Profile Summary Card */}
         <Card
-          bg="white"
+          bg="$color1"
           br={18}
           p="$4"
           mx="$4"
@@ -1074,7 +1074,7 @@ export default function ProfileScreen() {
           shadowOpacity={0.01}
           shadowRadius={6}
           bw={0.5}
-          bc="#E5E7EB"
+          bc="$borderColor"
           gap="$3.5"
         >
           <XStack ai="center" gap="$4">
@@ -1116,54 +1116,54 @@ export default function ProfileScreen() {
         <XStack gap="$3" px="$4" mt="$4" jc="space-between">
           <View
             f={1}
-            bg="#F5F6F8"
+            bg="$backgroundPress"
             br={16}
             p="$3"
             ai="center"
             jc="center"
             bw={0.5}
-            bc="#E5E7EB"
+            bc="$borderColor"
           >
             <Text fontSize={22} fontWeight="800" color="#312E81">
               {groups.length}
             </Text>
-            <Text fontSize={13} color="#6B7280" mt="$1">
+            <Text fontSize={13} color="$gray10" mt="$1">
               Groups
             </Text>
           </View>
 
           <View
             f={1}
-            bg="#F5F6F8"
+            bg="$backgroundPress"
             br={16}
             p="$3"
             ai="center"
             jc="center"
             bw={0.5}
-            bc="#E5E7EB"
+            bc="$borderColor"
           >
             <Text fontSize={22} fontWeight="800" color="#312E81">
               {expensesCount}
             </Text>
-            <Text fontSize={13} color="#6B7280" mt="$1">
+            <Text fontSize={13} color="$gray10" mt="$1">
               Expenses
             </Text>
           </View>
 
           <View
             f={1}
-            bg="#F5F6F8"
+            bg="$backgroundPress"
             br={16}
             p="$3"
             ai="center"
             jc="center"
             bw={0.5}
-            bc="#E5E7EB"
+            bc="$borderColor"
           >
             <Text fontSize={22} fontWeight="800" color="#312E81">
               {friends.length}
             </Text>
-            <Text fontSize={13} color="#6B7280" mt="$1">
+            <Text fontSize={13} color="$gray10" mt="$1">
               Friends
             </Text>
           </View>
@@ -1171,7 +1171,7 @@ export default function ProfileScreen() {
 
         {/* User Information Card */}
         <Card
-          bg="white"
+          bg="$color1"
           br={18}
           p="$4"
           mx="$4"
@@ -1181,13 +1181,13 @@ export default function ProfileScreen() {
           shadowOpacity={0.01}
           shadowRadius={6}
           bw={0.5}
-          bc="#E5E7EB"
+          bc="$borderColor"
           gap="$3.5"
         >
           {/* Header */}
           <XStack ai="center" gap="$2" mb="$1">
-            <UserIcon size={18} color="#6B7280" />
-            <Text fontSize={16} fontWeight="700" color="#1A1A1A">
+            <UserIcon size={18} color="$gray10" />
+            <Text fontSize={16} fontWeight="700" color="$color">
               User information
             </Text>
           </XStack>
@@ -1195,7 +1195,7 @@ export default function ProfileScreen() {
           {/* Username Field */}
           <YStack gap="$1">
             <XStack jc="space-between" ai="center">
-              <Text fontSize={13} color="#9CA3AF" fontWeight="500">
+              <Text fontSize={13} color="$gray10" fontWeight="500">
                 Username
               </Text>
               <XStack gap="$2">
@@ -1206,15 +1206,15 @@ export default function ProfileScreen() {
                   ai="center"
                   gap="$1.5"
                   bw={1}
-                  bc="#E5E7EB"
+                  bc="$borderColor"
                   br={8}
                   px="$2.5"
                   py="$1.5"
-                  bg="white"
-                  pressStyle={{ bg: '#F9FAFB' }}
+                  bg="$color1"
+                  pressStyle={{ bg: '$backgroundPress' }}
                 >
-                  <Copy size={13} color="#374151" />
-                  <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
+                  <Copy size={13} color="$gray11" />
+                  <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
                 </Button>
                 <Button
                   unstyled
@@ -1222,30 +1222,30 @@ export default function ProfileScreen() {
                   ai="center"
                   jc="center"
                   bw={1}
-                  bc="#E5E7EB"
+                  bc="$borderColor"
                   br={8}
                   px="$2.5"
                   py="$1.5"
-                  bg="white"
-                  pressStyle={{ bg: '#F9FAFB' }}
+                  bg="$color1"
+                  pressStyle={{ bg: '$backgroundPress' }}
                 >
-                  <Edit3 size={13} color="#374151" />
+                  <Edit3 size={13} color="$gray11" />
                 </Button>
               </XStack>
             </XStack>
-            <View bg="#F5F6F8" br={10} p="$3" mt="$1">
-              <Text fontSize={15} fontWeight="600" color="#1A1A1A">
+            <View bg="$backgroundPress" br={10} p="$3" mt="$1">
+              <Text fontSize={15} fontWeight="600" color="$color">
                 {user?.username || '—'}
               </Text>
             </View>
           </YStack>
 
-          <Separator bc="#F3F4F6" />
+          <Separator bc="$borderColor" />
 
           {/* Email Field */}
           <YStack gap="$1">
             <XStack jc="space-between" ai="center">
-              <Text fontSize={13} color="#9CA3AF" fontWeight="500">
+              <Text fontSize={13} color="$gray10" fontWeight="500">
                 Email
               </Text>
               <XStack gap="$2">
@@ -1256,15 +1256,15 @@ export default function ProfileScreen() {
                   ai="center"
                   gap="$1.5"
                   bw={1}
-                  bc="#E5E7EB"
+                  bc="$borderColor"
                   br={8}
                   px="$2.5"
                   py="$1.5"
-                  bg="white"
-                  pressStyle={{ bg: '#F9FAFB' }}
+                  bg="$color1"
+                  pressStyle={{ bg: '$backgroundPress' }}
                 >
-                  <Copy size={13} color="#374151" />
-                  <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
+                  <Copy size={13} color="$gray11" />
+                  <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
                 </Button>
                 <Button
                   unstyled
@@ -1272,30 +1272,30 @@ export default function ProfileScreen() {
                   ai="center"
                   jc="center"
                   bw={1}
-                  bc="#E5E7EB"
+                  bc="$borderColor"
                   br={8}
                   px="$2.5"
                   py="$1.5"
-                  bg="white"
-                  pressStyle={{ bg: '#F9FAFB' }}
+                  bg="$color1"
+                  pressStyle={{ bg: '$backgroundPress' }}
                 >
-                  <Edit3 size={13} color="#374151" />
+                  <Edit3 size={13} color="$gray11" />
                 </Button>
               </XStack>
             </XStack>
-            <View bg="#F5F6F8" br={10} p="$3" mt="$1">
-              <Text fontSize={15} fontWeight="600" color="#1A1A1A">
+            <View bg="$backgroundPress" br={10} p="$3" mt="$1">
+              <Text fontSize={15} fontWeight="600" color="$color">
                 {user?.email || '—'}
               </Text>
             </View>
           </YStack>
 
-          <Separator bc="#F3F4F6" />
+          <Separator bc="$borderColor" />
 
           {/* User ID Field */}
           <YStack gap="$1">
             <XStack jc="space-between" ai="center">
-              <Text fontSize={13} color="#9CA3AF" fontWeight="500">
+              <Text fontSize={13} color="$gray10" fontWeight="500">
                 User ID
               </Text>
               <Button
@@ -1305,19 +1305,19 @@ export default function ProfileScreen() {
                 ai="center"
                 gap="$1.5"
                 bw={1}
-                bc="#E5E7EB"
+                bc="$borderColor"
                 br={8}
                 px="$2.5"
                 py="$1.5"
-                bg="white"
-                pressStyle={{ bg: '#F9FAFB' }}
+                bg="$color1"
+                pressStyle={{ bg: '$backgroundPress' }}
               >
-                <Copy size={13} color="#374151" />
-                <Text fontSize={12} fontWeight="600" color="#374151">Copy</Text>
+                <Copy size={13} color="$gray11" />
+                <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
               </Button>
             </XStack>
-            <View bg="#F5F6F8" br={10} p="$3" mt="$1">
-              <Text fontSize={15} fontWeight="600" color="#1A1A1A">
+            <View bg="$backgroundPress" br={10} p="$3" mt="$1">
+              <Text fontSize={15} fontWeight="600" color="$color">
                 {userId ? (userId.startsWith('#') ? userId : `#${userId}`) : '—'}
               </Text>
             </View>

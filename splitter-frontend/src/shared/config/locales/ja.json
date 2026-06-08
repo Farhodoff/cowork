@@ -43,7 +43,8 @@
     "cancel": "キャンセル",
     "confirm": "確認",
     "continue": "続ける",
-    "back": "戻る"
+    "back": "戻る",
+    "delete": "削除"
   },
   "friends": {
     "title": "友だち",
@@ -179,6 +180,25 @@
     "finish": "完了",
     "history": "最近の明細",
     "historyDetails": "明細の詳細"
+  },
+  "splitSession": {
+    "orders": "注文一覧",
+    "editItem": "商品を編集",
+    "itemName": "商品名",
+    "price": "価格",
+    "quantity": "数量",
+    "save": "保存",
+    "saving": "保存中...",
+    "billConfirmed": "精算が確定しました",
+    "assignedTo": "{{count}} 人の参加者に割り当て済み",
+    "priceSplitEqually": "均等割:",
+    "each": "人あたり",
+    "unitsAssigned": "{{count}} 個割り当て済み",
+    "perUnit": "単価:",
+    "assigned": "割り当て済み",
+    "unit": "1点",
+    "addItem": "アイテム追加",
+    "addNewItem": "新しいアイテムを追加"
   },
   "settings": {
     "language": {

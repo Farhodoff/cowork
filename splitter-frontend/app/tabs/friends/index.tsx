@@ -3,6 +3,7 @@ import { YStack, XStack, Paragraph, Input, ScrollView, Spinner, Separator, Text 
 import { useRouter } from 'expo-router';
 import { Search } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
+import { RefreshControl } from 'react-native';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
 import { FriendListItem } from '@/features/friends/ui/FriendListItem';
 import Fab from '@/shared/ui/Fab';
@@ -16,6 +17,19 @@ export default function FriendsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchAll();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchAll]);
 
   const setReceiptItems = useReceiptSessionStore((s) => s.setItems);
   const setSessionName = useReceiptSessionStore((s) => s.setSessionName);
@@ -77,7 +91,19 @@ export default function FriendsScreen() {
 
         {error && <Paragraph col="$red10" p="$4">{error}</Paragraph>}
 
-        <ScrollView f={1} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+        <ScrollView
+          f={1}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#312E81"
+              colors={["#312E81"]}
+            />
+          }
+        >
           {filteredFriends.length > 0 && (
             <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden">
               {filteredFriends.map((f, index) => (

@@ -8,7 +8,9 @@ import {
   Spinner,
   Input,
   Text,
+  ScrollView,
 } from 'tamagui';
+import { RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CircleCheck, CircleX, QrCode, Scan } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
@@ -145,6 +147,19 @@ export default function FriendsRequestsUnified() {
   const { requestsRaw, fetchAll, loading, error, search, send, friends } = useFriendsStore();
   const meUniqueId = useAppStore((s) => s.user?.uniqueId);
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchAll();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchAll]);
+
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<UserLite[]>([]);
   const [searching, setSearching] = useState(false);
@@ -278,7 +293,20 @@ export default function FriendsRequestsUnified() {
   );
 
   return (
-    <YStack f={1} p="$4" gap="$4">
+    <ScrollView
+      f={1}
+      bg="$background"
+      contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#312E81"
+          colors={["#312E81"]}
+        />
+      }
+    >
+      <YStack f={1} gap="$4">
       {notice.node}
       {error && <Paragraph col="$red10">{error}</Paragraph>}
 
@@ -513,6 +541,7 @@ export default function FriendsRequestsUnified() {
           )}
         </>
       )}
-    </YStack>
+      </YStack>
+    </ScrollView>
   );
 }

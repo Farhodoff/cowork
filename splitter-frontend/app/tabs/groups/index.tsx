@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Plus, Users } from '@tamagui/lucide-icons';
@@ -100,6 +101,19 @@ export default function GroupsListScreen() {
   const { t } = useTranslation();
   const { groups, counts, loading, error, fetchGroups } = useGroupsStore();
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchGroups();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchGroups]);
+
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
@@ -127,6 +141,7 @@ export default function GroupsListScreen() {
           <Card
             key={group.id}
             pressStyle={{ scale: 0.98 }}
+            animation="quick"
             onPress={() =>
               router.push({
                 pathname: '/tabs/groups/[groupId]',
@@ -211,7 +226,18 @@ export default function GroupsListScreen() {
           </Text>
         </YStack>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} f={1}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          f={1}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#312E81"
+              colors={["#312E81"]}
+            />
+          }
+        >
           <YStack gap="$3" pb="$4">
             {cards}
           </YStack>

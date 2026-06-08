@@ -74,7 +74,11 @@ function HistoryCard({
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => ({ width: 358, opacity: pressed ? 0.9 : 1 })}
+      style={({ pressed }) => ({
+        width: 358,
+        opacity: pressed ? 0.95 : 1,
+        transform: [{ scale: pressed ? 0.98 : 1 }],
+      })}
     >
       <YStack
         h={110}
@@ -145,7 +149,12 @@ export default function SessionsHistoryScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ alignItems: 'center', paddingBottom: 32, gap: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#312E81"
+            colors={["#312E81"]}
+          />
         }
       >
         <YStack w={358} gap="$1" mb="$2">

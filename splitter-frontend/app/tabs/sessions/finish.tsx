@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { YStack, XStack, Text, Button, Circle, ScrollView } from 'tamagui';
 import { Check } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Share } from 'react-native';
 import type { FinalizeTotalsByItem, FinalizeTotalsByParticipant, ReceiptAllocation } from '@/features/receipt/api/receipt.api';
 import { useReceiptSessionStore, type FinishPayload } from '@/features/receipt/model/receipt-session.store';
 
@@ -411,6 +412,30 @@ export default function FinishScreen() {
   const showGrandTotal = participantSummaries.length > 0 || itemSummaries.length > 0;
   const grandTotalParts = showGrandTotal ? getCurrencyParts(effectiveGrandTotal, currency) : null;
 
+  const handleShare = async () => {
+    if (!payload) return;
+    try {
+      const title = sessionName || 'Receipt Split';
+      let message = `📊 **${title}**\n`;
+      if (receiptId) message += `Receipt #${receiptId}\n`;
+      message += `Total Amount: ${fmtCurrency(effectiveGrandTotal, currency)}\n\n`;
+      
+      message += `Split Details:\n`;
+      participantSummaries.forEach((summary) => {
+        message += `• ${summary.username}: ${fmtCurrency(summary.amount, currency)}\n`;
+      });
+      
+      message += `\nShared via Receipt Splitter`;
+      
+      await Share.share({
+        message,
+        title,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   const Avatar = ({ name }: { name: string }) => (
     <Circle size={32} bg="$gray5" ai="center" jc="center">
       <Text color="white" fontWeight="700" fontSize={14}>
@@ -615,20 +640,42 @@ export default function FinishScreen() {
         bottom={(insets?.bottom ?? 0) + 8}
         px="$4"
       >
-        <Button
-          unstyled
-          height={41}
-          borderRadius={10}
-          bg="#2ECC71"
-          ai="center"
-          jc="center"
-          onPress={() => router.replace('/tabs')}
-          pressStyle={{ opacity: 0.9 }}
-        >
-          <Text fontSize={16} fontWeight="600" color="white">
-            Complete settlement
-          </Text>
-        </Button>
+        <XStack gap="$2">
+          <Button
+            unstyled
+            f={1}
+            height={41}
+            borderRadius={10}
+            bg="$color1"
+            borderWidth={0.5}
+            borderColor="$gray6"
+            ai="center"
+            jc="center"
+            onPress={handleShare}
+            pressStyle={{ opacity: 0.9, scale: 0.98 }}
+            animation="quick"
+          >
+            <Text fontSize={16} fontWeight="600" color="$gray11">
+              Share
+            </Text>
+          </Button>
+          <Button
+            unstyled
+            f={2}
+            height={41}
+            borderRadius={10}
+            bg="#2ECC71"
+            ai="center"
+            jc="center"
+            onPress={() => router.replace('/tabs')}
+            pressStyle={{ opacity: 0.9, scale: 0.98 }}
+            animation="quick"
+          >
+            <Text fontSize={16} fontWeight="600" color="white">
+              Complete settlement
+            </Text>
+          </Button>
+        </XStack>
       </YStack>
     </YStack>
   );
