@@ -331,7 +331,7 @@ export default function ProfileScreen() {
   const setLanguage = useAppStore((s) => s.setLanguage);
 
   // Active Sub-screen State
-  const [activeSubScreen, setActiveSubScreen] = useState<'edit' | 'settings' | 'help' | null>(null);
+  const [activeSubScreen, setActiveSubScreen] = useState<'settings' | null>(null);
 
   // Stats Stores
   const { fetchGroups, groups } = useGroupsStore();
@@ -870,58 +870,7 @@ export default function ProfileScreen() {
     );
   }
 
-  if (activeSubScreen === 'help') {
-    return (
-      <YStack f={1} bg="$background">
-        <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
-          <XStack ai="center" mt="$2">
-            <Button
-              onPress={() => setActiveSubScreen(null)}
-              circular
-              size="$3.5"
-              bg="rgba(255,255,255,0.15)"
-              pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
-              borderWidth={0}
-              icon={<ArrowLeft color="white" size={20} />}
-            />
-            <Text color="white" fontSize={22} fontWeight="700" ml="$3">
-              {t('profile.help.title', 'Help & Support')}
-            </Text>
-          </XStack>
-        </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="$background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
-          <Card bg="$color1" br={16} p="$4" bw={0.5} bc="$borderColor" shadowOpacity={0}>
-            <YStack gap="$3">
-              <Text fontSize={18} fontWeight="700" color="#1A1A1A">
-                Splitter App Support
-              </Text>
-              <Text fontSize={14} color="#4B5563" lh={20}>
-                Welcome to Splitter! If you need any assistance with splitting receipts, managing groups, or adding friends, please feel free to reach out.
-              </Text>
-              <Separator />
-              <YStack gap="$1.5">
-                <Text fontSize={13} color="#6B7280">
-                  Support Email
-                </Text>
-                <Text fontSize={15} fontWeight="600" color="#312E81">
-                  support@splitter.io
-                </Text>
-              </YStack>
-              <YStack gap="$1.5">
-                <Text fontSize={13} color="#6B7280">
-                  Version
-                </Text>
-                <Text fontSize={15} fontWeight="600" color="#1A1A1A">
-                  1.0.0 (Production)
-                </Text>
-              </YStack>
-            </YStack>
-          </Card>
-        </ScrollView>
-      </YStack>
-    );
-  }
 
   // Main Dashboard View (activeSubScreen === null)
   return (
@@ -1182,12 +1131,7 @@ export default function ProfileScreen() {
             iconBg="rgba(49, 46, 129, 0.08)"
             onPress={() => setActiveSubScreen('settings')}
           />
-          <MenuItem
-            label={t('profile.menu.help', 'Help & Support')}
-            icon={<HelpCircle size={18} color="#312E81" />}
-            iconBg="rgba(49, 46, 129, 0.08)"
-            onPress={() => setActiveSubScreen('help')}
-          />
+
           <MenuItem
             label={logoutLabel}
             icon={<LogOut size={18} color="#EF4444" />}
