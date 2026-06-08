@@ -173,7 +173,7 @@ export default function HistoryDetailsScreen() {
           <Text fontSize={24} fontWeight="700">{bill.sessionName || 'Hisob'}</Text>
           <XStack jc="space-between" ai="center">
             <Button unstyled alignSelf="flex-start" onPress={() => router.back()} hitSlop={12}>
-              <Text color="#2ECC71">{'< Ortga'}</Text>
+              <Text color="#312E81">{'< Ortga'}</Text>
             </Button>
             <Button
               unstyled
@@ -193,7 +193,7 @@ export default function HistoryDetailsScreen() {
           <Text fontSize={14} color="$gray10">
             {`${formatSessionDate(bill.finalizedAt || bill.createdAt)} ${BULLET} ${(bill.participants ?? []).length} ishtirokchi`}
           </Text>
-          <Text fontSize={16} fontWeight="700" color="#2ECC71">
+          <Text fontSize={16} fontWeight="700" color="#10B981">
             {fmtCurrency(bill.grandTotal ?? 0, currency)}
           </Text>
         </YStack>
@@ -202,10 +202,10 @@ export default function HistoryDetailsScreen() {
           <YStack
             key={participant.uniqueId}
             w={358}
-            borderWidth={1}
-            borderColor="#2ECC71"
+            borderWidth={0.5}
+            borderColor="$borderColor"
             br={12}
-            bg="white"
+            bg="$background"
             px={16}
             py={12}
             gap="$3"
@@ -221,7 +221,7 @@ export default function HistoryDetailsScreen() {
                 />
                 <Text fontSize={16} fontWeight="600">{participant.username}</Text>
               </XStack>
-              <Text fontSize={16} fontWeight="700" color="#2ECC71">
+              <Text fontSize={16} fontWeight="700" color="#10B981">
                 {fmtCurrency(amount, currency)}
               </Text>
             </XStack>
@@ -231,7 +231,7 @@ export default function HistoryDetailsScreen() {
                 items.map(item => (
                   <XStack key={item.id} jc="space-between" ai="center">
                     <Text fontSize={14}>{item.title}</Text>
-                    <Text fontSize={14} fontWeight="600" color="#2ECC71">
+                    <Text fontSize={14} fontWeight="600" color="#10B981">
                       {item.price.toLocaleString()}
                     </Text>
                   </XStack>

@@ -30,7 +30,7 @@ export const Button: React.FC<CustomButtonProps> = ({
 
     const variantStyles = {
       primary: {
-        backgroundColor: disabled ? '$gray8' : '#4F46E5',
+        backgroundColor: disabled ? '$gray8' : '#312E81',
         color: '#FFFFFF',
       },
       secondary: {
@@ -40,8 +40,8 @@ export const Button: React.FC<CustomButtonProps> = ({
       outline: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: disabled ? '$gray8' : '#4F46E5',
-        color: disabled ? '$gray8' : '#4F46E5',
+        borderColor: disabled ? '$gray8' : '#312E81',
+        color: disabled ? '$gray8' : '#312E81',
       }
     }
 

@@ -131,12 +131,12 @@ function CustomTabBar({ state }: any) {
 
   return (
     <XStack
-      bg="white"
+      bg="$background"
       pt="$2.5"
       pb={Math.max(insets.bottom, 12)}
       px="$2"
-      borderTopWidth={1}
-      borderTopColor="#F3F4F6"
+      borderTopWidth={0.5}
+      borderTopColor="$borderColor"
       shadowColor="#000"
       shadowOffset={{ width: 0, height: -4 }}
       shadowOpacity={0.03}

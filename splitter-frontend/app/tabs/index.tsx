@@ -71,7 +71,7 @@ function AvatarStack({ participantIds }: { participantIds: string[] }) {
             borderRadius={14}
             backgroundColor={color}
             borderWidth={2}
-            borderColor="white"
+            borderColor="$background"
             alignItems="center"
             justifyContent="center"
           >
@@ -88,7 +88,7 @@ function AvatarStack({ participantIds }: { participantIds: string[] }) {
           borderRadius={14}
           backgroundColor="$gray4"
           borderWidth={2}
-          borderColor="white"
+          borderColor="$background"
           marginLeft={-8}
           alignItems="center"
           justifyContent="center"
@@ -129,14 +129,16 @@ function BillCard({
       <YStack
         padding="$4"
         borderRadius={20}
-        borderWidth={1}
-        borderColor="$gray3"
-        backgroundColor="white"
+        borderWidth={0.5}
+        borderColor="$borderColor"
+        backgroundColor="$background"
         elevation={1}
         shadowColor="#000"
         shadowOffset={{ width: 0, height: 1 }}
         shadowOpacity={0.05}
         shadowRadius={4}
+        pressStyle={{ scale: 0.98 }}
+        animation="quick"
       >
         <XStack justifyContent="space-between" alignItems="center">
           <YStack space="$1" flex={1} marginRight="$2">
@@ -280,9 +282,9 @@ export default function HomePage() {
 
   return (
     <ScreenContainer>
-      <View f={1} position="relative" bg="white">
+      <View f={1} position="relative" bg="$background">
         <ScrollView
-          style={{ flex: 1, backgroundColor: 'white' }}
+          style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         >
@@ -290,7 +292,7 @@ export default function HomePage() {
             {/* Curved Royal Blue Header */}
             <YStack
               width="100%"
-              backgroundColor="#4F46E5"
+              backgroundColor="#312E81"
               borderBottomLeftRadius={32}
               borderBottomRightRadius={32}
               paddingHorizontal="$4"
@@ -371,14 +373,16 @@ export default function HomePage() {
             {/* Floating Actions Card */}
             <XStack
               width="90%"
-              backgroundColor="white"
+              backgroundColor="$background"
               borderRadius={24}
               padding="$3"
-              elevation={4}
+              borderWidth={0.5}
+              borderColor="$borderColor"
+              elevation={2}
               shadowColor="#000"
-              shadowOffset={{ width: 0, height: 4 }}
-              shadowOpacity={0.1}
-              shadowRadius={10}
+              shadowOffset={{ width: 0, height: 2 }}
+              shadowOpacity={0.05}
+              shadowRadius={6}
               alignSelf="center"
               marginTop={-32}
               marginBottom="$6"
@@ -389,14 +393,15 @@ export default function HomePage() {
                 flex={1}
                 height={68}
                 borderRadius={18}
-                backgroundColor="rgba(79, 70, 229, 0.06)"
+                backgroundColor="rgba(49, 46, 129, 0.06)"
                 alignItems="center"
                 padding="$3"
                 marginRight="$2"
                 onPress={onScan}
-                pressStyle={{ opacity: 0.8 }}
+                pressStyle={{ scale: 0.98 }}
+                animation="quick"
               >
-                <Circle size={40} backgroundColor="#4F46E5" ai="center" jc="center" marginRight="$2">
+                <Circle size={40} backgroundColor="#312E81" ai="center" jc="center" marginRight="$2">
                   <Receipt size={20} color="white" />
                 </Circle>
                 <YStack>
@@ -419,7 +424,8 @@ export default function HomePage() {
                 padding="$3"
                 marginLeft="$2"
                 onPress={onMagicSplit}
-                pressStyle={{ opacity: 0.8 }}
+                pressStyle={{ scale: 0.98 }}
+                animation="quick"
               >
                 <Circle size={40} backgroundColor="#8A2BE2" ai="center" jc="center" marginRight="$2">
                   <Sparkles size={20} color="white" />
@@ -453,7 +459,7 @@ export default function HomePage() {
                 </Pressable>
 
                 <Pressable onPress={openAllSessions}>
-                  <Text color="#4F46E5" fontWeight="700" fontSize={14}>
+                  <Text color="#312E81" fontWeight="700" fontSize={14}>
                     View All
                   </Text>
                 </Pressable>
@@ -515,7 +521,7 @@ export default function HomePage() {
         {/* Floating Action Button (FAB) */}
         <Circle
           size={56}
-          backgroundColor="#4F46E5"
+          backgroundColor="#312E81"
           position="absolute"
           right={16}
           bottom={16}

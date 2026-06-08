@@ -10,17 +10,17 @@ const appConfig = createTamagui({
     ...config.themes,
     light: {
       ...config.themes.light,
-      primary: '#4F46E5',
-      primaryHover: '#6366F1',
-      success: '#2ECC71',
+      primary: '#312E81',
+      primaryHover: '#4338CA',
+      success: '#10B981',
       error: '#F44336',
       warning: '#FF9800',
     },
     dark: {
       ...config.themes.dark,
-      primary: '#4F46E5',
-      primaryHover: '#6366F1',
-      success: '#2ECC71',
+      primary: '#312E81',
+      primaryHover: '#1E1B4B',
+      success: '#10B981',
       error: '#F44336',
       warning: '#FF9800',
     }

@@ -1,7 +1,7 @@
 // app/tabs/settings.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { YStack, Text, Separator, XStack } from 'tamagui';
+import { YStack, Text, Separator, XStack, useTheme } from 'tamagui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +16,8 @@ import { LANGUAGE_OPTIONS, type LanguageCode } from '@/shared/config/languages';
 export default function SettingsScreen() {
   const { user, setUser, language, setLanguage } = useAppStore();
   const { t } = useTranslation();
+  const theme = useTheme();
+  const bg = theme.background?.get() || '#FFFFFF';
   const isLoggedIn = !!user;
 
   const [usernameValue, setUsernameValue] = useState(user?.username ?? '');
@@ -135,14 +137,14 @@ export default function SettingsScreen() {
   }, [currentPassword, newPassword, confirmPassword, passwordError]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.select({ ios: 0, android: 0 }) ?? 0}
       >
         <ScrollView
-          style={{ flex: 1 }}
+          style={{ flex: 1, backgroundColor: bg }}
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
           keyboardShouldPersistTaps="handled"
         >
