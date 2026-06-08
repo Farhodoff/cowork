@@ -148,11 +148,11 @@ export default function GroupsListScreen() {
                 params: { groupId: String(group.id) },
               } as never)
             }
-            bg="white"
+            bg="$background"
             br={16}
             p="$4"
-            bw={1}
-            bc="#F3F4F6"
+            bw={0.5}
+            bc="$borderColor"
             shadowColor="#000"
             shadowOffset={{ width: 0, height: 2 }}
             shadowOpacity={0.03}
@@ -161,7 +161,7 @@ export default function GroupsListScreen() {
             gap="$2.5"
           >
             <XStack jc="space-between" ai="center">
-              <Text fontSize={18} fontWeight="700" color="#111827">
+              <Text fontSize={18} fontWeight="700" color="$color">
                 {groupName}
               </Text>
               <View bg="#EBFDF5" px="$2.5" py="$1" br={12}>
@@ -171,7 +171,7 @@ export default function GroupsListScreen() {
               </View>
             </XStack>
 
-            <Text fontSize={14} color="#6B7280" mt={-2}>
+            <Text fontSize={14} color="$gray11" mt={-2}>
               {memberCount === 0 ? emptyMembersLabel : `${memberCount} members • ${relativeTime}`}
             </Text>
 
@@ -186,10 +186,10 @@ export default function GroupsListScreen() {
   );
 
   return (
-    <YStack f={1} bg="#F9FAFB" px="$4">
+    <YStack f={1} bg="$background" px="$4">
       {/* Custom Header Row */}
       <XStack jc="space-between" ai="center" mt="$4" mb="$3">
-        <Text fontSize={32} fontWeight="800" color="#111827">
+        <Text fontSize={32} fontWeight="800" color="$color">
           {t('groups.title', 'Groups')}
         </Text>
         <Button
@@ -197,8 +197,8 @@ export default function GroupsListScreen() {
           w={42}
           h={42}
           br={21}
-          bg="#4F46E5"
-          pressStyle={{ bg: '#4338CA', scale: 0.95 }}
+          bg="#312E81"
+          pressStyle={{ bg: '#1E1B4B', scale: 0.95 }}
           ai="center"
           jc="center"
           p={0}
@@ -217,7 +217,7 @@ export default function GroupsListScreen() {
 
       {loading && hasNoGroups ? (
         <YStack f={1} ai="center" jc="center">
-          <Spinner size="large" color="#4F46E5" />
+          <Spinner size="large" color="#312E81" />
         </YStack>
       ) : hasNoGroups ? (
         <YStack f={1} ai="center" jc="center" gap="$3">

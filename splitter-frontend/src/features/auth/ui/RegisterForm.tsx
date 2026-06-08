@@ -84,7 +84,7 @@ export default function RegisterForm() {
           <YStack
             width={64}
             height={64}
-            backgroundColor="#4F46E5"
+            backgroundColor="#312E81"
             borderRadius={18}
             alignItems="center"
             justifyContent="center"
@@ -169,7 +169,7 @@ export default function RegisterForm() {
           </Text>
           <Link href="/login" asChild>
             <Pressable>
-              <Text fontSize="$4" color="#4F46E5" fontWeight="700">
+              <Text fontSize="$4" color="#312E81" fontWeight="700">
                 {t('auth.signIn', 'Sign In')}
               </Text>
             </Pressable>

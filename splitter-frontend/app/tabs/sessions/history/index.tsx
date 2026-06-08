@@ -83,10 +83,10 @@ function HistoryCard({
       <YStack
         h={110}
         br={12}
-        borderWidth={1}
-        borderColor="#E4E7EB"
+        borderWidth={0.5}
+        borderColor="$borderColor"
         p="$3"
-        backgroundColor="white"
+        backgroundColor="$background"
       >
         <XStack jc="space-between" ai="center">
           <YStack>
@@ -97,7 +97,7 @@ function HistoryCard({
               {summary}
             </Text>
           </YStack>
-          <Text fontSize={14} lineHeight={22} fontWeight="700" color="#2ECC71">
+          <Text fontSize={14} lineHeight={22} fontWeight="700" color="#10B981">
             {amountLabel}
           </Text>
         </XStack>

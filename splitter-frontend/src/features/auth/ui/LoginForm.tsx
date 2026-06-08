@@ -83,7 +83,7 @@ export default function LoginForm() {
           <YStack
             width={64}
             height={64}
-            backgroundColor="#4F46E5"
+            backgroundColor="#312E81"
             borderRadius={18}
             alignItems="center"
             justifyContent="center"
@@ -138,7 +138,7 @@ export default function LoginForm() {
             {/* Forgot Password */}
             <XStack justifyContent="flex-end" marginTop="$-1">
               <Pressable onPress={() => {}}>
-                <Text fontSize="$3" color="#4F46E5" fontWeight="600">
+                <Text fontSize="$3" color="#312E81" fontWeight="600">
                   {t('auth.forgotPassword', 'Forgot password?')}
                 </Text>
               </Pressable>
@@ -164,7 +164,7 @@ export default function LoginForm() {
           </Text>
           <Link href="/register" asChild>
             <Pressable>
-              <Text fontSize="$4" color="#4F46E5" fontWeight="700">
+              <Text fontSize="$4" color="#312E81" fontWeight="700">
                 {t('auth.signUp', 'Sign Up')}
               </Text>
             </Pressable>

@@ -192,10 +192,10 @@ export default function GroupCreateScreen() {
   }
 
   return (
-    <YStack f={1} bg="#F9FAFB">
+    <YStack f={1} bg="$background">
       {/* Curved Header Banner */}
       <View
-        bg="#4F46E5"
+        bg="#312E81"
         pt="$5"
         pb="$6"
         px="$4"
@@ -235,12 +235,12 @@ export default function GroupCreateScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         f={1}
-        bg="#F9FAFB"
+        bg="$background"
         contentContainerStyle={{ pb: 30 }}
       >
         {/* Floating Card for Group Name */}
         <View
-          bg="white"
+          bg="$background"
           br={16}
           p="$4"
           mx="$4"
@@ -249,10 +249,10 @@ export default function GroupCreateScreen() {
           shadowOffset={{ width: 0, height: 4 }}
           shadowOpacity={0.06}
           shadowRadius={10}
-          bw={1}
-          bc="#F3F4F6"
+          bw={0.5}
+          bc="$borderColor"
         >
-          <Text fontSize={13} fontWeight="600" color="#4B5563" mb="$2">
+          <Text fontSize={13} fontWeight="600" color="$gray11" mb="$2">
             Group Name
           </Text>
           <Input
@@ -261,17 +261,17 @@ export default function GroupCreateScreen() {
             placeholder="e.g., Weekend Squad, Roommates, Trip 20"
             h={52}
             br={12}
-            borderWidth={1.5}
-            borderColor="#E5E7EB"
-            focusStyle={{ borderColor: '#4F46E5' }}
-            bg="white"
+            borderWidth={1}
+            borderColor="$borderColor"
+            focusStyle={{ borderColor: '#312E81' }}
+            bg="$background"
             fontSize={15}
           />
         </View>
 
         {/* Add Members Section */}
         <YStack px="$4" mt="$4" gap="$2.5">
-          <Text fontSize={18} fontWeight="700" color="#111827">
+          <Text fontSize={18} fontWeight="700" color="$color">
             Add Members
           </Text>
 
@@ -289,10 +289,10 @@ export default function GroupCreateScreen() {
               placeholder="Email or ID"
               h={50}
               br={12}
-              borderWidth={1.5}
-              borderColor="#E5E7EB"
-              focusStyle={{ borderColor: '#4F46E5' }}
-              bg="white"
+              borderWidth={1}
+              borderColor="$borderColor"
+              focusStyle={{ borderColor: '#312E81' }}
+              bg="$background"
               fontSize={14}
               autoCapitalize="none"
             />
@@ -303,16 +303,16 @@ export default function GroupCreateScreen() {
               placeholder="Name (optional)"
               h={50}
               br={12}
-              borderWidth={1.5}
-              borderColor="#E5E7EB"
-              focusStyle={{ borderColor: '#4F46E5' }}
-              bg="white"
+              borderWidth={1}
+              borderColor="$borderColor"
+              focusStyle={{ borderColor: '#312E81' }}
+              bg="$background"
               fontSize={14}
             />
             <Button
               onPress={onAddDraftMember}
-              bg="#4F46E5"
-              pressStyle={{ bg: '#4338CA', scale: 0.97 }}
+              bg="#312E81"
+              pressStyle={{ bg: '#1E1B4B', scale: 0.97 }}
               h={50}
               br={12}
               px="$4"
@@ -337,7 +337,7 @@ export default function GroupCreateScreen() {
             alignSelf="center"
             pressStyle={{ opacity: 0.7 }}
           >
-            <Text color="#4F46E5" fontWeight="600" fontSize={14}>
+            <Text color="#312E81" fontWeight="600" fontSize={14}>
               + Invite via email or phone
             </Text>
           </Button>
@@ -345,7 +345,7 @@ export default function GroupCreateScreen() {
           {/* Added members list */}
           {draftMembers.length > 0 && (
             <YStack gap="$2" mt="$2">
-              <Text fontSize={14} fontWeight="600" color="#6B7280" mb="$1">
+              <Text fontSize={14} fontWeight="600" color="$gray11" mb="$1">
                 Members to add ({draftMembers.length})
               </Text>
               {draftMembers.map((member, idx) => {
@@ -361,10 +361,10 @@ export default function GroupCreateScreen() {
                     ai="center"
                     jc="space-between"
                     p="$3"
-                    bg="white"
+                    bg="$background"
                     br={14}
-                    borderWidth={1}
-                    borderColor="#F3F4F6"
+                    borderWidth={0.5}
+                    borderColor="$borderColor"
                     shadowColor="#000"
                     shadowOffset={{ width: 0, height: 1 }}
                     shadowOpacity={0.01}
@@ -379,10 +379,10 @@ export default function GroupCreateScreen() {
                         backgroundColor={getBgColor(avatarLabel)}
                       />
                       <YStack>
-                        <Text fontSize={15} fontWeight="600" color="#111827">
+                        <Text fontSize={15} fontWeight="600" color="$color">
                           {member.displayName || member.username}
                         </Text>
-                        <Text fontSize={13} color="#6B7280">
+                        <Text fontSize={13} color="$gray11">
                           {member.uniqueId}
                         </Text>
                       </YStack>
@@ -404,8 +404,8 @@ export default function GroupCreateScreen() {
           {/* Submit Button */}
           <Button
             onPress={handleCreateGroup}
-            bg="#4F46E5"
-            pressStyle={{ bg: '#4338CA', scale: 0.98 }}
+            bg="#312E81"
+            pressStyle={{ bg: '#1E1B4B', scale: 0.98 }}
             h={52}
             br={14}
             mt="$4"

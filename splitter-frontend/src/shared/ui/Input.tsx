@@ -80,7 +80,7 @@ export function Input({
           backgroundColor="$white1"
           height={52}
           fontSize="$4"
-          focusStyle={{ borderColor: error ? '$red8' : '#4F46E5' }}
+          focusStyle={{ borderColor: error ? '$red8' : '#312E81' }}
           {...textInputProps}
         />
 

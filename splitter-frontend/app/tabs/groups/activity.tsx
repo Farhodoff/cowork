@@ -46,13 +46,13 @@ const getActivityIcon = (type: string) => {
 const getActivityColor = (type: string) => {
   switch (type) {
     case 'session_created':
-      return '#EBF5FB';
+      return 'rgba(52, 152, 219, 0.08)';
     case 'session_finalized':
-      return '#EAFAF1';
+      return 'rgba(46, 204, 113, 0.08)';
     case 'member_added':
-      return '#F4ECFB';
+      return 'rgba(138, 43, 226, 0.08)';
     case 'member_removed':
-      return '#FDEDEC';
+      return 'rgba(231, 76, 60, 0.08)';
     default:
       return '$gray3';
   }
@@ -154,7 +154,7 @@ export default function GroupActivityScreen() {
         w={40}
         h={40}
         borderRadius={20}
-        bg="white"
+        bg="$background"
         ai="center"
         jc="center"
       >
