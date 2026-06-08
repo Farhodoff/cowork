@@ -778,122 +778,6 @@ export default function ProfileScreen() {
   const isResetDisabled = isResettingAvatar || (!user?.avatarUrl && !previewUri);
 
   // Sub-screens conditional rendering
-  if (activeSubScreen === 'edit') {
-    return (
-      <YStack f={1} bg="$background">
-        <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
-          <XStack ai="center" mt="$2">
-            <Button
-              onPress={() => setActiveSubScreen(null)}
-              circular
-              size="$3.5"
-              bg="rgba(255,255,255,0.15)"
-              pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
-              borderWidth={0}
-              icon={<ArrowLeft color="white" size={20} />}
-            />
-            <Text color="white" fontSize={22} fontWeight="700" ml="$3">
-              {t('profile.info.editTitle', 'Edit Profile')}
-            </Text>
-          </XStack>
-        </View>
-
-        <ScrollView showsVerticalScrollIndicator={false} f={1} bg="$background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
-          {/* Avatar Upload */}
-          <SectionCard
-            title={avatarTitle}
-            icon={<Upload size={18} color="#312E81" />}
-            successTrigger={successCounters.avatar}
-          >
-            <YStack ai="center" gap="$3">
-              <UserAvatar
-                uri={previewUri ?? undefined}
-                label={displayName.slice(0, 1).toUpperCase()}
-                size={96}
-                textSize={34}
-                backgroundColor="#4E788F"
-              />
-              <Text fontSize={12} color="$gray10" textAlign="center">
-                {avatarHint}
-              </Text>
-              <XStack gap="$2" w="100%">
-                <Button
-                  flex={1}
-                  size="$3.5"
-                  bg="#312E81"
-                  color="white"
-                  pressStyle={{ bg: '#1E1B4B' }}
-                  icon={<Upload size={16} color="white" />}
-                  disabled={isSavingAvatar}
-                  onPress={handlePickFromLibrary}
-                >
-                  <Text color="white" fontWeight="600">{isSavingAvatar ? avatarUploadingLabel : avatarUploadLabel}</Text>
-                </Button>
-                <Button
-                  flex={1}
-                  size="$3.5"
-                  variant="outlined"
-                  icon={<RotateCcw size={16} color="$gray11" />}
-                  disabled={isResetDisabled}
-                  onPress={handleResetAvatar}
-                >
-                  {isResettingAvatar ? avatarResettingLabel : avatarResetLabel}
-                </Button>
-              </XStack>
-            </YStack>
-          </SectionCard>
-
-          {/* User Info */}
-          <SectionCard title={userInfoTitle} icon={<UserIcon size={18} color="#312E81" />}>
-            <EditableFieldRow
-              label={usernameLabel}
-              value={user?.username ?? ''}
-              draft={usernameDraft}
-              setDraft={setUsernameDraft}
-              placeholder={usernamePlaceholder}
-              isEditing={isEditingUsername}
-              onStartEdit={() => setIsEditingUsername(true)}
-              onCancelEdit={() => {
-                setUsernameDraft(user?.username ?? '');
-                setIsEditingUsername(false);
-                setUsernameError(null);
-              }}
-              onSave={handleSaveUsername}
-              status={usernameStatus}
-              error={usernameError}
-              onCopy={() => handleCopy(usernameLabel, user?.username)}
-            />
-            <Separator />
-            <EditableFieldRow
-              label={emailLabel}
-              value={user?.email ?? ''}
-              draft={emailDraft}
-              setDraft={setEmailDraft}
-              placeholder={emailPlaceholder}
-              isEditing={isEditingEmail}
-              onStartEdit={() => setIsEditingEmail(true)}
-              onCancelEdit={() => {
-                setEmailDraft(user?.email ?? '');
-                setIsEditingEmail(false);
-                setEmailError(null);
-              }}
-              onSave={handleSaveEmail}
-              status={emailStatus}
-              error={emailError}
-              onCopy={() => handleCopy(emailLabel, user?.email)}
-              textInputProps={{ keyboardType: 'email-address', autoCapitalize: 'none', autoCorrect: false }}
-            />
-            <Separator />
-            <InfoRow
-              label={userIdLabel}
-              value={userId || notAvailableLabel}
-              onCopy={() => handleCopy(userIdLabel, userId)}
-            />
-          </SectionCard>
-        </ScrollView>
-      </YStack>
-    );
-  }
 
   if (activeSubScreen === 'settings') {
     return (
@@ -1198,40 +1082,23 @@ export default function ProfileScreen() {
               <Text fontSize={13} color="$gray10" fontWeight="500">
                 Username
               </Text>
-              <XStack gap="$2">
-                <Button
-                  unstyled
-                  onPress={() => handleCopy('Username', user?.username)}
-                  flexDirection="row"
-                  ai="center"
-                  gap="$1.5"
-                  bw={1}
-                  bc="$borderColor"
-                  br={8}
-                  px="$2.5"
-                  py="$1.5"
-                  bg="$color1"
-                  pressStyle={{ bg: '$backgroundPress' }}
-                >
-                  <Copy size={13} color="$gray11" />
-                  <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
-                </Button>
-                <Button
-                  unstyled
-                  onPress={() => setActiveSubScreen('edit')}
-                  ai="center"
-                  jc="center"
-                  bw={1}
-                  bc="$borderColor"
-                  br={8}
-                  px="$2.5"
-                  py="$1.5"
-                  bg="$color1"
-                  pressStyle={{ bg: '$backgroundPress' }}
-                >
-                  <Edit3 size={13} color="$gray11" />
-                </Button>
-              </XStack>
+              <Button
+                unstyled
+                onPress={() => handleCopy('Username', user?.username)}
+                flexDirection="row"
+                ai="center"
+                gap="$1.5"
+                bw={1}
+                bc="$borderColor"
+                br={8}
+                px="$2.5"
+                py="$1.5"
+                bg="$color1"
+                pressStyle={{ bg: '$backgroundPress' }}
+              >
+                <Copy size={13} color="$gray11" />
+                <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
+              </Button>
             </XStack>
             <View bg="$backgroundPress" br={10} p="$3" mt="$1">
               <Text fontSize={15} fontWeight="600" color="$color">
@@ -1248,40 +1115,23 @@ export default function ProfileScreen() {
               <Text fontSize={13} color="$gray10" fontWeight="500">
                 Email
               </Text>
-              <XStack gap="$2">
-                <Button
-                  unstyled
-                  onPress={() => handleCopy('Email', user?.email)}
-                  flexDirection="row"
-                  ai="center"
-                  gap="$1.5"
-                  bw={1}
-                  bc="$borderColor"
-                  br={8}
-                  px="$2.5"
-                  py="$1.5"
-                  bg="$color1"
-                  pressStyle={{ bg: '$backgroundPress' }}
-                >
-                  <Copy size={13} color="$gray11" />
-                  <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
-                </Button>
-                <Button
-                  unstyled
-                  onPress={() => setActiveSubScreen('edit')}
-                  ai="center"
-                  jc="center"
-                  bw={1}
-                  bc="$borderColor"
-                  br={8}
-                  px="$2.5"
-                  py="$1.5"
-                  bg="$color1"
-                  pressStyle={{ bg: '$backgroundPress' }}
-                >
-                  <Edit3 size={13} color="$gray11" />
-                </Button>
-              </XStack>
+              <Button
+                unstyled
+                onPress={() => handleCopy('Email', user?.email)}
+                flexDirection="row"
+                ai="center"
+                gap="$1.5"
+                bw={1}
+                bc="$borderColor"
+                br={8}
+                px="$2.5"
+                py="$1.5"
+                bg="$color1"
+                pressStyle={{ bg: '$backgroundPress' }}
+              >
+                <Copy size={13} color="$gray11" />
+                <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
+              </Button>
             </XStack>
             <View bg="$backgroundPress" br={10} p="$3" mt="$1">
               <Text fontSize={15} fontWeight="600" color="$color">
@@ -1326,12 +1176,6 @@ export default function ProfileScreen() {
 
         {/* Menu Items List */}
         <YStack gap="$3" px="$4" mt="$4">
-          <MenuItem
-            label={t('profile.menu.edit', 'Edit Profile')}
-            icon={<UserIcon size={18} color="#312E81" />}
-            iconBg="rgba(49, 46, 129, 0.08)"
-            onPress={() => setActiveSubScreen('edit')}
-          />
           <MenuItem
             label={t('profile.menu.settings', 'Settings')}
             icon={<SettingsIcon size={18} color="#312E81" />}
