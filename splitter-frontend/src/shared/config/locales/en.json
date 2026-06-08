@@ -209,6 +209,14 @@
         "ja": "Japanese",
         "uz": "Uzbek"
       }
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Choose between Light and Dark mode.",
+      "options": {
+        "light": "Light",
+        "dark": "Dark"
+      }
     }
   }
 }

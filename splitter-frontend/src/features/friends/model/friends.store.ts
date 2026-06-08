@@ -1,5 +1,7 @@
 // src/features/friends/model/friends.store.ts
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FriendsApi } from '../api/friends.api';
 
 type State = {
@@ -16,10 +18,12 @@ type Actions = {
   remove: (uniqueId: string) => Promise<void>; // <-- меняем тип
 };
 
-export const useFriendsStore = create<State & Actions>((set, get) => ({
-  friends: [],
-  requestsRaw: null,
-  loading: false,
+export const useFriendsStore = create<State & Actions>()(
+  persist(
+    (set, get) => ({
+      friends: [],
+      requestsRaw: null,
+      loading: false,
 
   async fetchAll() {
     set({ loading: true, error: undefined });
@@ -62,8 +66,18 @@ export const useFriendsStore = create<State & Actions>((set, get) => ({
     await get().fetchAll();
   },
 
-  async remove(uniqueId) {
-    await FriendsApi.remove(uniqueId); // <-- передаем строку
-    await get().fetchAll(); // обновляем список после удаления
-  },
-}));
+      async remove(uniqueId) {
+        await FriendsApi.remove(uniqueId);
+        await get().fetchAll();
+      },
+    }),
+    {
+      name: 'friends-store',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        friends: state.friends,
+        requestsRaw: state.requestsRaw,
+      }),
+    }
+  )
+);

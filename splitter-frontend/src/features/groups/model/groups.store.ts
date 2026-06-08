@@ -1,4 +1,6 @@
-﻿import { create } from 'zustand';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GroupsApi, Group, GroupDetails } from '../api/groups.api';
 
 type State = {
@@ -21,11 +23,13 @@ type Actions = {
   clearCurrent: () => void;
 };
 
-export const useGroupsStore = create<State & Actions>((set, get) => ({
-  groups: [],
-  current: undefined,
-  counts: {},
-  loading: false,
+export const useGroupsStore = create<State & Actions>()(
+  persist(
+    (set, get) => ({
+      groups: [],
+      current: undefined,
+      counts: {},
+      loading: false,
 
   async fetchGroups() {
     set({ loading: true, error: undefined });
@@ -123,8 +127,19 @@ export const useGroupsStore = create<State & Actions>((set, get) => ({
     await get().openGroup(groupId);
   },
 
-  clearCurrent() {
-    set({ current: undefined });
-  },
-}));
+      clearCurrent() {
+        set({ current: undefined });
+      },
+    }),
+    {
+      name: 'groups-store',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        groups: state.groups,
+        current: state.current,
+        counts: state.counts,
+      }),
+    }
+  )
+);
 

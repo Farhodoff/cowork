@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {
   FinalizeReceiptResponse,
   FinalizeReceiptItemPayload,
@@ -101,153 +103,167 @@ const INITIAL_STATE: Pick<ReceiptSessionStore,
   lastFinishPayload: undefined,
 };
 
-export const useReceiptSessionStore = create<ReceiptSessionStore>((set, get) => ({
-  ...INITIAL_STATE,
+export const useReceiptSessionStore = create<ReceiptSessionStore>()(
+  persist(
+    (set, get) => ({
+      ...INITIAL_STATE,
 
-  setCapture: (capture) => set({ capture }),
-  clearCapture: () => set({ capture: undefined }),
+      setCapture: (capture) => set({ capture }),
+      clearCapture: () => set({ capture: undefined }),
 
-  setSessionName: (sessionName) => {
-    set((state) => {
-      if (!state.session) return {};
-      return { session: { ...state.session, sessionName } };
-    });
-  },
+      setSessionName: (sessionName) => {
+        set((state) => {
+          if (!state.session) return {};
+          return { session: { ...state.session, sessionName } };
+        });
+      },
 
-  setSessionMeta: (meta) => set({ session: meta }), // ✅ Implementation
+      setSessionMeta: (meta) => set({ session: meta }),
 
-  setParticipants: (participants) => set({ participants }),
+      setParticipants: (participants) => set({ participants }),
 
-  setCurrency: (currency) => set({ currency }), // ✅ Новый метод
+      setCurrency: (currency) => set({ currency }),
 
-  updateItem: (itemId, updater) => {
-    set((state) => ({
-      items: state.items.map((item) => item.id === itemId ? updater(item) : item),
-    }));
-  },
+      updateItem: (itemId, updater) => {
+        set((state) => ({
+          items: state.items.map((item) => item.id === itemId ? updater(item) : item),
+        }));
+      },
 
-  setItems: (items) => set({ items }),
-  setLastFinishPayload: (payload) => set({ lastFinishPayload: payload }),
+      setItems: (items) => set({ items }),
+      setLastFinishPayload: (payload) => set({ lastFinishPayload: payload }),
 
-  applyAiSplitAllocation: (allocations: AiSplitResponse['allocations']) => {
-    set((state) => {
-      const currentItems = [...state.items];
+      applyAiSplitAllocation: (allocations: AiSplitResponse['allocations']) => {
+        set((state) => {
+          const currentItems = [...state.items];
 
-      allocations.forEach((alloc: { itemId: string; assignedTo: string[] }) => {
-        const itemIndex = currentItems.findIndex((it) => it.id === alloc.itemId);
-        if (itemIndex > -1) {
-          const item = currentItems[itemIndex];
-          currentItems[itemIndex] = {
-            ...item,
-            splitMode: 'equal', // Force mode to equal for AI assignments
-            assignedTo: alloc.assignedTo,
-            perPersonCount: {}, // reset count mode
-          };
+          allocations.forEach((alloc: { itemId: string; assignedTo: string[] }) => {
+            const itemIndex = currentItems.findIndex((it) => it.id === alloc.itemId);
+            if (itemIndex > -1) {
+              const item = currentItems[itemIndex];
+              currentItems[itemIndex] = {
+                ...item,
+                splitMode: 'equal',
+                assignedTo: alloc.assignedTo,
+                perPersonCount: {},
+              };
+            }
+          });
+          return { items: currentItems };
+        });
+      },
+
+      parseReceipt: async (payload) => {
+        set({ parsing: true, parseError: undefined });
+        try {
+          const response = await ReceiptApi.parse(payload);
+          const splitItems: ReceiptSplitItem[] = response.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            totalPrice: item.totalPrice,
+            kind: item.kind,
+            splitMode: item.quantity > 1 ? 'count' : 'equal',
+            assignedTo: [],
+            perPersonCount: {},
+          }));
+
+          const detectedCurrency = response.summary?.currency || 'UZS';
+
+          set({
+            parsing: false,
+            parseError: undefined,
+            session: {
+              sessionId: response.sessionId,
+              sessionName: response.sessionName,
+              language: response.language,
+              summary: response.summary,
+            },
+            items: splitItems,
+            participants: [],
+            currency: detectedCurrency,
+            finalized: undefined,
+            finalizeError: undefined,
+          });
+
+          return response;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to parse receipt';
+          set({ parsing: false, parseError: message });
+          throw error;
         }
-      });
-      return { items: currentItems };
-    });
-  },
+      },
 
-  parseReceipt: async (payload) => {
-    set({ parsing: true, parseError: undefined });
-    try {
-      const response = await ReceiptApi.parse(payload);
-      const splitItems: ReceiptSplitItem[] = response.items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-        totalPrice: item.totalPrice,
-        kind: item.kind,
-        splitMode: item.quantity > 1 ? 'count' : 'equal',
-        assignedTo: [],
-        perPersonCount: {},
-      }));
+      finalizeSession: async () => {
+        const { session, participants, items, currency } = get();
+        if (!session) throw new Error('No session to finalize');
+        if (participants.length === 0) throw new Error('Add at least one participant');
 
-      // ✅ Извлекаем валюту из ответа API
-      const detectedCurrency = response.summary?.currency || 'UZS';
+        const payloadItems: FinalizeReceiptItemPayload[] = items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.unitPrice,
+          quantity: item.quantity,
+          kind: item.kind,
+          splitMode: item.splitMode,
+          assignedTo: item.splitMode === 'equal' ? item.assignedTo : undefined,
+          perPersonCount: item.splitMode === 'count' ? item.perPersonCount : undefined,
+        }));
 
-      set({
-        parsing: false,
-        parseError: undefined,
-        session: {
-          sessionId: response.sessionId,
-          sessionName: response.sessionName,
-          language: response.language,
-          summary: response.summary,
-        },
-        items: splitItems,
-        participants: [],
-        currency: detectedCurrency, // ✅ Сохраняем валюту
-        finalized: undefined,
-        finalizeError: undefined,
-      });
+        set({ finalizing: true, finalizeError: undefined });
+        try {
+          const response = await ReceiptApi.finalize({
+            sessionId: session.sessionId,
+            sessionName: session.sessionName,
+            participants,
+            items: payloadItems,
+            currency,
+          });
 
-      return response;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to parse receipt';
-      set({ parsing: false, parseError: message });
-      throw error;
+          const nextState: Partial<ReceiptSessionStore> = {
+            finalizing: false,
+            finalized: response,
+            finalizeError: undefined,
+            lastFinishPayload: {
+              sessionId: response.sessionId,
+              sessionName: response.sessionName,
+              participants,
+              totalsByParticipant: response.totals?.byParticipant,
+              totalsByItem: response.totals?.byItem,
+              allocations: response.allocations,
+              grandTotal: response.totals?.grandTotal,
+              currency: response.totals?.currency ?? currency,
+              status: response.status,
+              createdAt: response.createdAt,
+            },
+          };
+
+          if (response.totals?.currency) {
+            nextState.currency = response.totals.currency;
+          }
+
+          set(nextState);
+          return response;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to finalize session';
+          set({ finalizing: false, finalizeError: message });
+          throw error;
+        }
+      },
+
+      reset: () => set({ ...INITIAL_STATE }),
+    }),
+    {
+      name: 'receipt-session-store',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        session: state.session,
+        items: state.items,
+        participants: state.participants,
+        currency: state.currency,
+        lastFinishPayload: state.lastFinishPayload,
+      }),
     }
-  },
-
-  finalizeSession: async () => {
-    const { session, participants, items, currency } = get();
-    if (!session) throw new Error('No session to finalize');
-    if (participants.length === 0) throw new Error('Add at least one participant');
-
-    const payloadItems: FinalizeReceiptItemPayload[] = items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      price: item.unitPrice,
-      quantity: item.quantity,
-      kind: item.kind,
-      splitMode: item.splitMode,
-      assignedTo: item.splitMode === 'equal' ? item.assignedTo : undefined,
-      perPersonCount: item.splitMode === 'count' ? item.perPersonCount : undefined,
-    }));
-
-    set({ finalizing: true, finalizeError: undefined });
-    try {
-      const response = await ReceiptApi.finalize({
-        sessionId: session.sessionId,
-        sessionName: session.sessionName,
-        participants,
-        items: payloadItems,
-        currency,
-      });
-
-      const nextState: Partial<ReceiptSessionStore> = {
-        finalizing: false,
-        finalized: response,
-        finalizeError: undefined,
-        lastFinishPayload: {
-          sessionId: response.sessionId,
-          sessionName: response.sessionName,
-          participants,
-          totalsByParticipant: response.totals?.byParticipant,
-          totalsByItem: response.totals?.byItem,
-          allocations: response.allocations,
-          grandTotal: response.totals?.grandTotal,
-          currency: response.totals?.currency ?? currency,
-          status: response.status,
-          createdAt: response.createdAt,
-        },
-      };
-
-      if (response.totals?.currency) {
-        nextState.currency = response.totals.currency;
-      }
-
-      set(nextState);
-      return response;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to finalize session';
-      set({ finalizing: false, finalizeError: message });
-      throw error;
-    }
-  },
-
-  reset: () => set({ ...INITIAL_STATE }),
-}));
+  )
+);
