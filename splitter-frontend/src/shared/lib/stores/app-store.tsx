@@ -84,7 +84,7 @@ export const useAppStore = create<AppStore>()(
             console.error('Current user fetch error:', error);
             set({ user: null });
 
-            if (error instanceof Error && /authorization/i.test(error.message)) {
+            if (error instanceof Error && /authorization|unauthorized|not found/i.test(error.message)) {
               await removeToken();
               set({ token: null, user: null });
             }
@@ -115,7 +115,7 @@ export const useAppStore = create<AppStore>()(
 );
 
 // Provider component for initialization
-import { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { onUnauthorized } from '@/shared/api/auth-events';
 
@@ -123,10 +123,22 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const initializeAuth = useAppStore((s) => s.initializeAuth);
   const logout = useAppStore((s) => s.logout);
   const router = useRouter();
-  
+  const [isAuthReady, setIsAuthReady] = useState(false);
+
   useEffect(() => {
-    initializeAuth();
-  }, []);
+    let mounted = true;
+
+    (async () => {
+      await initializeAuth();
+      if (mounted) {
+        setIsAuthReady(true);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [initializeAuth]);
 
   useEffect(() => {
     const unsubscribe = onUnauthorized(async () => {
@@ -136,5 +148,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, [logout, router]);
   
+  if (!isAuthReady) {
+    return null;
+  }
+
   return <>{children}</>;
 }
