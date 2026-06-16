@@ -1,22 +1,23 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { YStack, XStack, Paragraph, Input, ScrollView, Spinner, Separator, Text } from 'tamagui';
+import { YStack, XStack, Paragraph, Input, ScrollView, Spinner, Separator, Text, View, Button } from 'tamagui';
 import { useRouter } from 'expo-router';
-import { Search } from '@tamagui/lucide-icons';
+import { Search, Bell } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl } from 'react-native';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
 import { FriendListItem } from '@/features/friends/ui/FriendListItem';
 import Fab from '@/shared/ui/Fab';
 import { ScreenContainer } from '@/shared/ui/ScreenContainer';
-import { useReceiptSessionStore, ReceiptSplitItem } from '@/features/receipt/model/receipt-session.store';
-import { Button } from 'tamagui'; // Added Button
+import { useReceiptSessionStore } from '@/features/receipt/model/receipt-session.store';
 
 
 export default function FriendsScreen() {
-  const { friends, loading, error, fetchAll } = useFriendsStore();
+  const { friends, loading, error, fetchAll, requestsRaw } = useFriendsStore();
   const router = useRouter();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const requestsCount = requestsRaw?.incoming?.length ?? 0;
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -63,28 +64,63 @@ export default function FriendsScreen() {
   }
 
   return (
-    <YStack f={1} bg="$background">
-      <YStack f={1} p="$4">
+    <ScreenContainer paddingHorizontal={0}>
+      <XStack height={50} alignItems="center" justifyContent="space-between" px="$4" mb="$3">
+        <Text fontSize={20} fontWeight="700" color="rgba(255,255,255,0.88)">
+          {t('friends.title', 'Friends')}
+        </Text>
+        <Button
+          onPress={() => router.push('/tabs/friends/requests' as never)}
+          circular
+          size="$3.5"
+          bg="rgba(255,255,255,0.06)"
+          pressStyle={{ bg: 'rgba(255,255,255,0.15)', scale: 0.95 }}
+          borderWidth={0}
+          icon={
+            <View position="relative">
+              <Bell color="rgba(255, 255, 255, 0.88)" size={20} />
+              {requestsCount > 0 && (
+                <View
+                  position="absolute"
+                  top={-2}
+                  right={-2}
+                  width={8}
+                  height={8}
+                  borderRadius={4}
+                  backgroundColor="#ff4d4f"
+                />
+              )}
+            </View>
+          }
+        />
+      </XStack>
 
+      <YStack f={1} px="$4">
         {/* Search Input */}
         <XStack position="relative" ai="center" mb="$4">
-
           <Input
             placeholder={t('friends.searchPlaceholder', 'Search friends...')}
             value={searchQuery}
             onChangeText={setSearchQuery}
             f={1}
-            h={40}
-            pl={40}
-            borderRadius={10}
-            bg="$backgroundPress"
-            borderWidth={0}
+            h={44}
+            pl={42}
+            borderRadius={12}
+            bg="rgba(255,255,255,0.04)"
+            borderWidth={0.5}
+            borderColor="rgba(255,255,255,0.08)"
+            color="rgba(255,255,255,0.88)"
+            placeholderTextColor="rgba(255,255,255,0.3)"
+            focusStyle={{
+              borderColor: 'rgba(124, 77, 255, 0.5)',
+              bg: 'rgba(255,255,255,0.06)'
+            }}
           />
           <Search
-            size={20}
-            color="$gray10"
+            size={18}
+            color="rgba(255,255,255,0.35)"
             position="absolute"
-            left={12}
+            left={14}
             pointerEvents="none"
           />
         </XStack>
@@ -105,11 +141,17 @@ export default function FriendsScreen() {
           }
         >
           {filteredFriends.length > 0 && (
-            <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden">
+            <YStack
+              borderWidth={0.5}
+              borderColor="rgba(255, 255, 255, 0.08)"
+              borderRadius={16}
+              overflow="hidden"
+              backgroundColor="rgba(255, 255, 255, 0.02)"
+            >
               {filteredFriends.map((f, index) => (
                 <React.Fragment key={f?.uniqueId || f.user?.uniqueId || f?.id || index}>
                   <FriendListItem friend={f} />
-                  {index < filteredFriends.length - 1 && <Separator />}
+                  {index < filteredFriends.length - 1 && <Separator borderColor="rgba(255, 255, 255, 0.06)" />}
                 </React.Fragment>
               ))}
             </YStack>
@@ -127,6 +169,6 @@ export default function FriendsScreen() {
       </YStack>
 
       <Fab onPress={() => router.push('/tabs/friends/requests')} />
-    </YStack>
+    </ScreenContainer>
   );
 }

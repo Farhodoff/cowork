@@ -9,18 +9,21 @@ import {
   Input,
   Text,
   ScrollView,
+  View,
 } from 'tamagui';
 import { RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
-import { CircleCheck, CircleX, QrCode, Scan } from '@tamagui/lucide-icons';
+import { CircleCheck, CircleX, QrCode, Scan, ChevronLeft, Search, Users } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useFriendsStore } from '@/features/friends/model/friends.store';
 import UserAvatar from '@/shared/ui/UserAvatar';
 import { FriendsApi } from '@/features/friends/api/friends.api';
 import { useAppStore } from '@/shared/lib/stores/app-store';
+import { ScreenContainer } from '@/shared/ui/ScreenContainer';
+import GlassCard from '@/components/ui/GlassCard';
 
-const LIST_W = 358;
 const ROW_H = 60;
 const TAB_W = 171;
 const TAB_H = 37;
@@ -51,7 +54,7 @@ function useAutoNotice() {
       setText(message);
     },
     node: text ? (
-      <Paragraph col={kind === 'error' ? '$red10' : '$green10'}>{text}</Paragraph>
+      <Paragraph style={{ color: kind === 'error' ? '#ef5350' : '#00bc8c' } as any}>{text}</Paragraph>
     ) : null,
   };
 }
@@ -71,13 +74,18 @@ function IconPill({
     <Button
       chromeless
       circular
-      w={28}
-      h={28}
-      p={0}
-      bg={tint}
       onPress={onPress}
       disabled={disabled}
-      pressStyle={{ opacity: 0.9 }}
+      pressStyle={{ opacity: 0.8, scale: 0.9 }}
+      hitSlop={10}
+      style={{
+        width: 34,
+        height: 34,
+        padding: 0,
+        backgroundColor: tint,
+        alignItems: 'center',
+        justifyContent: 'center',
+      } as any}
     >
       {children}
     </Button>
@@ -96,39 +104,36 @@ interface UserRowProps {
 }
 
 function UserRow({ title, uid, right, index, total, avatarUrl }: UserRowProps) {
-  const isFirst = index === 0;
   const isLast = index === total - 1;
   const avatarLabel = (title || 'U').slice(0, 1).toUpperCase() || 'U';
 
   return (
     <XStack
-      w={LIST_W}
-      h={ROW_H}
-      ai="center"
-      jc="space-between"
-      px={16}
-      alignSelf="center"
-      bg="$color1"
-      borderColor="$gray5"
-      borderLeftWidth={1}
-      borderRightWidth={1}
-      borderTopWidth={isFirst ? 1 : 0}
-      borderBottomWidth={isLast ? 1 : 0}
+      style={{
+        width: '100%',
+        height: ROW_H,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderBottomWidth: isLast ? 0 : 0.5,
+        borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+      } as any}
     >
-      <XStack ai="center" gap="$3">
+      <XStack style={{ alignItems: 'center', gap: 12 } as any}>
         <UserAvatar
           uri={avatarUrl ?? undefined}
           label={avatarLabel}
           size={36}
           textSize={14}
-          backgroundColor="$gray5"
+          backgroundColor="rgba(255, 255, 255, 0.08)"
         />
         <YStack>
-          <Text fontSize={17} fontWeight="600">
+          <Text fontSize={15} fontWeight="600" color="rgba(255,255,255,0.88)">
             {title}
           </Text>
           {!!uid && (
-            <Paragraph fontSize={14} color="$gray10">
+            <Paragraph fontSize={12} color="rgba(255,255,255,0.4)">
               {uid}
             </Paragraph>
           )}
@@ -143,6 +148,7 @@ export default function FriendsRequestsUnified() {
   const router = useRouter();
   const notice = useAutoNotice();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const { requestsRaw, fetchAll, loading, error, search, send, friends } = useFriendsStore();
   const meUniqueId = useAppStore((s) => s.user?.uniqueId);
@@ -293,255 +299,327 @@ export default function FriendsRequestsUnified() {
   );
 
   return (
-    <ScrollView
-      f={1}
-      bg="$background"
-      contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#312E81"
-          colors={["#312E81"]}
-        />
-      }
-    >
-      <YStack f={1} gap="$4">
-      {notice.node}
-      {error && <Paragraph col="$red10">{error}</Paragraph>}
-
-      {/* Invite quick actions */}
-      <XStack jc="space-between" ai="center" alignSelf="center" w={LIST_W}>
+    <ScreenContainer paddingHorizontal={0}>
+      <XStack height={50} alignItems="center" justifyContent="space-between" px="$4" mb="$2">
         <Button
-          onPress={() =>
-            router.push({ pathname: '/tabs/scan-invite', params: { from: 'friends-requests' } } as never)
-          }
-          size="$3"
-          borderRadius="$3"
-          theme="active"
-          icon={<Scan size={18} />}
-        >
-          {t('friends.requests.scanInvite', 'Scan invite')}
-        </Button>
-        <Button
-          onPress={() => router.push('/tabs/friends/invite' as never)}
-          size="$3"
-          borderRadius="$3"
-          theme="gray"
-          icon={<QrCode size={18} />}
-        >
-          {t('friends.requests.showMyQr', 'Show my QR')}
-        </Button>
-      </XStack>
-
-      {/* Search */}
-      <XStack ai="center" alignSelf="center">
-        <Input
-          w={LIST_W}
-          value={query}
-          onChangeText={setQuery}
-          placeholder={t('friends.search.placeholder', 'Enter uniqueId, e.g. USER#1234')}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-          onSubmitEditing={onSubmitSearch}
-          h={41}
-          px={16}
-          borderRadius={10}
-          fontSize={14}
-          fontWeight="500"
-          bg="$backgroundPress"
+          onPress={() => router.replace('/tabs/friends' as never)}
+          circular
+          size="$3.5"
+          bg="rgba(255,255,255,0.06)"
+          pressStyle={{ bg: 'rgba(255,255,255,0.15)', scale: 0.95 }}
           borderWidth={0}
-          color="$gray12"
-          placeholderTextColor="$gray10"
+          icon={<ChevronLeft color="rgba(255, 255, 255, 0.88)" size={22} />}
         />
+        <Text fontSize={18} fontWeight="700" color="rgba(255,255,255,0.88)">
+          {t('friends.requests.title', 'Friend Requests')}
+        </Text>
+        <View width={42} />
       </XStack>
 
-      {/* Search results */}
-      {searching ? (
-        <Spinner />
-      ) : results.length > 0 ? (
-        <>
-          <Separator />
-          {results.map((user, index) => {
-            const uid = user.uniqueId;
-            const avatarUrl = (user as any)?.avatarUrl ?? (user as any)?.user?.avatarUrl ?? undefined;
-            const fallbackTitle = user.displayName || user.username || uid;
-            const title = fallbackTitle || unknownUser;
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 60 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#7c4dff"
+            colors={["#7c4dff"]}
+          />
+        }
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <YStack gap="$4" style={{ flex: 1 } as any}>
+          {notice.node}
+          {error && <Paragraph style={{ color: '#ef5350' } as any}>{error}</Paragraph>}
 
-            const isMe = !!uid && !!meUniqueId && uid === meUniqueId;
-            const isFriend = !!uid && friendsSet.has(uid);
-            const isOutgoing = !!uid && outgoingSet.has(uid);
-            const isIncoming = !!uid && incomingSet.has(uid);
-
-            let label = statusLabels.add;
-            let disabled = false;
-            if (isMe) {
-              label = statusLabels.you;
-              disabled = true;
-            } else if (isFriend) {
-              label = statusLabels.friend;
-              disabled = true;
-            } else if (isOutgoing) {
-              label = statusLabels.requested;
-              disabled = true;
-            } else if (isIncoming) {
-              label = statusLabels.incoming;
-              disabled = true;
-            }
-
-            const isBusy = sendingId === uid;
-
-            return (
-              <UserRow
-                key={`${uid ?? 'u'}-${index}`}
-                index={index}
-                total={results.length}
-                title={title}
-                uid={uid}
-                avatarUrl={avatarUrl}
-                right={
-                  <Button
-                    size="$2"
-                    borderRadius={10}
-                    borderWidth={1}
-                    h={37}
-                    px={10}
-                    gap={10}
-                    w={TAB_W}
-                    onPress={() => sendInvite(uid, title)}
-                    disabled={!uid || disabled || isBusy}
-                  >
-                    {isBusy ? '...' : label}
-                  </Button>
+          {/* Quick Actions Card */}
+          <GlassCard radius={18} padding={16} style={{ width: '100%', maxWidth: 400, alignSelf: 'center' } as any}>
+            <XStack justifyContent="space-between" gap="$3">
+              <Button
+                onPress={() =>
+                  router.push({ pathname: '/tabs/scan-invite', params: { from: 'friends-requests' } } as never)
                 }
-              />
-            );
-          })}
-        </>
-      ) : (
-        <Paragraph col="$gray10">{t('friends.search.hint', 'Search by uniqueId to find someone')}</Paragraph>
-      )}
+                flex={1}
+                height={44}
+                borderRadius={12}
+                bg="#7c4dff"
+                pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
+                borderWidth={0}
+                icon={<Scan size={18} color="white" />}
+              >
+                <Text color="white" fontSize={14} fontWeight="600">
+                  {t('friends.requests.scanInvite', 'Scan invite')}
+                </Text>
+              </Button>
+              <Button
+                onPress={() => router.push('/tabs/friends/invite' as never)}
+                flex={1}
+                height={44}
+                borderRadius={12}
+                bg="rgba(255,255,255,0.06)"
+                pressStyle={{ bg: 'rgba(255,255,255,0.15)', scale: 0.96 }}
+                borderWidth={0.5}
+                borderColor="rgba(255,255,255,0.15)"
+                icon={<QrCode size={18} color="rgba(255, 255, 255, 0.88)" />}
+              >
+                <Text color="rgba(255, 255, 255, 0.88)" fontSize={14} fontWeight="600">
+                  {t('friends.requests.showMyQr', 'My QR Code')}
+                </Text>
+              </Button>
+            </XStack>
+          </GlassCard>
 
-      {/* Tabs */}
-      <Separator />
-      <XStack gap={10} ai="center" jc="center" alignSelf="center">
-        <Button
-          w={TAB_W}
-          h={TAB_H}
-          gap={10}
-          onPress={() => setTab('outgoing')}
-          variant="outlined"
-          borderColor={tab === 'outgoing' ? '$green8' : '$gray6'}
-          bg={tab === 'outgoing' ? '$green3' : '$color1'}
-          color="$gray12"
-          borderRadius={10}
-          borderWidth={1}
-          p="$2"
-        >
-          {tabLabels.outgoing}
-        </Button>
-        <Button
-          w={TAB_W}
-          h={TAB_H}
-          gap={10}
-          onPress={() => setTab('incoming')}
-          variant="outlined"
-          borderColor={tab === 'incoming' ? '$green8' : '$gray6'}
-          bg={tab === 'incoming' ? '$green3' : '$color1'}
-          color="$gray12"
-          borderRadius={10}
-          borderWidth={1}
-          p="$2"
-        >
-          {tabLabels.incoming}
-        </Button>
-      </XStack>
+          {/* Search Input Box */}
+          <View alignSelf="center" style={{ width: '100%', maxWidth: 400, position: 'relative', justifyContent: 'center' } as any}>
+            <Input
+              value={query}
+              onChangeText={setQuery}
+              placeholder={t('friends.search.placeholder', 'Search by unique ID, e.g. USER#1234')}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="search"
+              onSubmitEditing={onSubmitSearch}
+              borderRadius={12}
+              fontSize={14}
+              fontWeight="500"
+              borderWidth={0.5}
+              borderColor="rgba(255,255,255,0.08)"
+              color="rgba(255,255,255,0.88)"
+              placeholderTextColor="rgba(255,255,255,0.3)"
+              bg="rgba(255,255,255,0.04)"
+              h={44}
+              pl={42}
+              pr={16}
+              focusStyle={{
+                borderColor: 'rgba(124, 77, 255, 0.5)',
+                bg: 'rgba(255,255,255,0.06)'
+              }}
+            />
+            <Search
+              size={18}
+              color="rgba(255,255,255,0.35)"
+              position="absolute"
+              left={14}
+              pointerEvents="none"
+            />
+          </View>
 
-      {/* Lists */}
-      {tab === 'incoming' ? (
-        <>
-          <Separator />
-          {incoming.length === 0 ? (
-            <Paragraph col="$gray10">{t('friends.requests.emptyIncoming', 'No incoming requests')}</Paragraph>
-          ) : (
-            incoming.map((request: any, index: number) => {
-              const name =
-                request.from?.displayName ||
-                request.from?.username ||
-                (request.from?.id ? `User #${request.from.id}` : undefined) ||
-                unknownUser;
-              const uid = request.from?.uniqueId;
-              const fromId = request.from?.id as number;
-              const avatarUrl = request.from?.avatarUrl ?? null;
-              const isBusy = busyId === fromId;
+          {/* Search results */}
+          {searching ? (
+            <Spinner color="#7c4dff" />
+          ) : results.length > 0 ? (
+            <View style={{ borderRadius: 16, overflow: 'hidden', width: '100%', maxWidth: 400, alignSelf: 'center', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)' } as any}>
+              {results.map((user, index) => {
+                const uid = user.uniqueId;
+                const avatarUrl = (user as any)?.avatarUrl ?? (user as any)?.user?.avatarUrl ?? undefined;
+                const fallbackTitle = user.displayName || user.username || uid;
+                const title = fallbackTitle || unknownUser;
 
-              return (
-                <UserRow
-                  key={`in-${fromId}-${index}`}
-                  index={index}
-                  total={incoming.length}
-                  title={name}
-                  uid={uid}
-                  avatarUrl={avatarUrl ?? undefined}
-                  right={
-                    <XStack gap={10}>
-                      <IconPill
-                        tint={TINT_REJECT}
-                        onPress={() => reject(fromId, name, uid)}
-                        disabled={isBusy}
+                const isMe = !!uid && !!meUniqueId && uid === meUniqueId;
+                const isFriend = !!uid && friendsSet.has(uid);
+                const isOutgoing = !!uid && outgoingSet.has(uid);
+                const isIncoming = !!uid && incomingSet.has(uid);
+
+                let label = statusLabels.add;
+                let disabled = false;
+                if (isMe) {
+                  label = statusLabels.you;
+                  disabled = true;
+                } else if (isFriend) {
+                  label = statusLabels.friend;
+                  disabled = true;
+                } else if (isOutgoing) {
+                  label = statusLabels.requested;
+                  disabled = true;
+                } else if (isIncoming) {
+                  label = statusLabels.incoming;
+                  disabled = true;
+                }
+
+                const isBusy = sendingId === uid;
+
+                return (
+                  <UserRow
+                    key={`${uid ?? 'u'}-${index}`}
+                    index={index}
+                    total={results.length}
+                    title={title}
+                    uid={uid}
+                    avatarUrl={avatarUrl}
+                    right={
+                      <Button
+                        size="$2"
+                        borderRadius={10}
+                        borderWidth={0}
+                        bg={disabled ? "rgba(255,255,255,0.04)" : "#7c4dff"}
+                        pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
+                        style={{ height: 32, paddingHorizontal: 12 } as any}
+                        onPress={() => sendInvite(uid, title)}
+                        disabled={!uid || disabled || isBusy}
                       >
-                        <CircleX size={16} color="#E74C3C" />
-                      </IconPill>
-                      <IconPill
-                        tint={TINT_ACCEPT}
-                        onPress={() => accept(fromId, name, uid)}
-                        disabled={isBusy}
-                      >
-                        <CircleCheck size={16} color="#2ECC71" />
-                      </IconPill>
-                    </XStack>
-                  }
-                />
-              );
-            })
-          )}
-        </>
-      ) : (
-        <>
-          <Separator />
-          {outgoing.length === 0 ? (
-            <Paragraph col="$gray10">{t('friends.requests.emptyOutgoing', 'No outgoing requests')}</Paragraph>
+                        <Text color={disabled ? "rgba(255,255,255,0.3)" : "white"} fontSize={12} fontWeight="600">
+                          {isBusy ? '...' : label}
+                        </Text>
+                      </Button>
+                    }
+                  />
+                );
+              })}
+            </View>
           ) : (
-            outgoing.map((request: any, index: number) => {
-              const name =
-                request.to?.displayName ||
-                request.to?.username ||
-                request.to?.uniqueId ||
-                unknownUser;
-              const uid = request.to?.uniqueId;
-              const avatarUrl = request.to?.avatarUrl ?? null;
-
-              return (
-                <UserRow
-                  key={`out-${uid ?? index}`}
-                  index={index}
-                  total={outgoing.length}
-                  title={name}
-                  uid={uid}
-                  avatarUrl={avatarUrl ?? undefined}
-                  right={
-                    <Paragraph size="$2" col="$gray10">
-                      {t('friends.requests.requestedLabel', 'Requested')}
-                    </Paragraph>
-                  }
-                />
-              );
-            })
+            <Paragraph fontSize={12} color="rgba(255,255,255,0.3)" textAlign="center" mt="$-2" mb="$2">
+              {t('friends.search.hint', 'Search by unique ID to find someone')}
+            </Paragraph>
           )}
-        </>
-      )}
-      </YStack>
-    </ScrollView>
+
+          {/* Premium Segmented Tab Control */}
+          <View
+            alignSelf="center"
+            w="100%"
+            maxWidth={400}
+            h={44}
+            br={14}
+            bg="rgba(255, 255, 255, 0.04)"
+            p={3}
+            flexDirection="row"
+            mb="$1"
+            borderWidth={0.5}
+            borderColor="rgba(255, 255, 255, 0.06)"
+          >
+            <Button
+              flex={1}
+              h="100%"
+              br={11}
+              bg={tab === 'incoming' ? '#7c4dff' : 'transparent'}
+              pressStyle={{ scale: 0.97 }}
+              onPress={() => setTab('incoming')}
+              unstyled
+              ai="center"
+              jc="center"
+            >
+              <Text
+                fontSize={13}
+                fontWeight="700"
+                color={tab === 'incoming' ? 'white' : 'rgba(255,255,255,0.45)'}
+              >
+                {tabLabels.incoming}
+              </Text>
+            </Button>
+            <Button
+              flex={1}
+              h="100%"
+              br={11}
+              bg={tab === 'outgoing' ? '#7c4dff' : 'transparent'}
+              pressStyle={{ scale: 0.97 }}
+              onPress={() => setTab('outgoing')}
+              unstyled
+              ai="center"
+              jc="center"
+            >
+              <Text
+                fontSize={13}
+                fontWeight="700"
+                color={tab === 'outgoing' ? 'white' : 'rgba(255,255,255,0.45)'}
+              >
+                {tabLabels.outgoing}
+              </Text>
+            </Button>
+          </View>
+
+          {/* Lists */}
+          {tab === 'incoming' ? (
+            incoming.length === 0 ? (
+              <GlassCard radius={18} padding={24} style={{ width: '100%', maxWidth: 400, alignSelf: 'center', alignItems: 'center', gap: 10 } as any}>
+                <Users size={32} color="rgba(255,255,255,0.2)" />
+                <Paragraph fontSize={14} color="rgba(255,255,255,0.4)" textAlign="center">
+                  {t('friends.requests.emptyIncoming', 'No incoming requests yet')}
+                </Paragraph>
+              </GlassCard>
+            ) : (
+              <View style={{ borderRadius: 16, overflow: 'hidden', width: '100%', maxWidth: 400, alignSelf: 'center', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)' } as any}>
+                {incoming.map((request: any, index: number) => {
+                  const name =
+                    request.from?.displayName ||
+                    request.from?.username ||
+                    (request.from?.id ? `User #${request.from.id}` : undefined) ||
+                    unknownUser;
+                  const uid = request.from?.uniqueId;
+                  const fromId = request.from?.id as number;
+                  const avatarUrl = request.from?.avatarUrl ?? null;
+                  const isBusy = busyId === fromId;
+
+                  return (
+                    <UserRow
+                      key={`in-${fromId}-${index}`}
+                      index={index}
+                      total={incoming.length}
+                      title={name}
+                      uid={uid}
+                      avatarUrl={avatarUrl ?? undefined}
+                      right={
+                        <XStack gap={10}>
+                          <IconPill
+                            tint={TINT_REJECT}
+                            onPress={() => reject(fromId, name, uid)}
+                            disabled={isBusy}
+                          >
+                            <CircleX size={18} color="#E74C3C" />
+                          </IconPill>
+                          <IconPill
+                            tint={TINT_ACCEPT}
+                            onPress={() => accept(fromId, name, uid)}
+                            disabled={isBusy}
+                          >
+                            <CircleCheck size={18} color="#2ECC71" />
+                          </IconPill>
+                        </XStack>
+                      }
+                    />
+                  );
+                })}
+              </View>
+            )
+          ) : (
+            outgoing.length === 0 ? (
+              <GlassCard radius={18} padding={24} style={{ width: '100%', maxWidth: 400, alignSelf: 'center', alignItems: 'center', gap: 10 } as any}>
+                <Users size={32} color="rgba(255,255,255,0.2)" />
+                <Paragraph fontSize={14} color="rgba(255,255,255,0.4)" textAlign="center">
+                  {t('friends.requests.emptyOutgoing', 'No outgoing requests yet')}
+                </Paragraph>
+              </GlassCard>
+            ) : (
+              <View style={{ borderRadius: 16, overflow: 'hidden', width: '100%', maxWidth: 400, alignSelf: 'center', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)' } as any}>
+                {outgoing.map((request: any, index: number) => {
+                  const name =
+                    request.to?.displayName ||
+                    request.to?.username ||
+                    request.to?.uniqueId ||
+                    unknownUser;
+                  const uid = request.to?.uniqueId;
+                  const avatarUrl = request.to?.avatarUrl ?? null;
+
+                  return (
+                    <UserRow
+                      key={`out-${uid ?? index}`}
+                      index={index}
+                      total={outgoing.length}
+                      title={name}
+                      uid={uid}
+                      avatarUrl={avatarUrl ?? undefined}
+                      right={
+                        <Text fontSize={13} fontWeight="600" color="rgba(255,255,255,0.3)">
+                          {t('friends.requests.requestedLabel', 'Requested')}
+                        </Text>
+                      }
+                    />
+                  );
+                })}
+              </View>
+            )
+          )}
+        </YStack>
+      </ScrollView>
+    </ScreenContainer>
   );
 }

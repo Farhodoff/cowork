@@ -7,12 +7,14 @@ import {
 import { useFriendsStore } from '../model/friends.store';
 import { FriendsApi } from '../api/friends.api';
 import { useAppStore } from '@/shared/lib/stores/app-store';
+import { useTranslation } from 'react-i18next';
 
 type Props = { type: 'incoming' | 'outgoing' };
 
 export function RequestList({ type }: Props) {
   const { requestsRaw, fetchAll, loading, error } = useFriendsStore();
   const meUniqueId = useAppStore((s) => s.user?.uniqueId);
+  const { t } = useTranslation();
 
   const [busyId, setBusyId] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | undefined>();
@@ -41,7 +43,7 @@ export function RequestList({ type }: Props) {
         setNotice(okMsg);
       } catch (e: any) {
         setNoticeKind('error');
-        setNotice(e?.message || 'Something went wrong');
+        setNotice(e?.message || t('friends.common.error', 'Something went wrong'));
       } finally {
         setBusyId(null);
         fetchAll();
@@ -51,36 +53,36 @@ export function RequestList({ type }: Props) {
   );
 
   const accept = (requesterId: number, label?: string) =>
-    wrap(() => FriendsApi.accept(meUniqueId!, requesterId), requesterId, `Accepted ${label ?? ''}`.trim());
+    wrap(() => FriendsApi.accept(meUniqueId!, requesterId), requesterId, t('friends.requests.acceptedLabel', { name: label ?? '' }));
 
   const reject = (requesterId: number, label?: string) =>
-    wrap(() => FriendsApi.reject(meUniqueId!, requesterId), requesterId, `Rejected ${label ?? ''}`.trim());
+    wrap(() => FriendsApi.reject(meUniqueId!, requesterId), requesterId, t('friends.requests.rejectedLabel', { name: label ?? '' }));
 
   if (loading) {
     return (
-      <YStack gap="$3" ai="center" py="$4">
+      <YStack style={{ gap: 12, alignItems: 'center', paddingVertical: 16 } as any}>
         <Spinner />
-        <Paragraph col="$gray10">Loading requests…</Paragraph>
+        <Paragraph style={{ color: '$gray10' } as any}>{t('friends.loading', 'Loading...')}</Paragraph>
       </YStack>
     );
   }
 
   if (error) {
-    return <Paragraph col="$red10">{error}</Paragraph>;
+    return <Paragraph style={{ color: '$red10' } as any}>{error}</Paragraph>;
   }
 
   return (
     <YStack gap="$3">
       {notice && (
-        <Paragraph col={noticeKind === 'error' ? '$red10' : '$green10'}>
+        <Paragraph style={{ color: noticeKind === 'error' ? '$red10' : '$green10' } as any}>
           {notice}
         </Paragraph>
       )}
 
       {arr.length === 0 ? (
-        <YStack gap="$2" ai="center" py="$4">
-          <Paragraph col="$gray10">
-            {type === 'incoming' ? 'No incoming requests' : 'No outgoing requests'}
+        <YStack style={{ gap: 8, alignItems: 'center', paddingVertical: 16 } as any}>
+          <Paragraph style={{ color: '$gray10' } as any}>
+            {type === 'incoming' ? t('friends.requests.emptyIncoming', 'No incoming requests') : t('friends.requests.emptyOutgoing', 'No outgoing requests')}
           </Paragraph>
           <Separator />
         </YStack>
@@ -93,11 +95,11 @@ export function RequestList({ type }: Props) {
           const isBusy = !!idNum && busyId === idNum;
 
           return (
-            <Card key={`${type}-${side?.uniqueId ?? side?.id ?? i}`} p="$3" br="$4" bc="$backgroundFocus">
-              <XStack ai="center" jc="space-between" gap="$3">
+            <Card key={`${type}-${side?.uniqueId ?? side?.id ?? i}`} style={{ padding: 12, borderRadius: 8, backgroundColor: '$backgroundFocus' } as any}>
+              <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 } as any}>
                 <YStack>
-                  <Paragraph fow="600">{title}</Paragraph>
-                  {!!sub && <Paragraph size="$2" col="$gray10">{sub}</Paragraph>}
+                  <Paragraph style={{ fontWeight: '600' } as any}>{title}</Paragraph>
+                  {!!sub && <Paragraph size="$2" style={{ color: '$gray10' } as any}>{sub}</Paragraph>}
                 </YStack>
 
                 {type === 'incoming' ? (
@@ -107,20 +109,22 @@ export function RequestList({ type }: Props) {
                       onPress={() => idNum != null && accept(idNum, title)}
                       disabled={isBusy || idNum == null}
                     >
-                      {isBusy ? '...' : 'Accept'}
+                      {isBusy ? '...' : t('friends.requests.accept', 'Accept')}
                     </Button>
                     <Button
                       size="$2"
-                      theme="red"
+                      theme="dark"
+                      backgroundColor="rgba(239,83,80,0.15)"
+                      color="#ef5350"
                       onPress={() => idNum != null && reject(idNum, title)}
                       disabled={isBusy || idNum == null}
                     >
-                      {isBusy ? '...' : 'Reject'}
+                      {isBusy ? '...' : t('friends.requests.reject', 'Reject')}
                     </Button>
                   </XStack>
                 ) : (
                   // Outgoing: no actions for now (spec doesn’t have cancel)
-                  <Paragraph size="$2" col="$gray10">Requested</Paragraph>
+                  <Paragraph size="$2" style={{ color: '$gray10' } as any}>{t('friends.requests.requestedLabel', 'Requested')}</Paragraph>
                 )}
               </XStack>
             </Card>

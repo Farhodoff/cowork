@@ -70,7 +70,7 @@ export const FriendListItem = memo(function FriendListItem({ friend }: { friend:
   };
 
   return (
-    <XStack h={60} ai="center" jc="space-between" px="$4" bg="$background">
+    <XStack h={60} ai="center" jc="space-between" px="$4" bg="transparent">
       <XStack ai="center" gap="$3">
         <UserAvatar
           uri={avatarUrl ?? undefined}

@@ -1,7 +1,6 @@
-// app/tabs/friends/invite.tsx
 import React, { useEffect, useState } from 'react';
-import { YStack, XStack, Button, Paragraph, Spinner } from 'tamagui';
-import { QrCode } from '@tamagui/lucide-icons';
+import { YStack, XStack, Button, Paragraph, Spinner, Text, View } from 'tamagui';
+import { QrCode, ChevronLeft } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
@@ -34,30 +33,29 @@ export default function FriendInviteScreen() {
   }, []);
 
   return (
-    <ScreenContainer>
-      <YStack f={1} p="$4" gap="$4" bg="$background">
-        {/* Header */}
-        <XStack ai="center" jc="space-between">
-          {/* <Button
-            size="$2"
-            h={28}
-            chromeless
+    <ScreenContainer paddingHorizontal={0}>
+      <YStack f={1} gap="$4" bg="transparent">
+        {/* Header with back button */}
+        <XStack height={50} alignItems="center" justifyContent="space-between" px="$4" mb="$2">
+          <Button
             onPress={goBack}
-            icon={<ChevronLeft size={18} color="$gray12" />}
-          >
-            Back
-          </Button> */}
-          <XStack ai="center" gap="$2">
-            <QrCode size={18} color="$gray12" />
-            <Paragraph fow="700" fos="$6">{t('friends.invite.title', 'My Friend QR')}</Paragraph>
-          </XStack>
-          <YStack w={54} />{/* spacer */}
+            circular
+            size="$3.5"
+            bg="rgba(255,255,255,0.06)"
+            pressStyle={{ bg: 'rgba(255,255,255,0.15)', scale: 0.95 }}
+            borderWidth={0}
+            icon={<ChevronLeft color="rgba(255, 255, 255, 0.88)" size={22} />}
+          />
+          <Text fontSize={18} fontWeight="700" color="rgba(255,255,255,0.88)">
+            {t('friends.invite.title', 'My Friend QR')}
+          </Text>
+          <View width={42} />
         </XStack>
 
         {/* Body */}
-        <YStack f={1} ai="center" jc="center" gap="$4">
+        <YStack f={1} ai="center" jc="center" gap="$4" px="$4">
           {loading && !data ? (
-            <Spinner />
+            <Spinner color="#7c4dff" />
           ) : data ? (
             <>
               <InviteQR
@@ -65,15 +63,36 @@ export default function FriendInviteScreen() {
                 title={t('friends.invite.description', 'Show this QR to your friend')}
                 expiresAt={data.expiresAt}
               />
-              <Button onPress={refresh} size="$3" borderRadius="$3">
-                {t('friends.invite.new', 'New QR')}
+              <Button
+                onPress={refresh}
+                size="$4"
+                borderRadius={12}
+                bg="#7c4dff"
+                pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
+                borderWidth={0}
+                px="$6"
+                mt="$3"
+              >
+                <Text color="white" fontWeight="600" fontSize={14}>
+                  {t('friends.invite.new', 'New QR')}
+                </Text>
               </Button>
             </>
           ) : (
             <>
-              <Paragraph>{t('friends.invite.error', 'Failed to get invite')}</Paragraph>
-              <Button onPress={refresh}>{t('common.retry', 'Retry')}</Button>
-              {/* <Button onPress={goBack} variant="outlined">Back</Button> */}
+              <Paragraph color="rgba(255,255,255,0.55)">{t('friends.invite.error', 'Failed to get invite')}</Paragraph>
+              <Button
+                onPress={refresh}
+                borderRadius={12}
+                bg="#7c4dff"
+                pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
+                borderWidth={0}
+                px="$5"
+              >
+                <Text color="white" fontWeight="600">
+                  {t('common.retry', 'Retry')}
+                </Text>
+              </Button>
             </>
           )}
         </YStack>
