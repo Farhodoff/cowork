@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { YStack, XStack, Text, ScrollView, Button } from 'tamagui';
 import { Share } from 'react-native';
@@ -41,7 +42,7 @@ type ParticipantView = {
   }[];
 };
 
-const buildParticipantsView = (bill?: SessionHistoryEntry): ParticipantView[] => {
+const buildParticipantsView = (bill: SessionHistoryEntry | undefined, t: any): ParticipantView[] => {
   if (!bill) return [];
 
   const totalsByParticipant = new Map<string, SessionHistoryTotalsByParticipant>();
@@ -68,7 +69,7 @@ const buildParticipantsView = (bill?: SessionHistoryEntry): ParticipantView[] =>
       const itemMeta = itemsById.get(allocation.itemId);
       return {
         id: `${allocation.itemId}-${p.uniqueId}-${index}`,
-        title: itemMeta?.name || 'Tovar',
+        title: itemMeta?.name || t('historyDetail.item', 'Item'),
         price: allocation.shareAmount,
       };
     });
@@ -86,6 +87,7 @@ const buildParticipantsView = (bill?: SessionHistoryEntry): ParticipantView[] =>
 };
 
 export default function HistoryDetailsScreen() {
+  const { t } = useTranslation();
   const { historyId } = useLocalSearchParams<{ historyId: string }>();
   const router = useRouter();
   const sessions = useSessionsHistoryStore(state => state.sessions);
@@ -110,7 +112,7 @@ export default function HistoryDetailsScreen() {
     }
   }, [initialized, loading, currentLimit, fetchHistory, bill]);
 
-  const participants = useMemo(() => buildParticipantsView(bill), [bill]);
+  const participants = useMemo(() => buildParticipantsView(bill, t), [bill, t]);
   const currency =
     bill?.currency ||
     bill?.totals?.currency ||
@@ -120,17 +122,17 @@ export default function HistoryDetailsScreen() {
   const handleShare = async () => {
     if (!bill) return;
     try {
-      const title = bill.sessionName || 'Hisob';
+      const title = bill.sessionName || t('history.bill', 'Bill');
       let message = `📊 **${title}**\n`;
-      message += `Sana: ${formatSessionDate(bill.finalizedAt || bill.createdAt)}\n`;
-      message += `Jami summa: ${fmtCurrency(bill.grandTotal ?? 0, currency)}\n\n`;
+      message += `${t('historyDetail.date')} ${formatSessionDate(bill.finalizedAt || bill.createdAt)}\n`;
+      message += `${t('historyDetail.totalAmount')} ${fmtCurrency(bill.grandTotal ?? 0, currency)}\n\n`;
       
-      message += `Taqsimot:\n`;
+      message += `${t('historyDetail.breakdown')}\n`;
       participants.forEach(({ participant, amount }) => {
         message += `• ${participant.username}: ${fmtCurrency(amount, currency)}\n`;
       });
       
-      message += `\nReceipt Splitter orqali ulashildi`;
+      message += `\n${t('historyDetail.sharedVia')}`;
       
       await Share.share({
         message,
@@ -144,7 +146,7 @@ export default function HistoryDetailsScreen() {
   if (!bill && loading) {
     return (
       <YStack f={1} bg="$background" ai="center" jc="center">
-        <Text fontSize={16}>Yuklanmoqda...</Text>
+        <Text fontSize={16}>{t('historyDetail.loading')}</Text>
       </YStack>
     );
   }
@@ -152,13 +154,13 @@ export default function HistoryDetailsScreen() {
   if (!bill) {
     return (
       <YStack f={1} bg="$background" ai="center" jc="center" gap="$3">
-        <Text fontSize={16} fontWeight="600">History not found</Text>
+        <Text fontSize={16} fontWeight="600">{t('historyDetail.notFound')}</Text>
         {error && (
           <Text fontSize={14} color="$red10">
             {error}
           </Text>
         )}
-        <Button onPress={() => router.back()}>Go back</Button>
+        <Button onPress={() => router.back()}>{t('historyDetail.goBack')}</Button>
       </YStack>
     );
   }
@@ -170,10 +172,10 @@ export default function HistoryDetailsScreen() {
         contentContainerStyle={{ alignItems: 'center', paddingBottom: 32, gap: 16 }}
       >
         <YStack w={358} gap="$3">
-          <Text fontSize={24} fontWeight="700">{bill.sessionName || 'Hisob'}</Text>
+          <Text fontSize={24} fontWeight="700">{bill.sessionName || t('history.bill', 'Bill')}</Text>
           <XStack jc="space-between" ai="center">
             <Button unstyled alignSelf="flex-start" onPress={() => router.back()} hitSlop={12}>
-              <Text color="#312E81">{'< Ortga'}</Text>
+              <Text color="#312E81">{t('historyDetail.back')}</Text>
             </Button>
             <Button
               unstyled
@@ -187,11 +189,11 @@ export default function HistoryDetailsScreen() {
               pressStyle={{ scale: 0.98, bg: '$backgroundPress' }}
               animation="quick"
             >
-              <Text color="$gray11" fontSize={13} fontWeight="600">Share</Text>
+              <Text color="$gray11" fontSize={13} fontWeight="600">{t('historyDetail.share')}</Text>
             </Button>
           </XStack>
           <Text fontSize={14} color="$gray10">
-            {`${formatSessionDate(bill.finalizedAt || bill.createdAt)} ${BULLET} ${(bill.participants ?? []).length} ishtirokchi`}
+            {`${formatSessionDate(bill.finalizedAt || bill.createdAt)} ${BULLET} ${t('history.participants', { count: (bill.participants ?? []).length })}`}
           </Text>
           <Text fontSize={16} fontWeight="700" color="#10B981">
             {fmtCurrency(bill.grandTotal ?? 0, currency)}
@@ -238,7 +240,7 @@ export default function HistoryDetailsScreen() {
                 ))
               ) : (
                 <Text fontSize={12} color="$gray9">
-                  Hech qanday element biriktirilmagan
+                  {t('historyDetail.noItems')}
                 </Text>
               )}
             </YStack>

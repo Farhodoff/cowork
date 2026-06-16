@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Pressable, RefreshControl } from 'react-native';
 import { YStack, XStack, Text, ScrollView, View } from 'tamagui';
+import { useTranslation } from 'react-i18next';
 
 import UserAvatar from '@/shared/ui/UserAvatar';
 import { useSessionsHistoryStore } from '@/features/sessions/model/history.store';
@@ -11,11 +12,12 @@ const BULLET = '\u2022';
 const HISTORY_LIMIT = 50;
 const DEFAULT_CURRENCY = 'UZS';
 
-const formatSessionDate = (value?: string) => {
+const formatSessionDate = (value?: string, locale = 'uz') => {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString('uz-UZ', {
+  const canonicalLocale = locale === 'uz' ? 'uz-UZ' : locale === 'en' ? 'en-US' : locale;
+  return date.toLocaleString(canonicalLocale, {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
@@ -112,6 +114,7 @@ function HistoryCard({
 
 export default function SessionsHistoryScreen() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const sessions = useSessionsHistoryStore(state => state.sessions);
   const loading = useSessionsHistoryStore(state => state.loading);
   const initialized = useSessionsHistoryStore(state => state.initialized);
@@ -158,13 +161,13 @@ export default function SessionsHistoryScreen() {
         }
       >
         <YStack w={358} gap="$1" mb="$2">
-          <Text fontSize={24} fontWeight="700">Oxirgi hisoblar</Text>
-          <Text fontSize={12} color="$gray10">Bosh sahifa</Text>
+          <Text fontSize={24} fontWeight="700">{t('navigation.history', 'Recent bills')}</Text>
+          <Text fontSize={12} color="$gray10">{t('navigation.tabs.home', 'Home')}</Text>
         </YStack>
 
         {loading && (
           <Text color="$gray10" fontSize={14}>
-            Yuklanmoqda...
+            {t('common.loading', 'Loading...')}
           </Text>
         )}
         {error && (
@@ -174,21 +177,21 @@ export default function SessionsHistoryScreen() {
         )}
         {!loading && !error && !history.length && (
           <Text color="$gray10" fontSize={14}>
-            Hali tarix mavjud emas
+            {t('home.recent.empty', 'No bills yet')}
           </Text>
         )}
 
         {history.map((bill) => {
           const participants = bill.participants ?? [];
           const dateForSummary = bill.finalizedAt || bill.createdAt;
-          const summary = `${formatSessionDate(dateForSummary)} ${BULLET} ${participants.length} ishtirokchi`;
+          const summary = `${formatSessionDate(dateForSummary, i18n.language)} ${BULLET} ${t('home.recent.participants', { count: participants.length })}`;
           const totalAmount = bill.grandTotal ?? 0;
           const currency = bill.currency || bill.totals?.currency || bill.payload?.totals?.currency || DEFAULT_CURRENCY;
           const amountLabel = `${currency} ${totalAmount.toLocaleString()}`;
           return (
             <HistoryCard
               key={bill.sessionId}
-              title={bill.sessionName || 'Hisob'}
+              title={bill.sessionName || t('home.recent.fallbackName', 'Bill')}
               summary={summary}
               amountLabel={amountLabel}
               participants={participants}

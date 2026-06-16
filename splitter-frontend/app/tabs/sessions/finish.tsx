@@ -4,6 +4,7 @@ import { YStack, XStack, Text, Button, Circle, ScrollView } from 'tamagui';
 import { Check } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Share } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { FinalizeTotalsByItem, FinalizeTotalsByParticipant, ReceiptAllocation } from '@/features/receipt/api/receipt.api';
 import { useReceiptSessionStore, type FinishPayload } from '@/features/receipt/model/receipt-session.store';
 
@@ -37,6 +38,7 @@ export default function FinishScreen() {
   const { data } = useLocalSearchParams<{ data?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const lastFinishPayload = useReceiptSessionStore((s) => s.lastFinishPayload);
 
   const payload = useMemo<FinishPayload | null>(() => {
@@ -415,17 +417,26 @@ export default function FinishScreen() {
   const handleShare = async () => {
     if (!payload) return;
     try {
-      const title = sessionName || 'Receipt Split';
-      let message = `📊 **${title}**\n`;
-      if (receiptId) message += `Receipt #${receiptId}\n`;
-      message += `Total Amount: ${fmtCurrency(effectiveGrandTotal, currency)}\n\n`;
-      
-      message += `Split Details:\n`;
-      participantSummaries.forEach((summary) => {
-        message += `• ${summary.username}: ${fmtCurrency(summary.amount, currency)}\n`;
-      });
-      
-      message += `\nShared via Receipt Splitter`;
+      const title = sessionName || t('home.recent.fallbackName', 'Receipt Split');
+      const detailsStr = participantSummaries
+        .map((summary) => `• ${summary.username}: ${fmtCurrency(summary.amount, currency)}`)
+        .join('\n');
+
+      let message = '';
+      if (receiptId) {
+        message = t('finish.shareTemplate', {
+          title,
+          receiptId,
+          total: fmtCurrency(effectiveGrandTotal, currency),
+          details: detailsStr,
+        });
+      } else {
+        message = t('finish.shareTemplateNoReceipt', {
+          title,
+          total: fmtCurrency(effectiveGrandTotal, currency),
+          details: detailsStr,
+        });
+      }
       
       await Share.share({
         message,
@@ -451,11 +462,11 @@ export default function FinishScreen() {
         <XStack w="100%" ai="center" jc="flex-start" mb="$3">
           <YStack ai="flex-start">
             <Text fontSize={16} fontWeight="700">
-              Bill Summary
+              {t('finish.title', 'Bill Summary')}
             </Text>
             {receiptId && (
               <Text fontSize={12} color="$gray10">
-                Receipt #{receiptId}
+                {t('finish.receiptLabel', { id: receiptId })}
               </Text>
             )}
           </YStack>
@@ -500,7 +511,7 @@ export default function FinishScreen() {
             mb="$3"
           >
             <Text fontSize={13} color="$gray11" mb="$1">
-              Total Amount
+              {t('finish.totalAmount', 'Total Amount')}
             </Text>
             <XStack ai="baseline" gap="$1">
               <Text fontSize={14} color="#2ECC71">
@@ -522,7 +533,7 @@ export default function FinishScreen() {
       >
         <YStack gap="$2">
           <Text fontSize={14} fontWeight="600" color="$gray11" mb="$1">
-            Split by participant:
+            {t('finish.splitByParticipant', 'Split by participant:')}
           </Text>
           {participantSummaries.length > 0 ? (
             participantSummaries.map((summary) => {
@@ -560,7 +571,7 @@ export default function FinishScreen() {
             })
           ) : (
             <Text fontSize={13} color="$gray10">
-              No participant data available yet.
+              {t('finish.noParticipantData', 'No participant data available yet.')}
             </Text>
           )}
         </YStack>
@@ -568,7 +579,7 @@ export default function FinishScreen() {
         {itemSummaries.length > 0 && (
           <YStack gap="$2" mt="$4">
             <Text fontSize={14} fontWeight="600" color="$gray11" mb="$1">
-              Split by item:
+              {t('finish.splitByItem', 'Split by item:')}
             </Text>
             {itemSummaries.map((item) => {
               const itemParts = getCurrencyParts(item.total, currency);
@@ -623,7 +634,7 @@ export default function FinishScreen() {
                     </YStack>
                   ) : (
                     <Text fontSize={12} color="$gray9">
-                      No allocation details available.
+                      {t('finish.noAllocationDetails', 'No allocation details available.')}
                     </Text>
                   )}
                 </YStack>
@@ -656,7 +667,7 @@ export default function FinishScreen() {
             animation="quick"
           >
             <Text fontSize={16} fontWeight="600" color="$gray11">
-              Share
+              {t('finish.share', 'Share')}
             </Text>
           </Button>
           <Button
@@ -672,7 +683,7 @@ export default function FinishScreen() {
             animation="quick"
           >
             <Text fontSize={16} fontWeight="600" color="white">
-              Complete settlement
+              {t('finish.completeSettlement', 'Complete settlement')}
             </Text>
           </Button>
         </XStack>

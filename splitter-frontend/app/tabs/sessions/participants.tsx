@@ -5,6 +5,7 @@ import {
 } from 'tamagui';
 import { Users as UsersIcon, Check } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
 import UserAvatar from '@/shared/ui/UserAvatar';
 import { useAppStore } from '@/shared/lib/stores/app-store';
@@ -17,6 +18,7 @@ export default function SessionParticipantsScreen() {
   const { receiptId } = useLocalSearchParams<{ receiptId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   // stores
   const me = useAppStore(s => s.user);
@@ -46,7 +48,7 @@ export default function SessionParticipantsScreen() {
   const meUid = useMemo(() => {
     return (me?.uniqueId || me?.username || (typeof me?.id === 'number' ? `id:${me.id}` : '')) as string;
   }, [me?.uniqueId, me?.username, me?.id]);
-  const meName = useMemo(() => (me?.username || 'You') as string, [me?.username]);
+  const meName = useMemo(() => (me?.username || t('friends.status.you', 'You')) as string, [me?.username, t]);
 
   // гарантируем, что «я» всегда в selected = true при появлении user
   useEffect(() => {
@@ -247,12 +249,11 @@ export default function SessionParticipantsScreen() {
       jc="center"
     >
       <Text fontSize={14} fontWeight="500" color={on ? '#FFFFFF' : '$gray11'}>
-        {on ? 'Selected' : 'Select'}
+        {on ? t('splitSession.selected', 'Selected') : t('splitSession.select', 'Select')}
       </Text>
     </Button>
   );
 
-  // group chip
   const GroupChip = ({
     id, name, count, active, loading, onPress,
   }: { id: number; name: string; count?: number; active?: boolean; loading?: boolean; onPress: () => void }) => (
@@ -261,21 +262,23 @@ export default function SessionParticipantsScreen() {
       onPress={onPress}
       animation="bouncy"
       pressStyle={{ transform: [{ scale: 0.98 }] }}
-      h={32}
-      px={12}
-      borderRadius={18}
-      borderWidth={0.5}
-      borderColor={active ? '#312E81' : '$borderColor'}
-      backgroundColor={active ? '#312E81' : 'transparent'}
-      ai="center"
-      jc="center"
+      style={{
+        height: 32,
+        paddingHorizontal: 12,
+        borderRadius: 18,
+        borderWidth: 0.5,
+        borderColor: active ? '#312E81' : '#333333',
+        backgroundColor: active ? '#312E81' : 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+      } as any}
     >
-      <XStack ai="center" gap="$1">
-        <UsersIcon size={14} color={active ? '#FFFFFF' : '$gray11'} />
-        <Text fontSize={14} fontWeight="500" color={active ? '#FFFFFF' : '$gray11'}>
+      <XStack style={{ alignItems: 'center', gap: 4 } as any}>
+        <UsersIcon size={14} color={active ? '#FFFFFF' : '#888888'} />
+        <Text fontSize={14} fontWeight="500" color={active ? '#FFFFFF' : '#888888'}>
           {name}
         </Text>
-        <Text fontSize={12} color={active ? '#FFFFFF' : '$gray10'}>
+        <Text fontSize={12} color={active ? '#FFFFFF' : '#777777'}>
           · {typeof count === 'number' ? count : (loading ? '…' : '—')}
         </Text>
         {loading && <Spinner size="small" color={active ? 'white' : '$gray10'} />}
@@ -291,11 +294,11 @@ export default function SessionParticipantsScreen() {
   const bottomPad = (insets?.bottom ?? 0) + 72;
 
   return (
-    <YStack f={1} bg="$background" p="$4" position="relative">
+    <YStack style={{ flex: 1, backgroundColor: '#0a0a0f', padding: 16, position: 'relative' } as any}>
 
       {/* Groups */}
       {(groups ?? []).length > 0 && (
-        <XStack flexWrap="wrap" gap="$2" mb="$2">
+        <XStack flexWrap="wrap" style={{ gap: 8, marginBottom: 8 } as any}>
           {(groups ?? []).map((g: any) => (
             <GroupChip
               key={g.id}
@@ -312,30 +315,32 @@ export default function SessionParticipantsScreen() {
 
       {/* Search */}
       <Input
-        placeholder="Search…"
+        placeholder={t('common.search', 'Search...')}
         value={q}
         onChangeText={setQ}
-        h={41}
-        px={16}
-        borderRadius={10}
-        bg="$backgroundPress"
-        borderWidth={0}
-        mb="$3"
+        style={{
+          height: 41,
+          paddingHorizontal: 16,
+          borderRadius: 10,
+          backgroundColor: '#151520',
+          borderWidth: 0,
+          marginBottom: 12,
+        } as any}
       />
 
       {/* List */}
       <ScrollView
-        f={1}
+        style={{ flex: 1 } as any}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: bottomPad }}
       >
         <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden">
           {(friendsLoading && basePeople.length === 0) && (
-            <XStack h={56} ai="center" jc="center"><Spinner /></XStack>
+            <XStack style={{ height: 56, alignItems: 'center', justifyContent: 'center' } as any}><Spinner /></XStack>
           )}
 
           {!!friendsError && (
-            <XStack h={56} ai="center" jc="center">
+            <XStack style={{ height: 56, alignItems: 'center', justifyContent: 'center' } as any}>
               <Text color="$red10">{String(friendsError)}</Text>
             </XStack>
           )}
@@ -345,8 +350,8 @@ export default function SessionParticipantsScreen() {
             const avatarUrl = p.avatarUrl ?? null;
             return (
               <React.Fragment key={p.uniqueId}>
-                <XStack h={56} ai="center" jc="space-between" px="$4" bg="$color1">
-                  <XStack ai="center" gap="$3">
+                <XStack style={{ height: 56, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, backgroundColor: '#111118' } as any}>
+                  <XStack style={{ alignItems: 'center', gap: 12 } as any}>
                     <UserAvatar uri={avatarUrl ?? undefined} label={(p.username || "U").slice(0, 1).toUpperCase()} size={32} textSize={12} backgroundColor="$gray5" />
                     <YStack>
                       <Text fontSize={16} fontWeight="600">{p.username}</Text>
@@ -357,7 +362,7 @@ export default function SessionParticipantsScreen() {
                   </XStack>
                   <SelectPill on={on} onPress={() => toggleUser(p.uniqueId)} />
                 </XStack>
-                {idx < filtered.length - 1 && <XStack h={1} bg="$gray5" />}
+                {idx < filtered.length - 1 && <XStack style={{ height: 1, backgroundColor: '#222228' } as any} />}
               </React.Fragment>
             );
           })}
@@ -366,12 +371,14 @@ export default function SessionParticipantsScreen() {
 
       {/* Fixed Next button */}
       <YStack
-        position="absolute"
-        left={0}
-        right={0}
-        bottom={(insets?.bottom ?? 0) + 8}
-        ai="center"
-        pointerEvents="box-none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: (insets?.bottom ?? 0) + 8,
+          alignItems: 'center',
+          pointerEvents: 'box-none',
+        } as any}
       >
         <Button
           unstyled
@@ -381,12 +388,14 @@ export default function SessionParticipantsScreen() {
           height={41}
           borderRadius={10}
           backgroundColor="#312E81"
-          ai="center"
-          jc="center"
-          opacity={canNext ? 1 : 0.5}
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: canNext ? 1 : 0.5,
+          } as any}
         >
           <Text fontSize={16} fontWeight="500" color="#FFFFFF" style={{ lineHeight: 25 }}>
-            Next
+            {t('common.next', 'Next')}
           </Text>
         </Button>
       </YStack>

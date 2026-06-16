@@ -13,7 +13,7 @@ import type { FinishPayload, ReceiptSplitItem } from '@/features/receipt/model/r
 import { ReceiptApi } from '@/features/receipt/api/receipt.api';
 import type { FinalizeReceiptItemPayload, FinalizeTotalsByItem, FinalizeTotalsByParticipant, ReceiptAllocation } from '@/features/receipt/api/receipt.api';
 import { buildLocalFinalization } from '@/features/receipt/model/receipt-calculator';
-import { Audio } from 'expo-av';
+import { useAudioRecorder, requestRecordingPermissionsAsync, setAudioModeAsync, RecordingPresets } from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import { convertItemPrice } from '@/shared/lib/utils/currency';
 
@@ -204,24 +204,23 @@ export default function ItemsSplitScreen() {
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [isRecording, setIsRecording] = useState(false);
   const [audioPayload, setAudioPayload] = useState<{ mimeType: string; data: string } | null>(null);
 
   const startRecording = async () => {
     try {
       setAiError(null);
-      const perm = await Audio.requestPermissionsAsync();
+      const perm = await requestRecordingPermissionsAsync();
       if (perm.status !== 'granted') {
         setAiError('Mikrofon ruxsati berilmadi');
         return;
       }
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
-      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      setRecording(recording);
+      recorder.record();
       setIsRecording(true);
       setAudioPayload(null);
     } catch (err) {
@@ -233,17 +232,16 @@ export default function ItemsSplitScreen() {
 
   const stopRecording = async () => {
     try {
-      if (!recording) return;
+      if (!isRecording) return;
       setIsRecording(false);
-      await recording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
-      const uri = recording.getURI();
+      await recorder.stop();
+      await setAudioModeAsync({ allowsRecording: false });
+      const uri = recorder.uri;
       if (uri) {
         const base64 = await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
         // HIGH_QUALITY on iOS creates .m4a. On Android it might create .m4a or .mp4.
         setAudioPayload({ mimeType: 'audio/m4a', data: base64 });
       }
-      setRecording(null);
     } catch (err) {
       console.error('Failed to stop recording', err);
       setAiError("Yozishni to'xtatishda xatolik yuz berdi");
@@ -759,7 +757,7 @@ export default function ItemsSplitScreen() {
 
   // --- UI atoms ---
   const Avatar = ({ name }: { name: string }) => (
-    <Circle size={28} bg="$gray5" ai="center" jc="center">
+    <Circle style={{ width: 28, height: 28, backgroundColor: '$gray5', alignItems: 'center', justifyContent: 'center' } as any}>
       <Text color="white" fontWeight="700">
         {name?.[0]?.toUpperCase() || '?'}
       </Text>
@@ -767,8 +765,8 @@ export default function ItemsSplitScreen() {
   );
 
   const ProgressBar = ({ value }: { value: number }) => (
-    <YStack h={8} w="100%" br={999} bg="$gray5" overflow="hidden">
-      <YStack h="100%" w={`${Math.max(0, Math.min(100, value))}%`} bg="#2ECC71" />
+    <YStack style={{ height: 8, width: '100%', borderRadius: 999, backgroundColor: '$gray5' } as any} overflow="hidden">
+      <YStack style={{ height: '100%', width: `${Math.max(0, Math.min(100, value))}%`, backgroundColor: '#2ECC71' } as any} />
     </YStack>
   );
 
@@ -786,14 +784,9 @@ export default function ItemsSplitScreen() {
     <Button
       unstyled
       onPress={onPress}
-      px={12}
-      py={10}
-      borderRadius={8}
-      bg={active ? '#2ECC71' : '$backgroundPress'}
-      borderWidth={1}
-      borderColor={active ? '#2ECC71' : '#E4E7EB'}
+      style={{ paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, backgroundColor: active ? '#2ECC71' : '$backgroundPress', borderWidth: 1, borderColor: active ? '#2ECC71' : '#E4E7EB' } as any}
     >
-      <XStack ai="center" gap="$2">
+      <XStack style={{ alignItems: 'center', gap: 8 } as any}>
         {icon}
         <Text fontSize={13} fontWeight="600" color={active ? 'white' : '$gray11'}>
           {label}
@@ -805,21 +798,18 @@ export default function ItemsSplitScreen() {
   const gapBottom = (insets?.bottom ?? 0) + 72;
 
   return (
-    <YStack f={1} bg="$background" position="relative">
+    <YStack style={{ flex: 1, backgroundColor: '$background', position: 'relative' } as any}>
       {/* Header */}
-      <YStack bg="$background" p="$4" pb="$2">
-        <XStack w="100%" ai="center" jc="space-between" mb="$3">
-          <YStack ai="flex-start">
-            <XStack ai="center" gap="$2">
+      <YStack style={{ backgroundColor: '$background', padding: 16, paddingBottom: 8 } as any}>
+        <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 } as any}>
+          <YStack style={{ alignItems: 'flex-start' } as any}>
+            <XStack style={{ alignItems: 'center', gap: 8 } as any}>
               <Text fontSize={16} fontWeight="700">
                 {t('splitSession.orders')}
               </Text>
               <Button
                 unstyled
-                bg="$backgroundPress"
-                px="$2"
-                py="$0.5"
-                br={8}
+                style={{ backgroundColor: '$backgroundPress', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 } as any}
                 borderWidth={0.5}
                 borderColor="$borderColor"
                 onPress={() => setCurrencySheetOpen(true)}
@@ -838,7 +828,7 @@ export default function ItemsSplitScreen() {
           <Button
             size="$3"
             borderRadius="$3"
-            bg="#8A2BE2" // Purple magic color
+            style={{ backgroundColor: '#8A2BE2' } as any} // Purple magic color
             color="white"
             icon={<Sparkles size={16} color="white" />}
             onPress={() => setAiModalOpen(true)}
@@ -851,28 +841,25 @@ export default function ItemsSplitScreen() {
 
       {/* Content */}
       <ScrollView
-        f={1}
+        style={{ flex: 1 } as any}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: gapBottom }}
       >
-        <YStack px="$4" gap="$3">
+        <YStack style={{ paddingHorizontal: 16, gap: 12 } as any}>
           {/* Participants */}
           <YStack>
-            <XStack w="100%" ai="center" jc="flex-start" mb="$2">
-              <XStack ai="center" gap="$2">
+            <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 8 } as any}>
+              <XStack style={{ alignItems: 'center', gap: 8 } as any}>
                 <UsersIcon size={18} color="$gray10" />
                 <Text fontWeight="700">{t('navigation.participants')} ({participants.length})</Text>
               </XStack>
             </XStack>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <XStack gap="$2" pr="$4">
+              <XStack style={{ gap: 8, paddingRight: 16 } as any}>
                 {participants.map((p) => (
                   <XStack
                     key={p.uniqueId}
-                    ai="center"
-                    gap="$2"
-                    px="$2"
-                    py="$1"
+                    style={{ alignItems: 'center', gap: 8, paddingHorizontal: 8, paddingVertical: 4 } as any}
                     borderWidth={1}
                     borderColor="$gray6"
                     borderRadius={16}
@@ -889,7 +876,7 @@ export default function ItemsSplitScreen() {
           </YStack>
 
           {/* Items */}
-          <YStack gap="$3" mt="$2">
+          <YStack style={{ gap: 12, marginTop: 8 } as any}>
             {items.map((it) => {
               const total =
                 typeof it.totalPrice === 'number' ? it.totalPrice : it.price * it.quantity;
@@ -923,17 +910,16 @@ export default function ItemsSplitScreen() {
               return (
                 <YStack
                   key={it.id}
-                  w="100%"
+                  style={{ width: '100%', backgroundColor: '$color1' } as any}
                   borderWidth={1}
                   borderColor={
                     isCountAndMissing ? '#E74C3C' : assigned ? '#2ECC71' : '#E4E7EB'
                   }
                   borderRadius={12}
-                  bg="$color1"
                 >
-                  <XStack w="100%" ai="center" jc="space-between" px={16} py="$3" gap="$3">
-                    <YStack f={1} pr={12} gap="$1">
-                      <XStack ai="center" gap="$2">
+                  <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, gap: 12 } as any}>
+                    <YStack style={{ flex: 1, paddingRight: 12, gap: 4 } as any}>
+                      <XStack style={{ alignItems: 'center', gap: 8 } as any}>
                         <Text fontSize={16} fontWeight="700" numberOfLines={1}>
                           {it.name}
                           {it.quantity > 1 ? ` (${it.quantity}x)` : ''}
@@ -943,7 +929,7 @@ export default function ItemsSplitScreen() {
                         </Button>
                       </XStack>
                       {summaryText && (
-                        <XStack ai="center" gap="$1">
+                        <XStack style={{ alignItems: 'center', gap: 4 } as any}>
                           {showUnitIcon && <PackageIcon size={14} color="$gray10" />}
                           <Text fontSize={12} color="$gray10" numberOfLines={1}>
                             {summaryText}
@@ -957,8 +943,8 @@ export default function ItemsSplitScreen() {
                       )}
                     </YStack>
 
-                    <YStack ai="flex-end" gap="$2" flexShrink={0}>
-                      <XStack ai="baseline" gap="$1">
+                    <YStack style={{ alignItems: 'flex-end', gap: 8 } as any} flexShrink={0}>
+                      <XStack style={{ alignItems: 'baseline', gap: 4 } as any}>
                         <Text fontSize={12} color="$gray10">
                           {priceParts.currency}
                         </Text>
@@ -970,16 +956,18 @@ export default function ItemsSplitScreen() {
                       <Button
                         unstyled
                         onPress={() => openAssignModal(it)}
-                        width={assigned ? 109 : undefined}
-                        minHeight={assigned ? 29 : 32}
-                        px={assigned ? 16 : 12}
-                        py={assigned ? 6 : undefined}
-                        borderRadius={assigned ? 5 : 6}
-                        bg={assigned ? '#2ECC711A' : '$backgroundPress'}
-                        borderWidth={assigned ? 0 : 1}
-                        borderColor={assigned ? 'transparent' : '#E4E7EB'}
-                        ai="center"
-                        jc="center"
+                        style={{
+                          width: assigned ? 109 : undefined,
+                          minHeight: assigned ? 29 : 32,
+                          paddingHorizontal: assigned ? 16 : 12,
+                          paddingVertical: assigned ? 6 : undefined,
+                          borderRadius: assigned ? 5 : 6,
+                          backgroundColor: assigned ? '#2ECC711A' : '$backgroundPress',
+                          borderWidth: assigned ? 0 : 1,
+                          borderColor: assigned ? 'transparent' : '#E4E7EB',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        } as any}
                       >
                         <Text
                           fontSize={14}
@@ -1000,18 +988,20 @@ export default function ItemsSplitScreen() {
           <Button
             unstyled
             onPress={handleAddNewItem}
-            mt="$3"
-            h={44}
-            br={10}
-            bg="$color1"
+            style={{
+              marginTop: 12,
+              height: 44,
+              borderRadius: 10,
+              backgroundColor: '$color1',
+              alignItems: 'center',
+              justifyContent: 'center',
+            } as any}
             borderWidth={0.5}
             borderColor="$gray6"
-            ai="center"
-            jc="center"
-            pressStyle={{ scale: 0.98, bg: '$backgroundPress' }}
+            pressStyle={{ scale: 0.98, backgroundColor: '$backgroundPress' } as any}
             animation="quick"
           >
-            <XStack ai="center" gap="$2">
+            <XStack style={{ alignItems: 'center', gap: 8 } as any}>
               <Plus size={16} color="$gray11" />
               <Text fontWeight="600" color="$gray11">
                 {t('splitSession.addItem')}
@@ -1028,11 +1018,11 @@ export default function ItemsSplitScreen() {
         right={0}
         bottom={(insets?.bottom ?? 0) + 8
         }
-        px="$4"
+        style={{ paddingHorizontal: 16 } as any}
       >
         {!canContinue ? (
-          <YStack p="$3" borderWidth={1} borderColor="$gray5" borderRadius={12} bg="$color1">
-            <XStack w="100%" ai="center" jc="space-between" mb="$2">
+          <YStack style={{ padding: 12, backgroundColor: '$color1' } as any} borderWidth={1} borderColor="$gray5" borderRadius={12}>
+            <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 } as any}>
               <Text color="$gray10" fontSize={13}>
                 Assignment progress
               </Text>
@@ -1051,9 +1041,7 @@ export default function ItemsSplitScreen() {
               onPress={onContinue}
               height={41}
               borderRadius={10}
-              bg="#2ECC71"
-              ai="center"
-              jc="center"
+              style={{ backgroundColor: '#2ECC71', alignItems: 'center', justifyContent: 'center' } as any}
               pressStyle={finalizing ? undefined : { opacity: 0.9 }}
               disabled={finalizing}
               opacity={finalizing ? 0.6 : 1}
@@ -1063,7 +1051,7 @@ export default function ItemsSplitScreen() {
               </Text>
             </Button>
             {submitError && (
-              <Text mt="$2" color="$red10" fontSize={13} textAlign="center">
+              <Text style={{ marginTop: 8 } as any} color="$red10" fontSize={13} textAlign="center">
                 {submitError}
               </Text>
             )}
@@ -1076,26 +1064,39 @@ export default function ItemsSplitScreen() {
         editing && (
           <YStack
             position="absolute"
-            inset={0}
-            bg="rgba(0,0,0,0.35)"
-            ai="center"
-            pt={insets.top + 12}
+            style={{
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.35)',
+              alignItems: 'center',
+              paddingTop: insets.top + 12,
+            } as any}
           >
             <YStack
-              w={358}
-              maxWidth={358}
-              h={(editingItem?.quantity || 1) > 1 ? 666 : 588}
-              bg="$color1"
-              borderRadius={8}
-              p="$3"
+              style={{
+                width: 358,
+                maxWidth: 358,
+                height: (editingItem?.quantity || 1) > 1 ? 666 : 588,
+                backgroundColor: 'rgba(15, 15, 25, 0.98)',
+                padding: 16,
+              } as any}
+              borderWidth={1}
+              borderColor="rgba(255, 255, 255, 0.12)"
+              borderRadius={16}
+              shadowColor="#000"
+              shadowOpacity={0.4}
+              shadowRadius={16}
+              elevation={10}
             >
               {/* Header product + price */}
-              <XStack w="100%" ai="center" jc="space-between" mb="$3">
+              <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 } as any}>
                 <Text fontSize={16} fontWeight="700" numberOfLines={1}>
                   {editingItem?.name}
                   {editingItem && editingItem.quantity > 1 ? ` (${editingItem.quantity}x)` : ''}
                 </Text>
-                <XStack ai="baseline" gap="$1">
+                <XStack style={{ alignItems: 'baseline', gap: 4 } as any}>
                   <Text fontSize={12} color="$gray10">
                     {editingPriceParts.currency}
                   </Text>
@@ -1106,7 +1107,7 @@ export default function ItemsSplitScreen() {
               </XStack>
 
               {editingItem && editingItem.quantity > 1 && (
-                <XStack gap="$2" mb="$2">
+                <XStack style={{ gap: 8, marginBottom: 8 } as any}>
                   <ModeToggleButton
                     label="Equal split"
                     icon={<UsersIcon size={16} color={isEqualMode ? 'white' : '#2C3D4F'} />}
@@ -1122,25 +1123,25 @@ export default function ItemsSplitScreen() {
                 </XStack>
               )}
 
-              <XStack w="100%" ai="center" jc="space-between" mb="$2">
-                <Text fontWeight="600">Assign to:</Text>
-                <XStack ai="center" gap="$2">
+              <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 } as any}>
+                <Text fontWeight="600" color="white">{t('splitSession.assignTo')}:</Text>
+                <XStack style={{ alignItems: 'center', gap: 8 } as any}>
                   <Button chromeless onPress={modalAll}>
                     <Text color="#2ECC71" fontWeight="700">
-                      All
+                      {t('splitSession.all')}
                     </Text>
                   </Button>
-                  <Text color="$gray8">|</Text>
+                  <Text color="rgba(255, 255, 255, 0.2)">|</Text>
                   <Button chromeless onPress={modalClear}>
                     <Text color="#E74C3C" fontWeight="700">
-                      Clear
+                      {t('splitSession.clear')}
                     </Text>
                   </Button>
                 </XStack>
               </XStack>
 
               <ScrollView style={{ flexGrow: 0 }} showsVerticalScrollIndicator>
-                <YStack gap="$2" pb="$2">
+                <YStack style={{ gap: 8, paddingBottom: 8 } as any}>
                   {participants.map((p) => {
                     const mode = effectiveMode;
                     const isCountRow = mode === 'count';
@@ -1159,35 +1160,39 @@ export default function ItemsSplitScreen() {
                         })}
                       >
                         <XStack
-                          h={60}
-                          ai="center"
-                          jc="space-between"
-                          px={16}
+                          style={{
+                            height: 60,
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            paddingHorizontal: 16,
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                          } as any}
                           borderWidth={1}
-                          borderColor={isSelected ? '#2ECC71' : '#E4E7EB'}
+                          borderColor={isSelected ? '#2ECC71' : 'rgba(255, 255, 255, 0.08)'}
                           borderRadius={12}
-                          bg="$color1"
                         >
-                          <XStack ai="center" gap="$3">
+                          <XStack style={{ alignItems: 'center', gap: 12 } as any}>
                             <Avatar name={p.username} />
-                            <Text fontWeight="600">{p.username}</Text>
+                            <Text fontWeight="600" color="white">{p.username}</Text>
                           </XStack>
 
-                          <XStack ai="center" gap="$3">
+                          <XStack style={{ alignItems: 'center', gap: 12 } as any}>
                             {isCountRow && (
-                              <XStack ai="center" gap="$2">
+                              <XStack style={{ alignItems: 'center', gap: 8 } as any}>
                                 <Button
                                   unstyled
                                   onPress={(e: any) => {
                                     e?.stopPropagation?.();
                                     modalDec(p.uniqueId);
                                   }}
-                                  width={28}
-                                  height={28}
-                                  br={999}
-                                  bg="#E4E7EB"
-                                  ai="center"
-                                  jc="center"
+                                  style={{
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: 999,
+                                    backgroundColor: '#E4E7EB',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  } as any}
                                 >
                                   <Minus size={16} color="#2C3D4F" />
                                 </Button>
@@ -1200,12 +1205,14 @@ export default function ItemsSplitScreen() {
                                     e?.stopPropagation?.();
                                     modalInc(p.uniqueId);
                                   }}
-                                  width={28}
-                                  height={28}
-                                  br={999}
-                                  bg="#E4E7EB"
-                                  ai="center"
-                                  jc="center"
+                                  style={{
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: 999,
+                                    backgroundColor: '#E4E7EB',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  } as any}
                                 >
                                   <Plus size={16} color="#2C3D4F" />
                                 </Button>
@@ -1213,12 +1220,15 @@ export default function ItemsSplitScreen() {
                             )}
 
                             <Circle
-                              size={22}
+                              style={{
+                                width: 22,
+                                height: 22,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: isSelected ? '#2ECC71' : 'transparent',
+                              } as any}
                               borderColor="#2ECC71"
                               borderWidth={2}
-                              ai="center"
-                              jc="center"
-                              bg={isSelected ? '#2ECC71' : 'transparent'}
                             >
                               {isSelected && <Check size={14} color="white" />}
                             </Circle>
@@ -1231,7 +1241,7 @@ export default function ItemsSplitScreen() {
               </ScrollView>
 
               {effectiveMode === 'equal' && editing.assignedTo.length > 0 && (
-                <YStack mt="$2" p={8} borderRadius={5} bg="#2ECC711A">
+                <YStack style={{ marginTop: 8, padding: 8, borderRadius: 5, backgroundColor: '#2ECC711A' } as any}>
                   <Text fontSize={13} fontWeight="700" color="#2ECC71">
                     {t('splitSession.assignedTo', { count: editing.assignedTo.length })}
                   </Text>
@@ -1244,7 +1254,7 @@ export default function ItemsSplitScreen() {
 
               {effectiveMode === 'count' &&
                 Object.values(editing.perPersonCount).reduce((a, b) => a + (b || 0), 0) > 0 && (
-                  <YStack mt="$2" p={8} borderRadius={5} bg="#2ECC711A">
+                  <YStack style={{ marginTop: 8, padding: 8, borderRadius: 5, backgroundColor: '#2ECC711A' } as any}>
                     <Text fontSize={13} fontWeight="700" color="#2ECC71">
                       {t('splitSession.unitsAssigned', { count: Object.values(editing.perPersonCount).reduce((a, b) => a + (b || 0), 0) })}
                     </Text>
@@ -1254,29 +1264,34 @@ export default function ItemsSplitScreen() {
                   </YStack>
                 )}
 
-              <XStack mt="auto" gap="$2">
+              <XStack style={{ marginTop: 'auto', gap: 8 } as any}>
                 <Button
                   unstyled
                   onPress={closeAssignModal}
-                  width={155}
-                  height={41}
-                  borderRadius={10}
+                  style={{
+                    width: 155,
+                    height: 41,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  } as any}
                   borderWidth={1}
-                  borderColor="#E4E7EB"
-                  ai="center"
-                  jc="center"
+                  borderColor="rgba(255, 255, 255, 0.15)"
                 >
-                  <Text>{t('common.cancel')}</Text>
+                  <Text color="rgba(255, 255, 255, 0.88)">{t('common.cancel')}</Text>
                 </Button>
                 <Button
                   unstyled
                   onPress={modalSave}
-                  width={155}
-                  height={41}
-                  borderRadius={10}
-                  bg="#2ECC71"
-                  ai="center"
-                  jc="center"
+                  style={{
+                    width: 155,
+                    height: 41,
+                    borderRadius: 10,
+                    backgroundColor: '#2ECC71',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  } as any}
                   disabled={saving}
                   pressStyle={{ opacity: 0.9 }}
                 >
@@ -1295,14 +1310,11 @@ export default function ItemsSplitScreen() {
         finalizing && !showSuccess && (
           <YStack
             position="absolute"
-            inset={0}
-            ai="center"
-            jc="center"
-            bg="rgba(0,0,0,0.25)"
+            style={{ top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.25)' } as any}
           >
-            <YStack w={390} h={156} ai="center" jc="center" bg="$color1" br={12}>
+            <YStack style={{ width: 390, height: 156, alignItems: 'center', justifyContent: 'center', backgroundColor: '$color1', borderRadius: 12 } as any}>
               <Spinner size="large" color="#2ECC71" />
-              <Text mt="$2" color="#2ECC71" fontSize={16} fontWeight="600">
+              <Text style={{ marginTop: 8 } as any} color="#2ECC71" fontSize={16} fontWeight="600">
                 {t('splitSession.saving')}
               </Text>
             </YStack>
@@ -1315,14 +1327,11 @@ export default function ItemsSplitScreen() {
         showSuccess && (
           <YStack
             position="absolute"
-            inset={0}
-            ai="center"
-            jc="center"
-            bg="rgba(0,0,0,0.25)"
+            style={{ top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.25)' } as any}
           >
-            <YStack w={390} h={156} ai="center" jc="center" bg="#2ECC71" br={12}>
+            <YStack style={{ width: 390, height: 156, alignItems: 'center', justifyContent: 'center', backgroundColor: '#2ECC71', borderRadius: 12 } as any}>
               <Check size={42} color="white" />
-              <Text mt="$2" color="white" fontSize={18} fontWeight="700">
+              <Text style={{ marginTop: 8 } as any} color="white" fontSize={18} fontWeight="700">
                 {t('splitSession.billConfirmed')}
               </Text>
             </YStack>
@@ -1334,59 +1343,73 @@ export default function ItemsSplitScreen() {
       {detailsEditing && (
         <YStack
           position="absolute"
-          inset={0}
-          bg="rgba(0,0,0,0.5)"
-          ai="center"
-          jc="center"
-          zIndex={1000}
+          style={{ top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 1000 } as any}
         >
           <YStack
-            w="90%"
-            maxWidth={350}
-            bg="$color1"
-            borderRadius={12}
-            p="$4"
-            gap="$3"
+            style={{
+              width: '90%',
+              maxWidth: 350,
+              backgroundColor: 'rgba(15, 15, 25, 0.98)',
+              padding: 16,
+              gap: 12,
+            } as any}
+            borderWidth={1}
+            borderColor="rgba(255, 255, 255, 0.12)"
+            borderRadius={16}
+            shadowColor="#000"
+            shadowOpacity={0.4}
+            shadowRadius={16}
+            elevation={10}
           >
-            <Text fontSize={18} fontWeight="700">{t('splitSession.editItem')}</Text>
+            <Text fontSize={18} fontWeight="700" color="white">{t('splitSession.editItem')}</Text>
 
-            <YStack gap="$1">
-              <Text fontSize={12} color="$gray10">{t('splitSession.itemName')}</Text>
+            <YStack style={{ gap: 4 } as any}>
+              <Text fontSize={12} color="rgba(255, 255, 255, 0.45)">{t('splitSession.itemName')}</Text>
               <Input
                 value={detailsEditing.name}
                 onChangeText={(t) => setDetailsEditing({ ...detailsEditing, name: t })}
-                bg="$backgroundPress"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' } as any}
+                borderColor="rgba(255, 255, 255, 0.1)"
+                color="white"
               />
             </YStack>
 
-            <XStack gap="$3">
-              <YStack f={1} gap="$1">
-                <Text fontSize={12} color="$gray10">{t('splitSession.price')}</Text>
+            <XStack style={{ gap: 12 } as any}>
+              <YStack style={{ flex: 1, gap: 4 } as any}>
+                <Text fontSize={12} color="rgba(255, 255, 255, 0.45)">{t('splitSession.price')}</Text>
                 <Input
                   value={String(detailsEditing.price)}
                   keyboardType="numeric"
                   onChangeText={(t) => setDetailsEditing({ ...detailsEditing, price: Number(t.replace(/[^0-9.]/g, '')) })}
-                  bg="$backgroundPress"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' } as any}
+                  borderColor="rgba(255, 255, 255, 0.1)"
+                  color="white"
                 />
               </YStack>
-              <YStack f={1} gap="$1">
-                <Text fontSize={12} color="$gray10">{t('splitSession.quantity')}</Text>
+              <YStack style={{ flex: 1, gap: 4 } as any}>
+                <Text fontSize={12} color="rgba(255, 255, 255, 0.45)">{t('splitSession.quantity')}</Text>
                 <Input
                   value={String(detailsEditing.quantity)}
                   keyboardType="numeric"
                   onChangeText={(t) => setDetailsEditing({ ...detailsEditing, quantity: Number(t.replace(/[^0-9]/g, '')) })}
-                  bg="$backgroundPress"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' } as any}
+                  borderColor="rgba(255, 255, 255, 0.1)"
+                  color="white"
                 />
               </YStack>
             </XStack>
 
-            <XStack mt="$2" gap="$2">
-              <Button f={1} onPress={() => setDetailsEditing(null)} bg="$gray5">
-                <Text>{t('common.cancel')}</Text>
+            <XStack style={{ marginTop: 8, gap: 8 } as any}>
+              <Button
+                style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' } as any}
+                onPress={() => setDetailsEditing(null)}
+                borderWidth={1}
+                borderColor="rgba(255, 255, 255, 0.15)"
+              >
+                <Text color="rgba(255, 255, 255, 0.88)">{t('common.cancel')}</Text>
               </Button>
               <Button
-                f={1}
-                bg="#2ECC71"
+                style={{ flex: 1, backgroundColor: '#2ECC71' } as any}
                 onPress={() => {
                   commitItems((prev) => {
                     const exists = prev.some(i => i.id === detailsEditing.id);
@@ -1405,8 +1428,8 @@ export default function ItemsSplitScreen() {
 
             {items.some(i => i.id === detailsEditing.id) && (
               <Button
-                bg="$red5"
-                borderColor="$red7"
+                style={{ backgroundColor: 'rgba(239, 83, 80, 0.15)' } as any}
+                borderColor="rgba(239, 83, 80, 0.3)"
                 borderWidth={0.5}
                 pressStyle={{ opacity: 0.8, scale: 0.98 }}
                 animation="quick"
@@ -1415,7 +1438,7 @@ export default function ItemsSplitScreen() {
                   setDetailsEditing(null);
                 }}
               >
-                <Text color="$red10" fontWeight="600">{t('common.delete')}</Text>
+                <Text color="#ef5350" fontWeight="600">{t('common.delete')}</Text>
               </Button>
             )}
           </YStack>
@@ -1431,11 +1454,11 @@ export default function ItemsSplitScreen() {
         dismissOnSnapToBottom
       >
         <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-        <Sheet.Frame ai="center" jc="flex-start" p="$4" bg="$color1" pb={insets.bottom + 20}>
+        <Sheet.Frame style={{ alignItems: 'center', justifyContent: 'flex-start', padding: 16, backgroundColor: '$color1', paddingBottom: insets.bottom + 20 } as any}>
           <Sheet.Handle />
 
-          <XStack w="100%" ai="center" jc="space-between" mb="$4">
-            <XStack ai="center" gap="$2">
+          <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 } as any}>
+            <XStack style={{ alignItems: 'center', gap: 8 } as any}>
               <Sparkles size={20} color="#8A2BE2" />
               <Text fontSize={18} fontWeight="700">Magic AI Bo'lishish</Text>
             </XStack>
@@ -1444,7 +1467,7 @@ export default function ItemsSplitScreen() {
             </Button>
           </XStack>
 
-          <Text fontSize={14} color="$gray11" textAlign="center" mb="$4">
+          <Text fontSize={14} color="$gray11" textAlign="center" style={{ marginBottom: 16 } as any}>
             Diktofon orqali ayting yoki yozing. Masalan:{"\n"}
             "Ali kabob yedi, choyni men va Vali ichdik."
           </Text>
@@ -1456,20 +1479,18 @@ export default function ItemsSplitScreen() {
             multiline
             numberOfLines={4}
             height={100}
-            w="100%"
-            bg="$backgroundPress"
+            style={{ width: '100%', backgroundColor: '$backgroundPress', padding: 12 } as any}
             borderRadius={12}
-            p="$3"
             textAlignVertical="top"
             blurOnSubmit={true}
             returnKeyType="done"
           />
 
-          <XStack w="100%" jc="center" ai="center" mt="$4">
+          <XStack style={{ width: '100%', justifyContent: 'center', alignItems: 'center', marginTop: 16 } as any}>
             <Button
               circular
               size="$5"
-              bg={isRecording ? "#E74C3C" : "#8A2BE2"}
+              style={{ backgroundColor: isRecording ? "#E74C3C" : "#8A2BE2" } as any}
               onPress={isRecording ? stopRecording : startRecording}
               pressStyle={{ opacity: 0.8 }}
             >
@@ -1477,22 +1498,24 @@ export default function ItemsSplitScreen() {
             </Button>
           </XStack>
           
-          <YStack minHeight={20} ai="center" jc="center" mt="$2">
+          <YStack minHeight={20} style={{ alignItems: 'center', justifyContent: 'center', marginTop: 8 } as any}>
             {isRecording && <Text color="#E74C3C" fontSize={13} fontWeight="600">Yozilmoqda...</Text>}
             {audioPayload && !isRecording && <Text color="#2ECC71" fontSize={13} fontWeight="600">Ovoz muvaffaqiyatli saqlandi! ✔️</Text>}
           </YStack>
 
           {aiError && (
-            <Text mt="$2" color="#E74C3C" fontSize={13} textAlign="center">
+            <Text style={{ marginTop: 8 } as any} color="#E74C3C" fontSize={13} textAlign="center">
               {aiError}
             </Text>
           )}
 
           <Button
-            mt="$3"
-            w="100%"
-            h={44}
-            bg={(aiPrompt.trim() || audioPayload) ? "#8A2BE2" : "$gray5"}
+            style={{
+              marginTop: 12,
+              width: '100%',
+              height: 44,
+              backgroundColor: (aiPrompt.trim() || audioPayload) ? "#8A2BE2" : "$gray5",
+            } as any}
             disabled={(!aiPrompt.trim() && !audioPayload) || isAiProcessing}
             opacity={isAiProcessing ? 0.7 : 1}
             borderRadius={10}
@@ -1517,24 +1540,26 @@ export default function ItemsSplitScreen() {
         animation="quick"
       >
         <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-        <Sheet.Frame ai="center" jc="flex-start" p="$4" bg="$color1" pb={insets.bottom + 20}>
+        <Sheet.Frame style={{ alignItems: 'center', justifyContent: 'flex-start', padding: 16, backgroundColor: '$color1', paddingBottom: insets.bottom + 20 } as any}>
           <Sheet.Handle />
-          <Text fontSize={18} fontWeight="700" mb="$4" mt="$2">
+          <Text fontSize={18} fontWeight="700" style={{ marginBottom: 16, marginTop: 8 } as any}>
             Select Currency
           </Text>
-          <XStack flexWrap="wrap" gap="$3" jc="center" w="100%">
+          <XStack style={{ flexWrap: 'wrap', gap: 12, justifyContent: 'center', width: '100%' } as any}>
             {['UZS', 'USD', 'EUR', 'RUB', 'JPY'].map((cur) => {
               const active = cur === storeCurrency;
               return (
                 <Button
                   key={cur}
                   onPress={() => onCurrencySelect(cur)}
-                  w={90}
-                  h={42}
+                  style={{
+                    width: 90,
+                    height: 42,
+                    backgroundColor: active ? 'rgba(49, 46, 129, 0.08)' : 'transparent',
+                  } as any}
                   borderRadius={10}
                   borderWidth={active ? 1.5 : 0.5}
                   borderColor={active ? '#312E81' : '$borderColor'}
-                  backgroundColor={active ? 'rgba(49, 46, 129, 0.08)' : 'transparent'}
                   pressStyle={{ scale: 0.98 }}
                   animation="quick"
                 >
