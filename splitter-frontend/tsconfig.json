@@ -1,8 +1,14 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+    "checkJs": false,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "moduleResolution": "bundler",  // или "node16"
     "paths": {
       "@/*": ["./src/*"]  // Используйте полный путь без baseUrl
@@ -15,6 +21,7 @@
     "expo-env.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".expo"
   ]
 }

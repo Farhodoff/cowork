@@ -12,9 +12,9 @@ type Props = {
 
 export function InviteQR({ url, title, expiresAt, caption }: Props) {
   return (
-    <YStack ai="center" gap="$3">
+    <YStack style={{ alignItems: 'center', gap: 12 } as any}>
       {!!title && (
-        <Paragraph fow="700" fos="$6">
+        <Paragraph fontWeight="700" fontSize="$6">
           {title}
         </Paragraph>
       )}
@@ -22,21 +22,23 @@ export function InviteQR({ url, title, expiresAt, caption }: Props) {
       <Card
         bordered
         elevate={false}
-        bw={1}
-        bc="$gray5"
-        br="$4"
-        p="$4"
-        bg="$color1"
+        style={{
+          borderWidth: 0.5,
+          borderColor: 'rgba(255, 255, 255, 0.12)',
+          borderRadius: 16,
+          padding: 20,
+          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        } as any}
       >
-        <QRCode value={url} size={260} ecl="M" />
+        <QRCode value={url} size={250} ecl="M" />
       </Card>
 
-      <YStack ai="center" gap="$1">
-        <Paragraph col="$gray10" size="$2">
+      <YStack style={{ alignItems: 'center', gap: 4 } as any}>
+        <Paragraph color="rgba(255, 255, 255, 0.55)" size="$2">
           {caption ?? 'Valid for a limited time'}
         </Paragraph>
         {!!expiresAt && (
-          <Text color="$gray10" fontSize={12}>
+          <Text color="rgba(255, 255, 255, 0.35)" fontSize={12}>
             Expires: {new Date(expiresAt).toLocaleString()}
           </Text>
         )}

@@ -64,10 +64,12 @@ export default function TopBar({ title, greeting = false }: Props) {
   return (
     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white', paddingTop: insets.top }}>
       <XStack
-        ai="center"
-        jc="space-between"
-        px="$4"
-        py="$3"
+        style={{
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+        } as any}
         borderBottomWidth={1}
         borderColor="$gray5"
       >
@@ -79,8 +81,8 @@ export default function TopBar({ title, greeting = false }: Props) {
           )}
         </YStack>
 
-        <XStack ai="center" gap="$3">
-          <XStack ai="center" position="relative" pressStyle={{ opacity: 0.7 }} onPress={onBellPress}>
+        <XStack style={{ alignItems: 'center', gap: 12 } as any}>
+          <XStack style={{ alignItems: 'center' } as any} position="relative" pressStyle={{ opacity: 0.7 }} onPress={onBellPress}>
             <Bell size={20} color="$gray11" />
             {requestsCount > 0 && (
               <Circle

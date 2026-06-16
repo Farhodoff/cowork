@@ -24,6 +24,7 @@ import {
 } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
 import UserAvatar from '@/shared/ui/UserAvatar';
+import { ScreenContainer } from '@/shared/ui/ScreenContainer';
 import Input from '@/shared/ui/Input';
 import PasswordInput from '@/shared/ui/PasswordInput';
 import { useAppStore } from '@/shared/lib/stores/app-store';
@@ -55,11 +56,11 @@ function SectionCard({ title, icon, children, successTrigger = 0 }: SectionCardP
   return (
     <YStack
       borderWidth={0.5}
-      borderColor="$borderColor"
-      borderRadius={16}
+      borderColor="rgba(255, 255, 255, 0.08)"
+      borderRadius={18}
       padding="$4"
       gap="$3"
-      backgroundColor="$color1"
+      backgroundColor="rgba(255, 255, 255, 0.04)"
       position="relative"
     >
       <XStack ai="center" jc="space-between">
@@ -345,11 +346,26 @@ export default function ProfileScreen() {
   }, [fetchGroups, fetchFriends, fetchHistory]);
 
   const joinDateLabel = useMemo(() => {
-    if (!(user as any)?.createdAt) return 'Member since Jun 2026';
+    const months = [
+      t('common.months.jan', 'Jan'),
+      t('common.months.feb', 'Feb'),
+      t('common.months.mar', 'Mar'),
+      t('common.months.apr', 'Apr'),
+      t('common.months.may', 'May'),
+      t('common.months.jun', 'Jun'),
+      t('common.months.jul', 'Jul'),
+      t('common.months.aug', 'Aug'),
+      t('common.months.sep', 'Sep'),
+      t('common.months.oct', 'Oct'),
+      t('common.months.nov', 'Nov'),
+      t('common.months.dec', 'Dec'),
+    ];
+    if (!(user as any)?.createdAt) {
+      return t('profile.memberSince', 'Member since {{month}} {{year}}', { month: t('common.months.jun', 'Jun'), year: 2026 });
+    }
     const date = new Date((user as any).createdAt);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `Member since ${months[date.getMonth()]} ${date.getFullYear()}`;
-  }, [user]);
+    return t('profile.memberSince', 'Member since {{month}} {{year}}', { month: months[date.getMonth()], year: date.getFullYear() });
+  }, [user, t]);
 
   const guestLabel = t('profile.labels.guest', 'Guest');
   const notAvailableLabel = t('profile.labels.notAvailable', 'N/A');
@@ -766,7 +782,7 @@ export default function ProfileScreen() {
 
   const handleLogout = useCallback(() => {
     logout()
-      .then(() => router.replace({ pathname: '/' }))
+      .then(() => router.replace({ pathname: '/(auth)/login' }))
       .catch(() =>
         Alert.alert(
           t('common.error', 'Error'),
@@ -810,11 +826,13 @@ export default function ProfileScreen() {
                 {t('settings.language.description', 'Choose the language used across the app.')}
               </Text>
 
-              <LanguageSegmentedControl
-                value={language}
-                onChange={(code) => setLanguage(code)}
-                getLabel={(code, fallback) => t(`settings.language.options.${code}`, fallback)}
-              />
+              <View width={180}>
+                <LanguageSegmentedControl
+                  value={language}
+                  onChange={(code) => setLanguage(code)}
+                  getLabel={(code, fallback) => t(`settings.language.options.${code}`, fallback)}
+                />
+              </View>
             </YStack>
           </SectionCard>
 
@@ -874,17 +892,13 @@ export default function ProfileScreen() {
 
   // Main Dashboard View (activeSubScreen === null)
   return (
-    <YStack f={1} bg="$background">
-      {/* Curved Blue Header */}
+    <ScreenContainer paddingHorizontal={0}>
+      {/* Transparent Header */}
       <View
-        bg="#312E81"
-        pt="$5"
         pb="$6"
         px="$4"
-        borderBottomLeftRadius={30}
-        borderBottomRightRadius={30}
       >
-        <Text color="white" fontSize={32} fontWeight="800" mt="$2">
+        <Text color="rgba(255,255,255,0.88)" fontSize={28} fontWeight="800">
           {t('profile.title', 'Profile')}
         </Text>
       </View>
@@ -892,22 +906,17 @@ export default function ProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         f={1}
-        bg="$background"
+        bg="#0a0a0f"
         contentContainerStyle={{ paddingBottom: 30 }}
       >
         {/* Profile Summary Card */}
         <Card
-          bg="$color1"
+          bg="rgba(255, 255, 255, 0.04)"
           br={18}
           p="$4"
           mx="$4"
-          mt={-24}
-          shadowColor="#000"
-          shadowOffset={{ width: 0, height: 2 }}
-          shadowOpacity={0.01}
-          shadowRadius={6}
           bw={0.5}
-          bc="$borderColor"
+          bc="rgba(255, 255, 255, 0.08)"
           gap="$3.5"
         >
           <XStack ai="center" gap="$4">
@@ -917,14 +926,14 @@ export default function ProfileScreen() {
                 label={displayName.slice(0, 1).toUpperCase()}
                 size={68}
                 textSize={24}
-                backgroundColor="#4E788F"
+                backgroundColor="#7c4dff"
               />
             ) : (
               <View
                 w={68}
                 h={68}
                 br={34}
-                bg="#4E788F"
+                bg="#7c4dff"
                 ai="center"
                 jc="center"
               >
@@ -935,10 +944,10 @@ export default function ProfileScreen() {
             )}
 
             <YStack>
-              <Text fontSize={20} fontWeight="800" color="#1A1A1A">
+              <Text fontSize={18} fontWeight="800" color="rgba(255,255,255,0.88)">
                 {displayName}
               </Text>
-              <Text fontSize={14} color="#6B7280" mt="$1">
+              <Text fontSize={13} color="rgba(255,255,255,0.4)" mt="$1">
                 {joinDateLabel}
               </Text>
             </YStack>
@@ -949,55 +958,55 @@ export default function ProfileScreen() {
         <XStack gap="$3" px="$4" mt="$4" jc="space-between">
           <View
             f={1}
-            bg="$backgroundPress"
-            br={16}
+            bg="rgba(255, 255, 255, 0.04)"
+            br={18}
             p="$3"
             ai="center"
             jc="center"
             bw={0.5}
-            bc="$borderColor"
+            bc="rgba(255, 255, 255, 0.08)"
           >
-            <Text fontSize={22} fontWeight="800" color="#312E81">
+            <Text fontSize={20} fontWeight="800" color="#7c4dff">
               {groups.length}
             </Text>
-            <Text fontSize={13} color="$gray10" mt="$1">
-              Groups
+            <Text fontSize={12} color="rgba(255,255,255,0.4)" mt="$1">
+              {t('profile.stats.groups', 'Groups')}
             </Text>
           </View>
 
           <View
             f={1}
-            bg="$backgroundPress"
-            br={16}
+            bg="rgba(255, 255, 255, 0.04)"
+            br={18}
             p="$3"
             ai="center"
             jc="center"
             bw={0.5}
-            bc="$borderColor"
+            bc="rgba(255, 255, 255, 0.08)"
           >
-            <Text fontSize={22} fontWeight="800" color="#312E81">
+            <Text fontSize={20} fontWeight="800" color="#7c4dff">
               {expensesCount}
             </Text>
-            <Text fontSize={13} color="$gray10" mt="$1">
-              Expenses
+            <Text fontSize={12} color="rgba(255,255,255,0.4)" mt="$1">
+              {t('profile.stats.expenses', 'Expenses')}
             </Text>
           </View>
 
           <View
             f={1}
-            bg="$backgroundPress"
-            br={16}
+            bg="rgba(255, 255, 255, 0.04)"
+            br={18}
             p="$3"
             ai="center"
             jc="center"
             bw={0.5}
-            bc="$borderColor"
+            bc="rgba(255, 255, 255, 0.08)"
           >
-            <Text fontSize={22} fontWeight="800" color="#312E81">
+            <Text fontSize={20} fontWeight="800" color="#7c4dff">
               {friends.length}
             </Text>
-            <Text fontSize={13} color="$gray10" mt="$1">
-              Friends
+            <Text fontSize={12} color="rgba(255,255,255,0.4)" mt="$1">
+              {t('profile.stats.friends', 'Friends')}
             </Text>
           </View>
         </XStack>
@@ -1021,7 +1030,7 @@ export default function ProfileScreen() {
           <XStack ai="center" gap="$2" mb="$1">
             <UserIcon size={18} color="$gray10" />
             <Text fontSize={16} fontWeight="700" color="$color">
-              User information
+              {t('profile.info.title', 'User information')}
             </Text>
           </XStack>
 
@@ -1029,7 +1038,7 @@ export default function ProfileScreen() {
           <YStack gap="$1">
             <XStack jc="space-between" ai="center">
               <Text fontSize={13} color="$gray10" fontWeight="500">
-                Username
+                {t('profile.info.usernameLabel', 'Username')}
               </Text>
               <Button
                 unstyled
@@ -1046,7 +1055,7 @@ export default function ProfileScreen() {
                 pressStyle={{ bg: '$backgroundPress' }}
               >
                 <Copy size={13} color="$gray11" />
-                <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
+                <Text fontSize={12} fontWeight="600" color="$gray11">{t('profile.actions.copy', 'Copy')}</Text>
               </Button>
             </XStack>
             <View bg="$backgroundPress" br={10} p="$3" mt="$1">
@@ -1062,7 +1071,7 @@ export default function ProfileScreen() {
           <YStack gap="$1">
             <XStack jc="space-between" ai="center">
               <Text fontSize={13} color="$gray10" fontWeight="500">
-                Email
+                {t('profile.info.emailLabel', 'Email')}
               </Text>
               <Button
                 unstyled
@@ -1079,7 +1088,7 @@ export default function ProfileScreen() {
                 pressStyle={{ bg: '$backgroundPress' }}
               >
                 <Copy size={13} color="$gray11" />
-                <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
+                <Text fontSize={12} fontWeight="600" color="$gray11">{t('profile.actions.copy', 'Copy')}</Text>
               </Button>
             </XStack>
             <View bg="$backgroundPress" br={10} p="$3" mt="$1">
@@ -1095,7 +1104,7 @@ export default function ProfileScreen() {
           <YStack gap="$1">
             <XStack jc="space-between" ai="center">
               <Text fontSize={13} color="$gray10" fontWeight="500">
-                User ID
+                {t('profile.info.userId', 'User ID')}
               </Text>
               <Button
                 unstyled
@@ -1112,7 +1121,7 @@ export default function ProfileScreen() {
                 pressStyle={{ bg: '$backgroundPress' }}
               >
                 <Copy size={13} color="$gray11" />
-                <Text fontSize={12} fontWeight="600" color="$gray11">Copy</Text>
+                <Text fontSize={12} fontWeight="600" color="$gray11">{t('profile.actions.copy', 'Copy')}</Text>
               </Button>
             </XStack>
             <View bg="$backgroundPress" br={10} p="$3" mt="$1">
@@ -1142,6 +1151,6 @@ export default function ProfileScreen() {
           />
         </YStack>
       </ScrollView>
-    </YStack>
+    </ScreenContainer>
   );
 }

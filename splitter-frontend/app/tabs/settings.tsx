@@ -17,7 +17,7 @@ export default function SettingsScreen() {
   const { user, setUser, language, setLanguage, theme: appTheme, setTheme: setAppTheme } = useAppStore();
   const { t } = useTranslation();
   const theme = useTheme();
-  const bg = theme.background?.get() || '#FFFFFF';
+  const bg = '#0a0a0f';
   const isLoggedIn = !!user;
 
   const [usernameValue, setUsernameValue] = useState(user?.username ?? '');
@@ -41,23 +41,23 @@ export default function SettingsScreen() {
 
   const validateUsername = (value: string) => {
     const trimmed = value.trim();
-    if (!trimmed) return 'Username cannot be empty';
-    if (trimmed.length < 2) return 'Username must be at least 2 characters';
+    if (!trimmed) return t('settings.validation.usernameRequired', 'Username cannot be empty');
+    if (trimmed.length < 2) return t('settings.validation.usernameMin', 'Username must be at least 2 characters');
     return null;
   };
 
   const validatePasswordForm = () => {
-    if (!currentPassword.trim()) return 'Enter your current password';
-    if (newPassword.length < 8) return 'New password must be at least 8 characters';
+    if (!currentPassword.trim()) return t('settings.validation.passwordCurrent', 'Enter your current password');
+    if (newPassword.length < 8) return t('settings.validation.passwordLength', 'New password must be at least 8 characters');
     const hasUppercase = /[A-Z]/.test(newPassword);
     const hasLowercase = /[a-z]/.test(newPassword);
     const hasNumber = /\d/.test(newPassword);
     const hasSymbol = /[^A-Za-z0-9\s]/.test(newPassword);
     if (!hasUppercase || !hasLowercase || !hasNumber || !hasSymbol) {
-      return 'Password must include uppercase, lowercase, number, and special character';
+      return t('settings.validation.passwordComplexity', 'Password must include uppercase, lowercase, number, and special character');
     }
-    if (newPassword !== confirmPassword) return 'Passwords do not match';
-    if (newPassword === currentPassword) return 'Choose a different password';
+    if (newPassword !== confirmPassword) return t('settings.validation.passwordMismatch', 'Passwords do not match');
+    if (newPassword === currentPassword) return t('settings.validation.passwordDifferent', 'Choose a different password');
     return null;
   };
 
@@ -68,7 +68,7 @@ export default function SettingsScreen() {
 
   const handleSaveUsername = async () => {
     if (!isLoggedIn) {
-      Alert.alert('Unavailable', 'Sign in to update your username.');
+      Alert.alert(t('settings.alerts.unavailable', 'Unavailable'), t('settings.alerts.loginToUpdateUsername', 'Sign in to update your username.'));
       return;
     }
     const error = validateUsername(usernameValue);
@@ -84,11 +84,12 @@ export default function SettingsScreen() {
       setIsUpdatingUsername(true);
       const updatedUser = await updateUsername({ username: trimmed });
       setUser(updatedUser);
-      Alert.alert('Success', 'Username updated.');
+      Alert.alert(t('settings.alerts.success', 'Success'), t('settings.alerts.usernameUpdated', 'Username updated.'));
     } catch (error) {
       console.error('Username update failed:', error);
-      const message = error instanceof Error ? error.message : 'Could not update the username.';
-      Alert.alert('Error', message);
+      const fallback = t('settings.alerts.updateUsernameFailed', 'Could not update the username.');
+      const message = error instanceof Error ? error.message : fallback;
+      Alert.alert(t('settings.alerts.error', 'Error'), message);
     } finally {
       setIsUpdatingUsername(false);
     }
@@ -96,7 +97,7 @@ export default function SettingsScreen() {
 
   const handleChangePassword = async () => {
     if (!isLoggedIn) {
-      Alert.alert('Unavailable', 'Sign in to change your password.');
+      Alert.alert(t('settings.alerts.unavailable', 'Unavailable'), t('settings.alerts.loginToChangePassword', 'Sign in to change your password.'));
       return;
     }
 
@@ -113,11 +114,12 @@ export default function SettingsScreen() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      Alert.alert('Password updated', 'Your password has been changed.');
+      Alert.alert(t('settings.alerts.passwordChanged', 'Password updated'), t('settings.alerts.passwordUpdated', 'Your password has been changed.'));
     } catch (error) {
       console.error('Password change failed:', error);
-      const message = error instanceof Error ? error.message : 'Could not change the password.';
-      Alert.alert('Error', message);
+      const fallback = t('settings.alerts.changePasswordFailed', 'Could not change the password.');
+      const message = error instanceof Error ? error.message : fallback;
+      Alert.alert(t('settings.alerts.error', 'Error'), message);
     } finally {
       setIsChangingPassword(false);
     }
@@ -137,26 +139,26 @@ export default function SettingsScreen() {
   }, [currentPassword, newPassword, confirmPassword, passwordError]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0a0a0f' }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.select({ ios: 0, android: 0 }) ?? 0}
       >
         <ScrollView
-          style={{ flex: 1, backgroundColor: bg }}
+          style={{ flex: 1, backgroundColor: '#0a0a0f' }}
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
           keyboardShouldPersistTaps="handled"
         >
           <ScreenContainer>
             <YStack space="$5">
               {/* Header */}
-              <YStack space="$3" mt="$4">
+              <YStack space="$3" style={{ marginTop: 16 } as any}>
                 <Text fontSize={20} fontWeight="700">
-                  Account settings
+                  {t('settings.accountSettings', 'Account settings')}
                 </Text>
                 <Text color="$gray10">
-                  Update your username and password using the forms below.
+                  {t('settings.updateDescription', 'Update your username and password using the forms below.')}
                 </Text>
               </YStack>
 
@@ -238,24 +240,24 @@ export default function SettingsScreen() {
 
               {/* USERNAME */}
               <YStack space="$3">
-                <Text fontSize={16} fontWeight="600">Username</Text>
+                <Text fontSize={16} fontWeight="600">{t('settings.username', 'Username')}</Text>
                 <Input
                   value={usernameValue}
                   onChangeText={setUsernameValue}
-                  placeholder="Enter a new username"
+                  placeholder={t('settings.enterNewUsername', 'Enter a new username')}
                   textInputProps={{ autoCapitalize: 'none', autoCorrect: false }}
                   error={usernameError || undefined}
                 />
                 <XStack space="$2">
                   <Button
-                    title={isUpdatingUsername ? 'Saving...' : 'Save username'}
+                    title={isUpdatingUsername ? t('settings.saving', 'Saving...') : t('settings.saveUsername', 'Save username')}
                     variant="primary"
                     size="medium"
                     disabled={!usernameDirty || isUpdatingUsername}
                     onPress={handleSaveUsername}
                   />
                   <Button
-                    title="Reset"
+                    title={t('settings.reset', 'Reset')}
                     variant="outline"
                     size="medium"
                     disabled={!usernameDirty}
@@ -268,31 +270,31 @@ export default function SettingsScreen() {
 
               {/* PASSWORD */}
               <YStack space="$3">
-                <Text fontSize={16} fontWeight="600">Password</Text>
+                <Text fontSize={16} fontWeight="600">{t('settings.password', 'Password')}</Text>
                 <PasswordInput
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
-                  placeholder="Current password"
+                  placeholder={t('settings.currentPassword', 'Current password')}
                   textInputProps={{ returnKeyType: 'next' }}
                 />
                 <PasswordInput
                   value={newPassword}
                   onChangeText={setNewPassword}
-                  placeholder="New password"
+                  placeholder={t('settings.newPassword', 'New password')}
                   textInputProps={{ returnKeyType: 'next' }}
                 />
                 <Text fontSize={12} color="$gray10">
-                  Password must be at least 8 characters and include uppercase, lowercase, number, and special symbol.
+                  {t('settings.passwordReq', 'Password must be at least 8 characters and include uppercase, lowercase, number, and special symbol.')}
                 </Text>
                 <PasswordInput
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
-                  placeholder="Confirm new password"
+                  placeholder={t('settings.confirmPassword', 'Confirm new password')}
                   error={passwordError || undefined}
                   textInputProps={{ returnKeyType: 'done' }}
                 />
                 <Button
-                  title={isChangingPassword ? 'Updating...' : 'Change password'}
+                  title={isChangingPassword ? t('settings.updating', 'Updating...') : t('settings.changePassword', 'Change password')}
                   variant="primary"
                   size="medium"
                   disabled={isChangingPassword}

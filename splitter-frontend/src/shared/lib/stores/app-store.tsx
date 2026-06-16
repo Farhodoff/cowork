@@ -125,6 +125,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [isAuthReady, setIsAuthReady] = useState(false);
 
+  const user = useAppStore((s) => s.user);
+  const token = useAppStore((s) => s.token);
+  const setAuthStoreUser = require('@/stores/authStore').useAuthStore.getState().setUser;
+  const setAuthStoreToken = require('@/stores/authStore').useAuthStore.getState().setToken;
+
   useEffect(() => {
     let mounted = true;
 
@@ -139,6 +144,13 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       mounted = false;
     };
   }, [initializeAuth]);
+
+  useEffect(() => {
+    if (isAuthReady) {
+      if (user) setAuthStoreUser(user);
+      if (token) setAuthStoreToken(token);
+    }
+  }, [isAuthReady, user, token]);
 
   useEffect(() => {
     const unsubscribe = onUnauthorized(async () => {

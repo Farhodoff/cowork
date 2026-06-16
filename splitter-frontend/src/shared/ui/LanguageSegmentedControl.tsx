@@ -19,9 +19,9 @@ export function LanguageSegmentedControl({
   onChange,
   getLabel,
   activeBgColor = 'white',
-  activeTextColor = '$gray12',
-  inactiveTextColor = '$gray11',
-  bg = '$gray3',
+  activeTextColor = '#18181b', // Zn-900 equivalent
+  inactiveTextColor = '#71717a', // Zn-400 equivalent
+  bg = '#27272a', // Zn-800 equivalent
 }: LanguageSegmentedControlProps) {
   const options = LANGUAGE_OPTIONS;
   const selectedIndex = Math.max(0, options.findIndex((o) => o.code === value));
@@ -60,10 +60,8 @@ export function LanguageSegmentedControl({
     <View>
       <XStack
         onLayout={onLayout}
-        position="relative"
-        ai="center"
-        bg={bg}
-        br="$10"
+        style={{ backgroundColor: bg === '$gray3' ? '#222228' : bg } as any}
+        borderRadius={20}
         padding={padding}
         height={height + padding * 2}
       >

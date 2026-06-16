@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { View, Text } from 'tamagui';
 
 interface UserAvatarProps {
@@ -9,13 +9,6 @@ interface UserAvatarProps {
   textSize?: number;
   backgroundColor?: string;
 }
-
-const styles = StyleSheet.create({
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-});
 
 export function UserAvatar({
   uri,
@@ -28,16 +21,18 @@ export function UserAvatar({
 
   return (
     <View
-      w={size}
-      h={size}
-      br={radius}
-      overflow="hidden"
-      ai="center"
-      jc="center"
-      backgroundColor={backgroundColor}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: radius,
+        overflow: 'hidden',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: backgroundColor.startsWith('$') ? undefined : backgroundColor,
+      } as any}
     >
       {uri ? (
-        <Image source={{ uri }} style={styles.image} resizeMode="cover" />
+        <Image source={uri} style={{ width: '100%', height: '100%' }} contentFit="cover" />
       ) : (
         <Text fontSize={textSize ?? Math.round(size / 2.5)} fontWeight="700">
           {label}

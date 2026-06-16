@@ -13,16 +13,16 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   return (
     <YStack
-      backgroundColor="$white1"
+      backgroundColor="rgba(255, 255, 255, 0.04)"
       borderRadius="$6"
-      borderWidth={1}
-      borderColor="$gray5"
+      borderWidth={0.5}
+      borderColor="rgba(255, 255, 255, 0.08)"
       padding={padding}
-      shadowColor="$shadowColor"
-      shadowOffset={{ width: 0, height: 2 }}
-      shadowOpacity={0.1}
-      shadowRadius={8}
-      elevation={3}
+      shadowColor="#000"
+      shadowOffset={{ width: 0, height: 4 }}
+      shadowOpacity={0.2}
+      shadowRadius={12}
+      elevation={2}
     >
       {children}
     </YStack>

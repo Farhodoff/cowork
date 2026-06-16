@@ -12,7 +12,8 @@ import {
   Plus, 
   Receipt,
   Clock,
-  Sparkles
+  Sparkles,
+  Check
 } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +28,7 @@ const DEFAULT_CURRENCY = 'UZS';
 
 const AVATAR_COLORS = ['#FF8A65', '#EF5350', '#FFD54F', '#4DB6AC', '#7986CB', '#9575CD'];
 
-const getRelativeTimeLabel = (dateStr?: string) => {
+const getRelativeTimeLabel = (dateStr?: string, t?: (key: string, opts?: any) => string) => {
   if (!dateStr) return '';
   const date = new Date(dateStr);
   if (Number.isNaN(date.getTime())) return dateStr;
@@ -40,11 +41,11 @@ const getRelativeTimeLabel = (dateStr?: string) => {
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   
   if (diffDays === 0) {
-    return 'Today';
+    return t ? t('dashboard.today', 'Today') : 'Today';
   } else if (diffDays === 1) {
-    return 'Yesterday';
+    return t ? t('dashboard.yesterday', 'Yesterday') : 'Yesterday';
   } else if (diffDays > 1 && diffDays <= 7) {
-    return `${diffDays} days ago`;
+    return t ? t('dashboard.daysAgo', { count: diffDays }) : `${diffDays} days ago`;
   }
   
   return date.toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
@@ -128,41 +129,36 @@ function BillCard({
     >
       <YStack
         padding="$4"
-        borderRadius={20}
+        borderRadius={18}
         borderWidth={0.5}
-        borderColor="$borderColor"
-        backgroundColor="$background"
-        elevation={1}
-        shadowColor="#000"
-        shadowOffset={{ width: 0, height: 1 }}
-        shadowOpacity={0.05}
-        shadowRadius={4}
+        borderColor="rgba(255,255,255,0.08)"
+        backgroundColor="rgba(255,255,255,0.04)"
         pressStyle={{ scale: 0.98 }}
         animation="quick"
       >
         <XStack justifyContent="space-between" alignItems="center">
           <YStack space="$1" flex={1} marginRight="$2">
-            <Text fontSize={16} fontWeight="700" color="$gray12" numberOfLines={1}>
+            <Text fontSize={15} fontWeight="700" color="rgba(255,255,255,0.88)" numberOfLines={1}>
               {title}
             </Text>
             
             {/* Group & Time info */}
             <XStack alignItems="center" space="$1.5">
-              <Users size={12} color="$gray9" />
-              <Text fontSize={12} color="$gray10" numberOfLines={1}>
+              <Users size={12} color="rgba(255,255,255,0.4)" />
+              <Text fontSize={12} color="rgba(255,255,255,0.4)" numberOfLines={1}>
                 {groupName}
               </Text>
-              <Text fontSize={12} color="$gray8">
+              <Text fontSize={12} color="rgba(255,255,255,0.25)">
                 •
               </Text>
-              <Clock size={12} color="$gray9" />
-              <Text fontSize={12} color="$gray10">
+              <Clock size={12} color="rgba(255,255,255,0.4)" />
+              <Text fontSize={12} color="rgba(255,255,255,0.4)">
                 {timeLabel}
               </Text>
             </XStack>
           </YStack>
 
-          <Text fontSize={18} fontWeight="800" color="$gray12">
+          <Text fontSize={16} fontWeight="700" color="rgba(255,255,255,0.88)">
             {amountLabel}
           </Text>
         </XStack>
@@ -226,33 +222,75 @@ export default function HomePage() {
 
   const openGroups = () => router.push('/tabs/groups');
   const onScan = () => router.push('/tabs/scan-receipt');
-  const onMagicSplit = () => router.push('/tabs/sessions/participants');
+  const onMagicSplit = () => router.push('/tabs/scan-receipt');
   const openAllSessions = () => router.push('/tabs/sessions/history');
 
   const recent = useMemo<SessionHistoryEntry[]>(() => sessions.slice(0, 3), [sessions]);
 
-  // Aggregate balance summary (Owe / Owed)
-  const { totalOwe, totalOwed } = useMemo(() => {
+  // Aggregate balance summary (Owe / Owed / Spent)
+  const { totalOwe, totalOwed, totalSpent } = useMemo(() => {
     let owe = 0;
     let owed = 0;
+    let spent = 0;
+
+    sessions.forEach(session => {
+      const byParticipant = session.totals?.byParticipant || [];
+      const grandTotal = session.grandTotal || 0;
+
+      if (session.isCreator) {
+        let othersOwed = 0;
+        byParticipant.forEach(p => {
+          if (p.uniqueId !== myUniqueId) {
+            owed += p.amountOwed;
+            othersOwed += p.amountOwed;
+          }
+        });
+        spent += Math.max(0, grandTotal - othersOwed);
+      } else {
+        const myEntry = byParticipant.find(p => p.uniqueId === myUniqueId);
+        if (myEntry) {
+          owe += myEntry.amountOwed;
+          spent += myEntry.amountOwed;
+        }
+      }
+    });
+
+    return { totalOwe: owe, totalOwed: owed, totalSpent: spent };
+  }, [sessions, myUniqueId]);
+
+  // Aggregate individual debt list for interactive settle-up display
+  const debtList = useMemo(() => {
+    const balanceMap = new Map<string, { username: string; amount: number }>();
 
     sessions.forEach(session => {
       const byParticipant = session.totals?.byParticipant || [];
       if (session.isCreator) {
         byParticipant.forEach(p => {
           if (p.uniqueId !== myUniqueId) {
-            owed += p.amountOwed;
+            const current = balanceMap.get(p.uniqueId) || { username: p.username || p.uniqueId, amount: 0 };
+            current.amount += p.amountOwed;
+            balanceMap.set(p.uniqueId, current);
           }
         });
       } else {
         const myEntry = byParticipant.find(p => p.uniqueId === myUniqueId);
-        if (myEntry) {
-          owe += myEntry.amountOwed;
+        if (myEntry && myEntry.amountOwed > 0) {
+          const creatorUid = 'creator';
+          const creatorName = t('common.creator', 'Creator');
+          const current = balanceMap.get(creatorUid) || { username: creatorName, amount: 0 };
+          current.amount -= myEntry.amountOwed;
+          balanceMap.set(creatorUid, current);
         }
       }
     });
 
-    return { totalOwe: owe, totalOwed: owed };
+    const list: { uniqueId: string; username: string; amount: number }[] = [];
+    balanceMap.forEach((val, key) => {
+      if (Math.abs(val.amount) > 0.01) {
+        list.push({ uniqueId: key, username: val.username, amount: val.amount });
+      }
+    });
+    return list;
   }, [sessions, myUniqueId]);
 
   // Group name mapping
@@ -289,102 +327,110 @@ export default function HomePage() {
           showsVerticalScrollIndicator={false}
         >
           <YStack width="100%">
-            {/* Curved Royal Blue Header */}
+            {/* Transparent Header */}
             <YStack
               width="100%"
-              backgroundColor="#312E81"
-              borderBottomLeftRadius={32}
-              borderBottomRightRadius={32}
               paddingHorizontal="$4"
-              pb="$9"
+              pb="$6"
               pt="$4"
             >
               {/* Header Title Row */}
               <XStack justifyContent="space-between" alignItems="center" marginTop="$2" marginBottom="$4">
                 <YStack>
-                  <Text fontSize={24} fontWeight="800" color="white">
-                    Hello, {user?.username || 'salom'} 👋
+                  <Text fontSize={24} fontWeight="800" color="rgba(255,255,255,0.88)">
+                    {t('dashboard.hello', { name: user?.username || 'salom' })}
                   </Text>
-                  <Text fontSize={14} color="rgba(255, 255, 255, 0.7)">
-                    Here's your expense summary
+                  <Text fontSize={14} color="rgba(255, 255, 255, 0.4)">
+                    {t('dashboard.expenseSummary')}
                   </Text>
                 </YStack>
                 
                 <Circle
                   size={42}
-                  backgroundColor="rgba(255, 255, 255, 0.15)"
-                  pressStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.25)' }}
+                  backgroundColor="rgba(255, 255, 255, 0.06)"
+                  borderWidth={0.5}
+                  borderColor="rgba(255, 255, 255, 0.1)"
+                  pressStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }}
                   onPress={() => {}}
                 >
-                  <Bell size={20} color="#F59E0B" fill="#F59E0B" />
+                  <Bell size={20} color="#ef9f27" fill="#ef9f27" />
                 </Circle>
               </XStack>
 
-              {/* Balance Cards */}
-              <XStack justifyContent="space-between" width="100%">
-                {/* You Owe Card */}
-                <YStack
-                  flex={1}
-                  marginRight="$2.5"
-                  backgroundColor="rgba(255, 255, 255, 0.1)"
-                  borderRadius={20}
-                  padding="$4"
-                  height={110}
-                  justifyContent="space-between"
-                >
-                  <Circle size={32} backgroundColor="#EF4444" ai="center" jc="center">
-                    <ArrowUpRight size={18} color="white" />
-                  </Circle>
-                  <YStack space="$1">
-                    <Text fontSize={12} color="rgba(255, 255, 255, 0.7)" fontWeight="500">
-                      You Owe
-                    </Text>
-                    <Text fontSize={22} fontWeight="800" color="white">
-                      {formatCurrencyValue(totalOwe)}
-                    </Text>
-                  </YStack>
-                </YStack>
+              {/* Total Spent Card - Glassmorphism */}
+              <YStack
+                width="100%"
+                backgroundColor="rgba(255, 255, 255, 0.04)"
+                borderWidth={0.5}
+                borderColor="rgba(255, 255, 255, 0.08)"
+                borderRadius={20}
+                padding="$4"
+                marginBottom="$4"
+                gap="$1"
+              >
+                <Text fontSize={11} color="rgba(255, 255, 255, 0.4)" fontWeight="700" letterSpacing={0.8} textTransform="uppercase">
+                  {t('dashboard.totalSpent', 'Jami shaxsiy xarajatlar')}
+                </Text>
+                <Text fontSize={28} fontWeight="700" color="rgba(255,255,255,0.88)">
+                  {formatCurrencyValue(totalSpent)}
+                </Text>
+              </YStack>
 
-                {/* You are owed Card */}
-                <YStack
-                  flex={1}
-                  marginLeft="$2.5"
-                  backgroundColor="rgba(255, 255, 255, 0.1)"
-                  borderRadius={20}
-                  padding="$4"
-                  height={110}
-                  justifyContent="space-between"
-                >
-                  <Circle size={32} backgroundColor="#10B981" ai="center" jc="center">
-                    <ArrowDownLeft size={18} color="white" />
-                  </Circle>
-                  <YStack space="$1">
-                    <Text fontSize={12} color="rgba(255, 255, 255, 0.7)" fontWeight="500">
-                      You are owed
+              {/* Balance & Settle Up Panel */}
+              {debtList.length > 0 && (
+                <View width="100%">
+                  <YStack gap="$2" width="100%">
+                    <Text fontSize={11} color="rgba(255, 255, 255, 0.4)" fontWeight="700" letterSpacing={0.8} textTransform="uppercase" marginBottom="$1">
+                      {t('dashboard.activeBalances', 'Faol balanslar')}
                     </Text>
-                    <Text fontSize={22} fontWeight="800" color="white">
-                      {formatCurrencyValue(totalOwed)}
-                    </Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
+                      {debtList.map((debt) => {
+                        const isOwed = debt.amount > 0;
+                        const absVal = Math.abs(debt.amount);
+                        return (
+                          <XStack
+                            key={debt.uniqueId}
+                            backgroundColor="rgba(255, 255, 255, 0.04)"
+                            borderWidth={0.5}
+                            borderColor="rgba(255, 255, 255, 0.08)"
+                            borderRadius={18}
+                            padding="$3"
+                            alignItems="center"
+                            gap="$3"
+                            minWidth={170}
+                          >
+                            <Circle size={38} backgroundColor={isOwed ? "rgba(0,188,140,0.18)" : "rgba(229,57,53,0.15)"} alignItems="center" justifyContent="center">
+                              <Text color={isOwed ? "#00d4a0" : "#ef5350"} fontWeight="700" fontSize={14}>
+                                {debt.username.slice(0, 1).toUpperCase()}
+                              </Text>
+                            </Circle>
+                            <YStack>
+                              <Text color="rgba(255,255,255,0.88)" fontWeight="700" fontSize={13} numberOfLines={1} maxWidth={90}>
+                                {debt.username}
+                              </Text>
+                              <Text color={isOwed ? "#00d4a0" : "#ef5350"} fontWeight="800" fontSize={14}>
+                                {isOwed ? `+${formatCurrencyValue(absVal)}` : `-${formatCurrencyValue(absVal)}`}
+                              </Text>
+                            </YStack>
+                          </XStack>
+                        );
+                      })}
+                    </ScrollView>
                   </YStack>
-                </YStack>
-              </XStack>
+                </View>
+              )}
             </YStack>
 
-            {/* Floating Actions Card */}
+            {/* Floating Actions Card - Glassmorphism */}
             <XStack
               width="90%"
-              backgroundColor="$background"
+              backgroundColor="rgba(255, 255, 255, 0.04)"
               borderRadius={24}
               padding="$3"
               borderWidth={0.5}
-              borderColor="$borderColor"
-              elevation={2}
-              shadowColor="#000"
-              shadowOffset={{ width: 0, height: 2 }}
-              shadowOpacity={0.05}
-              shadowRadius={6}
+              borderColor="rgba(255, 255, 255, 0.08)"
               alignSelf="center"
-              marginTop={-32}
+              marginTop="$4"
               marginBottom="$6"
               justifyContent="space-between"
             >
@@ -393,7 +439,7 @@ export default function HomePage() {
                 flex={1}
                 height={68}
                 borderRadius={18}
-                backgroundColor="rgba(49, 46, 129, 0.06)"
+                backgroundColor="rgba(255, 255, 255, 0.02)"
                 alignItems="center"
                 padding="$3"
                 marginRight="$2"
@@ -401,15 +447,15 @@ export default function HomePage() {
                 pressStyle={{ scale: 0.98 }}
                 animation="quick"
               >
-                <Circle size={40} backgroundColor="#312E81" ai="center" jc="center" marginRight="$2">
-                  <Receipt size={20} color="white" />
+                <Circle size={40} backgroundColor="rgba(124, 77, 255, 0.28)" ai="center" jc="center" marginRight="$2">
+                  <Receipt size={20} color="#b39dff" />
                 </Circle>
                 <YStack>
-                  <Text fontSize={14} fontWeight="700" color="$gray12">
-                    Scan Receipt
+                  <Text fontSize={13} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                    {t('dashboard.scanReceipt')}
                   </Text>
-                  <Text fontSize={10} color="$gray9">
-                    AI powered
+                  <Text fontSize={10} color="rgba(255, 255, 255, 0.4)">
+                    {t('dashboard.aiPowered')}
                   </Text>
                 </YStack>
               </XStack>
@@ -419,7 +465,7 @@ export default function HomePage() {
                 flex={1}
                 height={68}
                 borderRadius={18}
-                backgroundColor="rgba(138, 43, 226, 0.06)"
+                backgroundColor="rgba(255, 255, 255, 0.02)"
                 alignItems="center"
                 padding="$3"
                 marginLeft="$2"
@@ -427,15 +473,15 @@ export default function HomePage() {
                 pressStyle={{ scale: 0.98 }}
                 animation="quick"
               >
-                <Circle size={40} backgroundColor="#8A2BE2" ai="center" jc="center" marginRight="$2">
-                  <Sparkles size={20} color="white" />
+                <Circle size={40} backgroundColor="rgba(124, 77, 255, 0.28)" ai="center" jc="center" marginRight="$2">
+                  <Sparkles size={20} color="#b39dff" />
                 </Circle>
                 <YStack>
-                  <Text fontSize={14} fontWeight="700" color="$gray12">
-                    Magic Split
+                  <Text fontSize={13} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                    {t('dashboard.magicSplit')}
                   </Text>
-                  <Text fontSize={10} color="$gray9">
-                    Smart split
+                  <Text fontSize={10} color="rgba(255, 255, 255, 0.4)">
+                    {t('dashboard.smartSplit')}
                   </Text>
                 </YStack>
               </XStack>
@@ -443,8 +489,8 @@ export default function HomePage() {
 
             {/* Recent Activity Header */}
             <XStack paddingHorizontal="$4" justifyContent="space-between" alignItems="center" marginBottom="$4">
-              <Text fontSize={18} fontWeight="800" color="$gray12">
-                Recent Activity
+              <Text fontSize={16} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                {t('dashboard.recentActivity')}
               </Text>
               
               <XStack alignItems="center" gap="$3">
@@ -454,13 +500,13 @@ export default function HomePage() {
                   accessibilityLabel="Refresh recent bills"
                 >
                   <XStack alignItems="center" opacity={loading ? 0.6 : 1}>
-                    <RefreshCw size={16} color="$gray10" />
+                    <RefreshCw size={16} color="rgba(255, 255, 255, 0.4)" />
                   </XStack>
                 </Pressable>
 
                 <Pressable onPress={openAllSessions}>
-                  <Text color="#312E81" fontWeight="700" fontSize={14}>
-                    View All
+                  <Text color="#7c4dff" fontWeight="700" fontSize={13}>
+                    {t('dashboard.viewAll')}
                   </Text>
                 </Pressable>
               </XStack>
@@ -470,7 +516,7 @@ export default function HomePage() {
             <YStack paddingHorizontal="$4" gap="$3.5">
               {loading && !recent.length && (
                 <Text color="$gray10" fontSize={14} textAlign="center" py="$4">
-                  Loading recent activity...
+                  {t('dashboard.loadingActivity')}
                 </Text>
               )}
               
@@ -482,17 +528,17 @@ export default function HomePage() {
               
               {!loading && !error && !recent.length && (
                 <Text color="$gray10" fontSize={14} textAlign="center" py="$4">
-                  No activity yet
+                  {t('dashboard.noActivity')}
                 </Text>
               )}
               
               {recent.map((bill) => {
                 const participantIds = bill.participantUniqueIds ?? [];
                 const dateForSummary = bill.finalizedAt || bill.createdAt;
-                const timeLabel = getRelativeTimeLabel(dateForSummary);
+                const timeLabel = getRelativeTimeLabel(dateForSummary, t);
                 
                 const groupId = bill.payload?.groupId;
-                const groupName = (groupId != null && groupMap.get(groupId)) || 'Personal Split';
+                const groupName = (groupId != null && groupMap.get(groupId)) || t('dashboard.personalSplit', 'Personal Split');
                 
                 const totalAmount = bill.grandTotal ?? 0;
                 const amountLabel = formatCurrencyValue(totalAmount);
@@ -500,7 +546,7 @@ export default function HomePage() {
                 return (
                   <BillCard
                     key={bill.sessionId}
-                    title={bill.sessionName || 'Split Bill'}
+                    title={bill.sessionName || t('dashboard.splitBill', 'Split Bill')}
                     groupName={groupName}
                     timeLabel={timeLabel}
                     amountLabel={amountLabel}
@@ -521,17 +567,19 @@ export default function HomePage() {
         {/* Floating Action Button (FAB) */}
         <Circle
           size={56}
-          backgroundColor="#312E81"
+          backgroundColor="#7c4dff"
           position="absolute"
           right={16}
           bottom={16}
-          elevation={4}
-          shadowColor="#000"
-          shadowOffset={{ width: 0, height: 4 }}
-          shadowOpacity={0.2}
-          shadowRadius={6}
           pressStyle={{ scale: 0.95 }}
           onPress={openGroups}
+          style={{
+            shadowColor: '#7c4dff',
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.45,
+            shadowRadius: 28,
+            elevation: 8,
+          }}
         >
           <Plus size={24} color="white" />
         </Circle>
