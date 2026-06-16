@@ -1,11 +1,14 @@
 // app/tabs/scan-invite.tsx
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View, Image, Animated, Modal } from 'react-native';
+import { ActivityIndicator, Animated, Modal } from 'react-native';
+import { Image } from 'expo-image';
 import { useIsFocused } from '@react-navigation/native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { YStack, XStack, Button, Paragraph } from 'tamagui';
+import { YStack, XStack, Button, Paragraph, View, Text } from 'tamagui';
 import { ChevronLeft } from '@tamagui/lucide-icons';
+import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { parseInviteFromScan } from '@/shared/lib/utils/invite';
 import { FriendsApi } from '@/features/friends/api/friends.api';
@@ -28,6 +31,8 @@ export default function ScanInviteScreen() {
   const isFocused = useIsFocused();
   const router = useRouter();
   const { from } = useLocalSearchParams<{ from?: FromParam }>();
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   // Анимации для модалки
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -106,30 +111,31 @@ export default function ScanInviteScreen() {
   }
 
   return (
-    <View style={S.root}>
-      {/* Header (светлый текст поверх камеры) */}
-      <View style={S.headerAbs}>
-        <XStack ai="center" jc="space-between" px="$3" py="$2">
+    <YStack flex={1} backgroundColor="#000">
+      {/* Header */}
+      <YStack position="absolute" top={0} left={0} right={0} zIndex={10} pt={insets.top > 0 ? insets.top : 8} backgroundColor="rgba(0,0,0,0.4)">
+        <XStack height={50} alignItems="center" justifyContent="space-between" px="$4">
           <Button
-            size="$2"
-            h={28}
-            chromeless
             onPress={goBack}
-            icon={<ChevronLeft size={18} color="white" />}
-            color="white"
-          >
-            Back
-          </Button>
-          <Paragraph fow="700" fos="$6" col="white">Scan invite</Paragraph>
-          <YStack w={54} />
+            circular
+            size="$3.5"
+            bg="rgba(0,0,0,0.5)"
+            pressStyle={{ bg: 'rgba(0,0,0,0.7)', scale: 0.95 }}
+            borderWidth={0}
+            icon={<ChevronLeft color="white" size={22} />}
+          />
+          <Text fontSize={18} fontWeight="700" color="white">
+            {t('scanInviteScreen.title', 'Scan invite')}
+          </Text>
+          <View width={42} />
         </XStack>
-      </View>
+      </YStack>
 
-      {/* Камера только на фокусе */}
-      <View style={S.cameraWrap}>
+      {/* Camera */}
+      <YStack flex={1} backgroundColor="#000">
         {isFocused && perm?.granted ? (
           <CameraView
-            style={S.camera}
+            style={{ flex: 1 }}
             barcodeScannerSettings={{ barcodeTypes: ['qr'] as const }}
             onBarcodeScanned={(res) => {
               if (lock.current || status === 'loading') return;
@@ -139,26 +145,26 @@ export default function ScanInviteScreen() {
           />
         ) : (
           <YStack f={1} ai="center" jc="center">
-            <Paragraph col="$gray1">Allow camera access</Paragraph>
+            <Paragraph col="$gray1">{t('scanInviteScreen.allowCamera', 'Allow camera access')}</Paragraph>
           </YStack>
         )}
-      </View>
+      </YStack>
 
-      {/* Loading статус */}
+      {/* Loading */}
       {status === 'loading' && (
-        <View style={S.overlay}>
+        <YStack position="absolute" bottom={40} alignSelf="center" backgroundColor="rgba(0,0,0,0.85)" px={16} py={10} br={12}>
           <YStack ai="center" gap="$2">
             <ActivityIndicator color="white" />
-            <Paragraph col="white">Connecting…</Paragraph>
+            <Paragraph col="white">{t('scanInviteScreen.connecting', 'Connecting…')}</Paragraph>
           </YStack>
-        </View>
+        </YStack>
       )}
 
-      {/* Error статус */}
+      {/* Error */}
       {status === 'error' && (
-        <View style={S.overlay}>
-          <Paragraph col="white">Error 😕</Paragraph>
-        </View>
+        <YStack position="absolute" bottom={40} alignSelf="center" backgroundColor="rgba(0,0,0,0.85)" px={16} py={10} br={12}>
+          <Paragraph col="white">{t('scanInviteScreen.error', 'Error 😕')}</Paragraph>
+        </YStack>
       )}
 
       {/* Success Modal */}
@@ -168,149 +174,80 @@ export default function ScanInviteScreen() {
         animationType="none"
         statusBarTranslucent
       >
-        <View style={S.modalOverlay}>
+        <YStack flex={1} backgroundColor="rgba(0,0,0,0.6)" jc="center" ai="center" px={16}>
           <Animated.View
-            style={[
-              S.successModal,
-              {
-                opacity: fadeAnim,
-                transform: [{ scale: scaleAnim }],
-              },
-            ]}
+            style={{
+              width: 358,
+              backgroundColor: '#0a0a0f',
+              borderRadius: 28,
+              borderWidth: 1,
+              borderColor: 'rgba(46, 204, 113, 0.3)',
+              paddingVertical: 24,
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+              shadowColor: '#2ECC71',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.2,
+              shadowRadius: 20,
+              elevation: 10,
+            }}
           >
-            {/* Галочка успеха */}
-            <View style={S.checkmark}>
+            {/* Checkmark */}
+            <View
+              position="absolute"
+              top={-12}
+              right={-12}
+              w={40}
+              h={40}
+              br={20}
+              backgroundColor="#2ECC71"
+              ai="center"
+              jc="center"
+              zIndex={1}
+            >
               <Paragraph fos={24} fow="bold" col="white">✓</Paragraph>
             </View>
 
-            {/* Аватар */}
-            <View style={S.avatarContainer}>
+            {/* Avatar */}
+            <YStack ai="center" pt={16} pb={12}>
               {userData?.avatar ? (
                 <Image
                   source={{ uri: userData.avatar }}
-                  style={S.avatar}
-                  resizeMode="cover"
+                  style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: '#2ECC71' }}
+                  contentFit="cover"
                 />
               ) : (
-                <View style={[S.avatar, S.avatarPlaceholder]}>
+                <View w={64} h={64} br={32} backgroundColor="rgba(255,255,255,0.04)" ai="center" jc="center" borderWidth={2} borderColor="#2ECC71">
                   <Paragraph fos={32} col="$gray8">
                     {userData?.name?.[0]?.toUpperCase() || '?'}
                   </Paragraph>
                 </View>
               )}
-            </View>
+            </YStack>
 
-            {/* Информация о пользователе */}
+            {/* User info */}
             <YStack ai="center" px="$4" pt="$2" gap="$1">
-              <Paragraph fos={20} fow="700" col="#1a1a1a" ta="center">
+              <Paragraph fos={20} fow="700" col="white" ta="center">
                 {userData?.name || 'User'}
               </Paragraph>
-              <Paragraph fos={14} col="#666" ta="center">
+              <Paragraph fos={14} col="rgba(255,255,255,0.45)" ta="center">
                 {userData?.username || '@user'}
               </Paragraph>
             </YStack>
 
-            {/* Био */}
+            {/* Bio */}
             {userData?.bio && (
               <YStack px="$6" pt="$4">
-                <Paragraph fos={14} col="#333" ta="center" lh={20}>
+                <Paragraph fos={14} col="rgba(255,255,255,0.45)" ta="center" lh={20}>
                   {userData.bio}
                 </Paragraph>
               </YStack>
             )}
 
-            <View style={{ height: 24 }} />
+            <View h={24} />
           </Animated.View>
-        </View>
+        </YStack>
       </Modal>
-    </View>
+    </YStack>
   );
 }
-
-const S = StyleSheet.create({
-  root: { 
-    flex: 1, 
-    backgroundColor: '#000' 
-  },
-  headerAbs: {
-    position: 'absolute',
-    top: 0, 
-    left: 0, 
-    right: 0,
-    zIndex: 10,
-    paddingTop: 8,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-  },
-  cameraWrap: { 
-    flex: 1, 
-    backgroundColor: '#000' 
-  },
-  camera: { 
-    flex: 1 
-  },
-  overlay: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  successModal: {
-    width: 358,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2ECC71',
-    // Для Android/iOS тени используем elevation + shadowColor
-    elevation: 10,
-    shadowColor: '#2ECC71',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    position: 'relative',
-  },
-  checkmark: {
-    position: 'absolute',
-    top: -12,
-    right: -12,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#2ECC71',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-    // Тень для галочки
-    elevation: 5,
-    shadowColor: '#2ECC71',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  avatarContainer: {
-    alignItems: 'center',
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: '#2ECC71',
-  },
-  avatarPlaceholder: {
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

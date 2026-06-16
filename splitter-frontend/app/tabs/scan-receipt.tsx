@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
-import { YStack, XStack, Button, Paragraph, Input, Text, Spinner } from 'tamagui';
+import { YStack, XStack, Button, Paragraph, Input, Text, Spinner, View } from 'tamagui';
 import { ChevronLeft, AlertTriangle, Camera as CameraIcon, Image as ImageIcon } from '@tamagui/lucide-icons';
+import { useTranslation } from 'react-i18next';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   useReceiptSessionStore,
@@ -36,6 +39,8 @@ export default function ScanReceiptScreen() {
   const [mediaPermission, requestMediaPermission] = ImagePicker.useMediaLibraryPermissions();
   const isFocused = useIsFocused();
   const router = useRouter();
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const cameraRef = useRef<CameraView | null>(null);
 
@@ -132,11 +137,17 @@ export default function ScanReceiptScreen() {
       });
 
       router.push('/tabs/sessions/participants');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Something went wrong while sending the receipt';
+    } catch (error: any) {
+      console.error('[ReceiptScan] Capture/Parse error:', error);
+      let message = error instanceof Error ? error.message : 'Something went wrong while sending the receipt';
+      
+      // Handle camera unmounted or unresponsive states
+      if (message.includes('unmounted') || message.includes('Camera') || message.includes('inactive')) {
+        message = t('scanReceiptScreen.cameraError', 'Camera error occurred. Please try restarting the screen or checking permissions.');
+      }
       setLocalError(message);
     }
-  }, [cameraRef, parsing, sessionName, setSessionNameStore, setCapture, parseReceipt, language, router]);
+  }, [cameraRef, parsing, sessionName, setSessionNameStore, setCapture, parseReceipt, language, router, t]);
 
   const handleGalleryPick = useCallback(async () => {
     if (parsing) return;
@@ -224,58 +235,68 @@ export default function ScanReceiptScreen() {
   const errorMessage = localError || parseError;
 
   return (
-    <View style={S.root}>
-      <View style={S.headerAbs}>
-        <XStack ai="center" jc="space-between" px="$3" py="$2">
+    <YStack flex={1} backgroundColor="#000">
+      <YStack position="absolute" top={0} left={0} right={0} zIndex={10} pt={insets.top > 0 ? insets.top : 8} backgroundColor="rgba(0,0,0,0.4)">
+        <XStack height={50} alignItems="center" justifyContent="space-between" px="$4">
           <Button
-            size="$2"
-            h={28}
-            chromeless
             onPress={goBack}
-            icon={<ChevronLeft size={18} color="white" />}
-            color="white"
-          >
-            Back
-          </Button>
-          <Paragraph fow="700" fos="$6" col="white">Scan receipt</Paragraph>
-          <YStack w={54} />
+            circular
+            size="$3.5"
+            bg="rgba(0,0,0,0.5)"
+            pressStyle={{ bg: 'rgba(0,0,0,0.7)', scale: 0.95 }}
+            borderWidth={0}
+            icon={<ChevronLeft color="white" size={22} />}
+          />
+          <Text fontSize={18} fontWeight="700" color="white">
+            {t('scanReceiptScreen.title', 'Scan receipt')}
+          </Text>
+          <View width={42} />
         </XStack>
-      </View>
+      </YStack>
 
-      <View style={S.cameraWrap}>
+      <YStack flex={1} backgroundColor="#000">
         {isFocused && perm?.granted ? (
           <CameraView
             ref={cameraRef}
-            style={S.camera}
+            style={{ flex: 1 }}
             facing="back"
           />
         ) : (
-          <YStack f={1} ai="center" jc="center">
-            {!perm ? <ActivityIndicator color="white" /> : <Paragraph col="$gray1">Allow camera access</Paragraph>}
+          <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' } as any}>
+            {!perm ? <ActivityIndicator color="white" /> : <Paragraph style={{ color: '$gray1' } as any}>{t('scanReceiptScreen.allowCamera', 'Allow camera access')}</Paragraph>}
           </YStack>
         )}
 
         {parsing && (
-          <View style={S.overlay}>
+          <YStack position="absolute" top={0} left={0} right={0} bottom={0} backgroundColor="rgba(0,0,0,0.55)" style={{ alignItems: 'center', justifyContent: 'center' } as any}>
             <Spinner size="large" color="white" />
-            <Paragraph mt="$2" col="white">Uploading receipt...</Paragraph>
-          </View>
+            <Paragraph style={{ marginTop: 8, color: 'white' } as any}>{t('scanReceiptScreen.uploading', 'Uploading receipt...')}</Paragraph>
+          </YStack>
         )}
-      </View>
+      </YStack>
 
-      <View style={S.actions}>
+      <YStack
+        position="absolute"
+        bottom={Math.max(insets.bottom, 16)}
+        left={16}
+        right={16}
+        backgroundColor="rgba(10, 10, 15, 0.85)"
+        borderWidth={0.5}
+        borderColor="rgba(255,255,255,0.12)"
+        style={{ padding: 16, borderRadius: 16, overflow: 'hidden' } as any}
+      >
         <YStack gap="$3">
           <YStack gap={8}>
             <Paragraph color="$gray1" fontSize={12}>
-              Session name
+              {t('scanReceiptScreen.sessionName', 'Session name')}
             </Paragraph>
             <Input
               value={sessionName}
               onChangeText={handleSessionNameChange}
-              placeholder="e.g. Cafe on October"
+              placeholder={t('scanReceiptScreen.sessionPlaceholder', 'e.g. Cafe on October')}
               height={41}
               borderRadius={10}
-              px={16}
+              style={{ paddingHorizontal: 16 } as any}
               backgroundColor="rgba(255,255,255,0.1)"
               color="white"
               borderWidth={1}
@@ -284,102 +305,94 @@ export default function ScanReceiptScreen() {
           </YStack>
 
           <Paragraph color="$gray1" fontSize={12}>
-            language: <Text fontWeight="700" color="white">{language}</Text>
+            {t('scanReceiptScreen.language', 'language:')} <Text fontWeight="700" color="white">{language}</Text>
           </Paragraph>
 
           {storedCapture?.uri && (
-            <XStack ai="center" gap="$2">
-              <Image source={{ uri: storedCapture.uri }} style={S.preview} resizeMode="cover" />
+            <XStack style={{ alignItems: 'center', gap: 8 } as any}>
+              <Image source={storedCapture.uri} style={{ width: 56, height: 56, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.5)' }} contentFit="cover" />
               <Paragraph color="$gray1" fontSize={12}>
-                Last photo stored; capturing again will overwrite it.
+                {t('scanReceiptScreen.photoStored', 'Last photo stored; capturing again will overwrite it.')}
               </Paragraph>
             </XStack>
           )}
 
           {errorMessage && (
-            <XStack ai="center" gap="$2" bg="rgba(255,99,71,0.18)" px="$2" py="$2" borderRadius={8}>
+            <XStack style={{ alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,99,71,0.18)', paddingHorizontal: 8, paddingVertical: 8 } as any} borderRadius={8}>
               <AlertTriangle size={16} color="#FF6B6B" />
               <Paragraph color="#FF6B6B" flexShrink={1}>{errorMessage}</Paragraph>
             </XStack>
           )}
 
-          <XStack ai="center" jc="space-between" gap="$3">
+          <XStack style={{ alignItems: 'center', justifyContent: 'space-between', gap: 12 } as any}>
             <Button
               flex={1}
-              size="$3"
-              borderRadius="$3"
-              theme="gray"
+              size="$4"
+              borderRadius={12}
+              backgroundColor="rgba(255,255,255,0.06)"
+              pressStyle={{ bg: 'rgba(255,255,255,0.15)', scale: 0.96 }}
+              borderWidth={0}
               onPress={goBack}
               disabled={parsing}
               opacity={parsing ? 0.6 : 1}
             >
-              Cancel
+              <Text color="white" fontWeight="600" fontSize={14}>
+                {t('scanReceiptScreen.cancel', 'Cancel')}
+              </Text>
             </Button>
             <Button
               flex={1}
-              size="$3"
-              borderRadius="$3"
-              theme="active"
+              size="$4"
+              borderRadius={12}
+              backgroundColor="#7c4dff"
+              pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
+              borderWidth={0}
               onPress={handleParse}
               disabled={disableAction}
               icon={parsing ? undefined : <CameraIcon size={18} color="white" />}
             >
-              {parsing ? 'Processing...' : 'Take photo'}
+              <Text color="white" fontWeight="600" fontSize={14}>
+                {parsing ? t('scanReceiptScreen.processing', 'Processing...') : t('scanReceiptScreen.takePhoto', 'Take photo')}
+              </Text>
             </Button>
           </XStack>
 
           <Button
-            size="$3"
-            borderRadius="$3"
-            theme="active"
-            variant="outlined"
+            size="$4"
+            borderRadius={12}
+            backgroundColor="rgba(255,255,255,0.04)"
+            pressStyle={{ bg: 'rgba(255,255,255,0.12)', scale: 0.96 }}
+            borderWidth={0.5}
+            borderColor="rgba(255,255,255,0.1)"
             onPress={handleGalleryPick}
             disabled={parsing}
             icon={parsing ? undefined : <ImageIcon size={18} color="white" />}
-            borderColor="white"
-            color="white"
           >
-            {parsing ? 'Processing...' : 'Upload from gallery'}
+            <Text color="white" fontWeight="600" fontSize={14}>
+              {parsing ? t('scanReceiptScreen.processing', 'Processing...') : t('scanReceiptScreen.uploadGallery', 'Upload from gallery')}
+            </Text>
           </Button>
 
-          <Button size="$2" borderRadius="$3" theme="gray" variant="outlined" onPress={useMock} disabled={parsing}>
-            Use mock receipt
+          <Button
+            size="$3.5"
+            borderRadius={12}
+            backgroundColor="transparent"
+            pressStyle={{ scale: 0.96 }}
+            borderWidth={0.5}
+            borderColor="rgba(255,255,255,0.1)"
+            onPress={useMock}
+            disabled={parsing}
+          >
+            <Text color="rgba(255,255,255,0.45)" fontWeight="500" fontSize={13}>
+              {t('scanReceiptScreen.useMock', 'Use mock receipt')}
+            </Text>
           </Button>
         </YStack>
-      </View>
-    </View>
+      </YStack>
+    </YStack>
   );
 }
 
-const S = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#000' },
-  headerAbs: {
-    position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
-    paddingTop: 8, backgroundColor: 'rgba(0,0,0,0.25)',
-  },
-  cameraWrap: { flex: 1, backgroundColor: '#000' },
-  camera: { flex: 1 },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actions: {
-    position: 'absolute',
-    bottom: 24, left: 16, right: 16,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    padding: 16,
-    borderRadius: 16,
-  },
-  preview: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
-  },
-});
 
 
 
