@@ -36,7 +36,6 @@ function generateUniqueId() {
  *           schema:
  *             type: object
  *             required:
- *               - email
  *               - password
  *               - username
  *             properties:
@@ -75,20 +74,14 @@ router.post("/register", async (req, res) => {
         .json({ error: "Content-Type must be application/json" });
     }
 
-    const { email, password, username } = req.body ?? {};
+    const { password, username, email } = req.body ?? {};
     console.log("/auth/register types:", {
-      email: typeof email,
       password: typeof password,
       username: typeof username,
+      email: typeof email,
     });
 
     // Soft type coercion: numbers → strings, arrays/objects are not allowed
-    const emailVal =
-      typeof email === "string"
-        ? email
-        : typeof email === "number"
-          ? String(email)
-          : email;
     const passwordVal =
       typeof password === "string"
         ? password
@@ -101,48 +94,48 @@ router.post("/register", async (req, res) => {
         : typeof username === "number"
           ? String(username)
           : username;
+    const emailVal =
+      typeof email === "string"
+        ? email
+        : typeof email === "number"
+          ? String(email)
+          : email;
 
-    if (
-      typeof emailVal !== "string" ||
-      typeof passwordVal !== "string" ||
-      typeof usernameVal !== "string"
-    ) {
+    if (typeof passwordVal !== "string" || typeof usernameVal !== "string") {
       return res.status(400).json({
         error:
-          "Invalid field types: expected strings for email, password, username",
+          "Invalid field types: expected strings for password and username",
       });
     }
 
-    const cleanEmail = emailVal.trim().toLowerCase();
     const cleanUsername = usernameVal.trim();
     const cleanPassword = passwordVal;
+    const cleanEmail = emailVal ? emailVal.trim().toLowerCase() : null;
 
-    if (!cleanEmail || !cleanPassword || !cleanUsername) {
+    if (!cleanPassword || !cleanUsername) {
       return res
         .status(400)
-        .json({ error: "Please provide email, password, and username" });
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(cleanEmail)) {
-      return res.status(400).json({ error: "Invalid email format" });
+        .json({ error: "Please provide password and username" });
     }
     console.log(`Checking password strength for: ${cleanPassword}`);
-    // Inline check to ensure no caching issues with the imported function
     const isStrong = cleanPassword.length >= 6;
     console.log(`Password strength result: ${isStrong}`);
 
     if (!isStrong) {
-      return res.status(400).json({ error: "Password must be at least 6 characters (updated)" });
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters (updated)" });
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email: cleanEmail },
-    });
-    if (existingUser) {
-      return res.status(409).json({ error: "Email already in use" });
+    // Check if email already exists if a custom email is provided
+    if (cleanEmail) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: cleanEmail },
+      });
+      if (existingUser) {
+        return res.status(409).json({ error: "Email already exists" });
+      }
     }
-
-    const hashedPassword = await bcrypt.hash(cleanPassword, 10);
 
     // Generate uniqueId with multiple attempts to avoid collisions
     let uniqueId = "";
@@ -156,20 +149,27 @@ router.post("/register", async (req, res) => {
     }
     console.log("/auth/register generated uniqueId:", uniqueId);
 
+    // Generate placeholder email based on username to satisfy DB constraint if no email provided
+    const userEmail = cleanEmail || `${cleanUsername.replace(/\s+/g, "").toLowerCase()}_${Date.now()}@example.com`;
+
+    const hashedPassword = await bcrypt.hash(cleanPassword, 10);
+
     let user;
     try {
       user = await prisma.user.create({
         data: {
-          email: cleanEmail,
+          email: userEmail,
           password: hashedPassword,
           username: cleanUsername,
           uniqueId,
         },
       });
     } catch (e: any) {
+      // In the unlikely event of email conflict (should be unique), fallback
       if (e?.code === "P2002") {
-        // unique constraint conflict
-        return res.status(409).json({ error: "Email already in use" });
+        return res
+          .status(500)
+          .json({ error: "Failed to create user due to email conflict" });
       }
       throw e;
     }
@@ -177,7 +177,7 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET as string,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     console.log("/auth/register success:", { id: user.id });
@@ -218,7 +218,6 @@ router.post("/register", async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - email
  *               - password
  *             properties:
  *               email:
@@ -315,7 +314,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET as string,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     console.log("/auth/login success:", { id: user.id });
@@ -333,7 +332,9 @@ router.post("/login", async (req, res) => {
     console.error("POST /auth/login error:", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
-    return res.status(500).json({ error: "Server error", details: errorMessage });
+    return res
+      .status(500)
+      .json({ error: "Server error", details: errorMessage });
   }
 });
 
@@ -400,7 +401,9 @@ router.get("/me", authenticateToken, async (req: AuthRequest, res) => {
     console.error("/auth/me error:", err);
     const errorMessage =
       err instanceof Error ? err.message : "Unknown error occurred";
-    return res.status(500).json({ error: "Server error", details: errorMessage });
+    return res
+      .status(500)
+      .json({ error: "Server error", details: errorMessage });
   }
 });
 

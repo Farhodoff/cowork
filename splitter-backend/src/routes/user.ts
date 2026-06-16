@@ -448,4 +448,204 @@ router.get(
   }
 );
 
+/**
+ * @swagger
+ * /user/stats:
+ *   get:
+ *     summary: Get user profile statistics (groups, expenses, friends counts)
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Counts of groups, expenses, and friends
+ */
+router.get(
+  "/stats",
+  authenticateToken,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const userId = req.user.id;
+      const [groups, expenses, friends] = await Promise.all([
+        prisma.groupMember.count({
+          where: { userId }
+        }),
+        prisma.sessionParticipant.count({
+          where: { userId }
+        }),
+        prisma.friendship.count({
+          where: {
+            OR: [
+              { requesterId: userId, status: "ACCEPTED" },
+              { receiverId: userId, status: "ACCEPTED" }
+            ]
+          }
+        })
+      ]);
+      return res.json({ groups, expenses, friends });
+    } catch (err) {
+      console.error("GET /user/stats error:", err);
+      return res.status(500).json({ error: "Server error" });
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /user/insights:
+ *   get:
+ *     summary: Get AI-powered or rule-based insights based on actual user transactions
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Array of localized insights
+ */
+router.get(
+  "/insights",
+  authenticateToken,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      const userId = req.user.id;
+
+      // Fetch user profile and sessions
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { uniqueId: true, username: true } });
+      const myUid = user?.uniqueId || "";
+
+      const historyEntries = await prisma.sessionHistoryEntry.findMany({
+        where: {
+          OR: [
+            { creatorId: userId },
+            { participantUniqueIds: { has: myUid } },
+          ],
+        },
+        orderBy: { finalizedAt: "desc" },
+        take: 10,
+      });
+
+      let totalOwe = 0;
+      let totalOwed = 0;
+      let totalSpent = 0;
+
+      historyEntries.forEach(entry => {
+        const payload = entry.payload as any;
+        const byParticipant = payload?.totals?.byParticipant || [];
+        const grandTotal = entry.grandTotal.toNumber();
+
+        if (entry.creatorId === userId) {
+          let othersOwed = 0;
+          byParticipant.forEach((p: any) => {
+            if (p.uniqueId !== myUid) {
+              totalOwed += Number(p.amountOwed || 0);
+              othersOwed += Number(p.amountOwed || 0);
+            }
+          });
+          totalSpent += Math.max(0, grandTotal - othersOwed);
+        } else {
+          const myEntry = byParticipant.find((p: any) => p.uniqueId === myUid);
+          if (myEntry) {
+            totalOwe += Number(myEntry.amountOwed || 0);
+            totalSpent += Number(myEntry.amountOwed || 0);
+          }
+        }
+      });
+
+      const hasGemini = !!process.env.GEMINI_API_KEY;
+      if (hasGemini) {
+        try {
+          const prompt = `You are a financial AI advisor for a bill splitting app. Generate two brief personalized insights in JSON format for the user "${user?.username}".
+Current stats of the user:
+- Total spent: ${totalSpent} UZS
+- Total they owe to others: ${totalOwe} UZS
+- Total others owe them: ${totalOwed} UZS
+- Recent bills count: ${historyEntries.length}
+
+Response format MUST be strictly:
+{
+  "insights": [
+    {
+      "type": "smartSplit" | "savings" | "general",
+      "titleUz": "Short Title in Uzbek",
+      "descUz": "Insight text in Uzbek referencing their actual stats",
+      "titleEn": "Short Title in English",
+      "descEn": "Insight text in English referencing their actual stats",
+      "titleJa": "Short Title in Japanese",
+      "descJa": "Insight text in Japanese referencing their actual stats",
+      "variant": "purple" | "teal" | "amber"
+    }
+  ]
+}
+Return only JSON. No formatting.`;
+
+          const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(process.env.GEMINI_API_KEY!)}`;
+          const body = {
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.2, responseMimeType: "application/json" },
+          };
+          const resp = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+
+          if (resp.ok) {
+            const raw = await resp.json();
+            const text = raw.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            const parsed = JSON.parse(text.trim());
+            if (parsed.insights && Array.isArray(parsed.insights)) {
+              return res.json(parsed.insights);
+            }
+          }
+        } catch (geminiError) {
+          console.warn("Gemini insights fallback triggered:", geminiError);
+        }
+      }
+
+      // High-fidelity fallback based on actual database stats
+      const insights = [
+        {
+          type: "smartSplit",
+          titleUz: "Aqlli taqsimot tavsiyasi",
+          descUz: totalOwed > 0 
+            ? `Do'stlaringizdan ${totalOwed.toLocaleString()} UZS qaytarib olishingiz kerak. Qarz hisob-kitobini tezlashtirish uchun ularga havola yuboring.`
+            : "Sizda faol qarzdorliklar yo'q. Guruh xarajatlarini teng bo'lish uchun do'stlaringizni taklif qiling.",
+          titleEn: "Smart Split Recommendation",
+          descEn: totalOwed > 0
+            ? `You need to collect ${totalOwed.toLocaleString()} UZS from friends. Send a reminder link to settle debts.`
+            : "No active debts to collect. Invite friends to start splitting group expenses.",
+          titleJa: "スマート分割の推奨事項",
+          descJa: totalOwed > 0
+            ? `友だちから ${totalOwed.toLocaleString()} UZS を回収する必要があります。リンクを送信して精算してください。`
+            : "アクティブな売掛金はありません。友だちを招待してグループ分割を始めましょう。",
+          variant: "purple"
+        },
+        {
+          type: "savings",
+          titleUz: "Xarajatlar nazorati",
+          descUz: totalSpent > 0
+            ? `Sizning jami xarajatlaringiz ${totalSpent.toLocaleString()} UZS ga yetdi. Buni osonroq boshqarish uchun guruh tahlillaridan foydalaning.`
+            : "Hali xarajatlar tahlili mavjud emas. Chekni skanerlash orqali birinchi xarajatni qo'shing.",
+          titleEn: "Savings Tracker",
+          descEn: totalSpent > 0
+            ? `Your total split expenses reached ${totalSpent.toLocaleString()} UZS. Monitor group analytics to optimize your budget.`
+            : "No expenses tracked yet. Try scanning a receipt to add your first bill.",
+          titleJa: "貯蓄トラッカー",
+          descJa: totalSpent > 0
+            ? `合計分割費用は ${totalSpent.toLocaleString()} UZS に達しました。予算を最適化するためにグループ分析を監視してください。`
+            : "まだ追跡された費用はありません。レシートをスキャンして最初の請求書を追加してください。",
+          variant: "teal"
+        }
+      ];
+
+      return res.json(insights);
+    } catch (err) {
+      console.error("GET /user/insights error:", err);
+      return res.status(500).json({ error: "Server error" });
+    }
+  }
+);
+
 export default router;

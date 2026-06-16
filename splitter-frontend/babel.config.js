@@ -1,25 +1,10 @@
 module.exports = function (api) {
   api.cache(true);
   
-  const isProduction = process.env.NODE_ENV === 'production';
-  
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      // removed deprecated 'expo-router/babel' (use 'babel-preset-expo' in SDK 50+)
-      // Отключаем Tamagui babel plugin для production сборки
-      // Это уберет оптимизацию, но решит проблему со сборкой
-      ...(!isProduction ? [
-        [
-          '@tamagui/babel-plugin',
-          {
-            components: ['tamagui'],
-            config: './tamagui.config.ts',
-            logTimings: true,
-            disableExtraction: true
-          }
-        ]
-      ] : []),
+      // Tamagui babel plugin disabled — causes forEach null crash at runtime
       [
         'module-resolver',
         {
@@ -30,7 +15,7 @@ module.exports = function (api) {
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
         }
       ],
-      'react-native-reanimated/plugin' // должен быть последним
+      'react-native-reanimated/plugin'
     ]
   };
 };
