@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { YStack, XStack, Paragraph, Input, ScrollView, Spinner, Separator, Text, View, Button } from 'tamagui';
+import { YStack, XStack, Paragraph, Input, ScrollView, Spinner, Separator, Text, View, Button, Circle } from 'tamagui';
 import { useRouter } from 'expo-router';
-import { Search, Bell } from '@tamagui/lucide-icons';
+import { Search, Bell, Users, UserPlus } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
 import { FriendListItem } from '@/features/friends/ui/FriendListItem';
 import Fab from '@/shared/ui/Fab';
@@ -15,6 +16,7 @@ export default function FriendsScreen() {
   const { friends, loading, error, fetchAll, requestsRaw } = useFriendsStore();
   const router = useRouter();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
 
   const requestsCount = requestsRaw?.incoming?.length ?? 0;
@@ -65,8 +67,8 @@ export default function FriendsScreen() {
 
   return (
     <ScreenContainer paddingHorizontal={0}>
-      <XStack height={50} alignItems="center" justifyContent="space-between" px="$4" mb="$3">
-        <Text fontSize={20} fontWeight="700" color="rgba(255,255,255,0.88)">
+      <XStack height={50} alignItems="center" justifyContent="space-between" px="$4" mb="$3" mt={insets.top + 8}>
+        <Text fontSize={24} fontWeight="800" color="rgba(255,255,255,0.88)">
           {t('friends.title', 'Friends')}
         </Text>
         <Button
@@ -103,12 +105,12 @@ export default function FriendsScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
             f={1}
-            h={44}
+            h={48}
             pl={42}
-            borderRadius={12}
-            bg="rgba(255,255,255,0.04)"
-            borderWidth={0.5}
-            borderColor="rgba(255,255,255,0.08)"
+            borderRadius={100}
+            bg="rgba(255,255,255,0.06)"
+            borderWidth={1}
+            borderColor="rgba(255,255,255,0.05)"
             color="rgba(255,255,255,0.88)"
             placeholderTextColor="rgba(255,255,255,0.3)"
             focusStyle={{
@@ -158,12 +160,37 @@ export default function FriendsScreen() {
           )}
 
           {filteredFriends.length === 0 && !loading && (
-            <Paragraph ta="center" col="$gray10" mt="$4">
-              {searchQuery
-                ? t('friends.search.noResults', 'No friends found')
-                : t('friends.empty', 'No friends yet. Tap + to add.')
-              }
-            </Paragraph>
+            <YStack f={1} ai="center" jc="center" mt="$10" px="$4" gap="$4">
+              <Circle size={80} bg="rgba(124, 77, 255, 0.15)">
+                <Users size={36} color="#7c4dff" />
+              </Circle>
+              <YStack ai="center" gap="$2" mb="$2">
+                <Text fontSize={18} fontWeight="700" color="rgba(255,255,255,0.88)">
+                  {searchQuery ? t('friends.search.noResults', 'No friends found') : t('friends.emptyTitle', 'No friends yet')}
+                </Text>
+                <Text fontSize={14} color="rgba(255,255,255,0.5)" textAlign="center" lineHeight={20}>
+                  {searchQuery 
+                    ? t('friends.search.noResultsDesc', 'Try searching with a different name or ID.') 
+                    : t('friends.empty', 'Add friends to easily split bills and track shared expenses together.')}
+                </Text>
+              </YStack>
+              {!searchQuery && (
+                <Button
+                  icon={<UserPlus size={18} />}
+                  bg="#7c4dff"
+                  color="white"
+                  borderRadius={100}
+                  size="$4"
+                  px="$6"
+                  pressStyle={{ bg: '#651fff', scale: 0.95 }}
+                  onPress={() => router.push('/tabs/friends/requests')}
+                >
+                  <Text color="white" fontWeight="600" fontSize={15}>
+                    {t('friends.add', 'Add Friend')}
+                  </Text>
+                </Button>
+              )}
+            </YStack>
           )}
         </ScrollView>
       </YStack>

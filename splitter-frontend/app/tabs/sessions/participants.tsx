@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  YStack, XStack, Button, Spinner, Text, Input, ScrollView
+  YStack, XStack, Button, Spinner, Text, Input
 } from 'tamagui';
+import { FlatList } from 'react-native';
 import { Users as UsersIcon, Check } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -213,6 +214,9 @@ export default function SessionParticipantsScreen() {
   const canNext = selectedList.length >= 1; // Allow single participant for testing
 
   const fmtUid = (uid: string) => `@${uid.toLowerCase().replace('user#', 'user')}`;
+  
+  const finalData = useMemo(() => dedupByUniqueId(filtered), [filtered]);
+
   const goNext = () => {
     const participants = unionPeople
       .filter(p => selected[p.uniqueId])
@@ -329,12 +333,8 @@ export default function SessionParticipantsScreen() {
       />
 
       {/* List */}
-      <ScrollView
-        style={{ flex: 1 } as any}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: bottomPad }}
-      >
-        <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden">
+      <YStack flex={1} pb={bottomPad}>
+        <YStack flex={1} borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden">
           {(friendsLoading && basePeople.length === 0) && (
             <XStack style={{ height: 56, alignItems: 'center', justifyContent: 'center' } as any}><Spinner /></XStack>
           )}
@@ -345,29 +345,34 @@ export default function SessionParticipantsScreen() {
             </XStack>
           )}
 
-          {dedupByUniqueId(filtered).map((p, idx) => {
-            const on = !!selected[p.uniqueId];
-            const avatarUrl = p.avatarUrl ?? null;
-            return (
-              <React.Fragment key={p.uniqueId}>
-                <XStack style={{ height: 56, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, backgroundColor: '#111118' } as any}>
-                  <XStack style={{ alignItems: 'center', gap: 12 } as any}>
-                    <UserAvatar uri={avatarUrl ?? undefined} label={(p.username || "U").slice(0, 1).toUpperCase()} size={32} textSize={12} backgroundColor="$gray5" />
-                    <YStack>
-                      <Text fontSize={16} fontWeight="600">{p.username}</Text>
-                      <Text fontSize={12} color="$gray10">
-                        @{p.uniqueId.toLowerCase().replace('user#', 'user')}
-                      </Text>
-                    </YStack>
+          <FlatList
+            data={finalData}
+            keyExtractor={(item) => item.uniqueId}
+            renderItem={({ item: p, index: idx }) => {
+              const on = !!selected[p.uniqueId];
+              const avatarUrl = p.avatarUrl ?? null;
+              return (
+                <React.Fragment>
+                  <XStack style={{ height: 56, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, backgroundColor: '#111118' } as any}>
+                    <XStack style={{ alignItems: 'center', gap: 12 } as any}>
+                      <UserAvatar uri={avatarUrl ?? undefined} label={(p.username || "U").slice(0, 1).toUpperCase()} size={32} textSize={12} backgroundColor="$gray5" />
+                      <YStack>
+                        <Text fontSize={16} fontWeight="600">{p.username}</Text>
+                        <Text fontSize={12} color="$gray10">
+                          @{p.uniqueId.toLowerCase().replace('user#', 'user')}
+                        </Text>
+                      </YStack>
+                    </XStack>
+                    <SelectPill on={on} onPress={() => toggleUser(p.uniqueId)} />
                   </XStack>
-                  <SelectPill on={on} onPress={() => toggleUser(p.uniqueId)} />
-                </XStack>
-                {idx < filtered.length - 1 && <XStack style={{ height: 1, backgroundColor: '#222228' } as any} />}
-              </React.Fragment>
-            );
-          })}
+                  {idx < finalData.length - 1 && <XStack style={{ height: 1, backgroundColor: '#222228' } as any} />}
+                </React.Fragment>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+          />
         </YStack>
-      </ScrollView>
+      </YStack>
 
       {/* Fixed Next button */}
       <YStack

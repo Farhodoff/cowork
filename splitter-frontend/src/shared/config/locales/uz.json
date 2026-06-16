@@ -49,9 +49,19 @@
   },
   "friends": {
     "title": "Do'stlar",
-    "requests": "So'rovlar",
+    "requests": {
+      "title": "Do'stlik so'rovlari",
+      "description": "Kelgan va yuborilgan taklifnomalarni boshqarish",
+      "back": "Do'stlarga qaytish",
+      "empty": "Do'stlik so'rovlari yo'q",
+      "emptyDesc": "Boshqalar sizga so'rov yuborganda, ular bu yerda ko'rinadi.",
+      "incoming": "Kelgan so'rovlar",
+      "outgoing": "Yuborilgan so'rovlar",
+      "accept": "Qabul qilish",
+      "reject": "Rad etish"
+    },
     "add": "Do'st qo'shish",
-    "empty": "Hali do'stlar yo'q. Qo'shish uchun + tugmasini bosing.",
+    "empty": "Cheklarni bo'lishish va xarajatlarni kuzatish uchun do'stlarni qo'shing.",
     "searchPlaceholder": "Foydalanuvchi ID kiriting, masalan USER#1234",
     "send": "So'rov yuborish",
     "remove": "O'chirish",
@@ -81,18 +91,9 @@
       },
       "success": {
         "sent": "Do'stlik so'rovi {{username}}ga yuborildi!"
-      }
-    },
-    "requests": {
-      "title": "Do'stlik so'rovlari",
-      "description": "Kelgan va yuborilgan taklifnomalarni boshqarish",
-      "back": "Do'stlarga qaytish",
-      "empty": "Do'stlik so'rovlari yo'q",
-      "emptyDesc": "Boshqalar sizga so'rov yuborganda, ular bu yerda ko'rinadi.",
-      "incoming": "Kelgan so'rovlar",
-      "outgoing": "Yuborilgan so'rovlar",
-      "accept": "Qabul qilish",
-      "reject": "Rad etish"
+      },
+      "noResults": "Do'stlar topilmadi",
+      "noResultsDesc": "Boshqa ism yoki ID bilan qidirib ko'ring."
     },
     "myFriends": "Do'stlarim",
     "manageFriends": "Do'stlar ro'yxati va so'rovlarni boshqarish",
@@ -113,7 +114,8 @@
       "back": "Orqaga",
       "newQr": "Yangi QR",
       "generating": "Yaratilmoqda..."
-    }
+    },
+    "emptyTitle": "Hali do'stlar yo'q"
   },
   "home": {
     "header": {
@@ -178,8 +180,8 @@
       "newLabel": "Yangi parol",
       "newPlaceholder": "Yangi parolni kiriting",
       "confirmLabel": "Yangi parolni tasdiqlang",
-      "confirmPlaceholder": "Yangi parolni qayta kiriting",
-      "requirements": "Parol kamida 8 ta belgi bo'lib, katta va kichik harf, raqam va maxsus belgini o'z ichiga olishi kerak.",
+      "confirmPlaceholder": "Yangi parolni tasdiqlang",
+      "requirements": "Parol kamida 8 ta belgidan iborat bo'lishi va katta harf, kichik harf, raqam va maxsus belgini o'z ichiga olishi kerak.",
       "submit": "Parolni o'zgartirish",
       "updating": "Yangilanmoqda..."
     },
@@ -259,7 +261,7 @@
     "each": "har biriga",
     "unitsAssigned": "{{count}} birlik biriktirildi",
     "perUnit": "Birlik narxi:",
-    "assigned": "biriktirildi",
+    "assigned": "Biriktirildi",
     "unit": "1x",
     "addItem": "Tovar qo'shish",
     "addNewItem": "Yangi tovar qo'shish",
@@ -285,7 +287,6 @@
     "splitByUnits": "Birliklar bo'yicha bo'lish",
     "clearAssignments": "Biriktirishlarni tozalash",
     "selected": "Tanlandi",
-    "assigned": "Biriktirildi",
     "calculationMethod": "Hisoblash usuli",
     "equalSplit": "Teng bo'lish",
     "equalSplitDesc": "Narxni tanlanganlar orasida teng taqsimlash",
@@ -328,57 +329,50 @@
     "totalPrefix": "Jami: "
   },
   "settings": {
+    "accountSettings": "Sozlamalar",
     "language": {
       "title": "Til",
-      "description": "Ilovada ishlatiladigan tilni tanlang.",
-      "options": {
-        "en": "Ingliz tili",
-        "ja": "Yapon tili",
-        "uz": "O'zbek tili"
-      }
+      "description": "O'zingizga qulay tilni tanlang"
     },
     "theme": {
-      "title": "Tashqi ko'rinish",
-      "description": "Mavzu rejimini (yorug', qorong'u yoki tizim) tanlang.",
+      "title": "Ko'rinish",
+      "description": "Yorug', Qorong'u yoki Tizim mavzusini tanlang",
       "options": {
-        "light": "Yorug' mavzu",
-        "dark": "Qorong'u mavzu",
-        "system": "Tizim mavzusi"
+        "light": "Yorug'",
+        "dark": "Qorong'u",
+        "system": "Tizim"
       }
     },
-    "accountSettings": "Hisob sozlamalari",
-    "updateDescription": "Foydalanuvchi nomi va parolingizni quyidagi shakllar yordamida yangilang.",
     "username": "Foydalanuvchi nomi",
-    "enterNewUsername": "Yangi foydalanuvchi nomini kiriting",
+    "enterNewUsername": "Yangi nom kiriting",
     "saving": "Saqlanmoqda...",
-    "saveUsername": "Saqlash",
+    "saveUsername": "Nomni saqlash",
     "reset": "Tiklash",
-    "password": "Parol",
-    "currentPassword": "Joriy parol",
-    "newPassword": "Yangi parol",
-    "passwordReq": "Parol kamida 8 ta belgi bo'lishi hamda katta-kichik harf, raqam va maxsus belgilardan iborat bo'lishi kerak.",
+    "password": "Parolni o'zgartirish",
+    "currentPassword": "Joriy parolni kiriting",
+    "newPassword": "Yangi parolni kiriting",
+    "passwordReq": "Parol kamida 8 ta belgidan iborat bo'lishi va katta harf, kichik harf, raqam va maxsus belgini o'z ichiga olishi kerak.",
     "confirmPassword": "Yangi parolni tasdiqlang",
-    "updating": "Yangilanmoqda...",
     "changePassword": "Parolni o'zgartirish",
     "validation": {
       "usernameRequired": "Foydalanuvchi nomi bo'sh bo'lishi mumkin emas",
-      "usernameMin": "Foydalanuvchi nomi kamida 2 ta belgi bo'lishi kerak",
+      "usernameMin": "Foydalanuvchi nomi kamida 2 ta belgidan iborat bo'lishi kerak",
       "passwordCurrent": "Joriy parolingizni kiriting",
-      "passwordLength": "Yangi parol kamida 8 ta belgi bo'lishi kerak",
-      "passwordComplexity": "Parolda katta va kichik harf, raqam hamda maxsus belgi bo'lishi kerak",
+      "passwordLength": "Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak",
+      "passwordComplexity": "Parol katta harf, kichik harf, raqam va maxsus belgini o'z ichiga olishi kerak",
       "passwordMismatch": "Parollar mos kelmadi",
       "passwordDifferent": "Boshqa parol tanlang"
     },
     "alerts": {
-      "loginToUpdateUsername": "Foydalanuvchi nomini o'zgartirish uchun tizimga kiring.",
       "unavailable": "Mavjud emas",
-      "usernameUpdated": "Foydalanuvchi nomi muvaffaqiyatli yangilandi.",
-      "success": "Muvaffaqiyat",
+      "loginToUpdateUsername": "Foydalanuvchi nomini o'zgartirish uchun tizimga kiring.",
+      "success": "Muvaffaqiyatli",
+      "usernameUpdated": "Foydalanuvchi nomi yangilandi.",
       "updateUsernameFailed": "Foydalanuvchi nomini yangilab bo'lmadi.",
       "error": "Xato",
       "loginToChangePassword": "Parolni o'zgartirish uchun tizimga kiring.",
-      "passwordUpdated": "Parolingiz muvaffaqiyatli o'zgartirildi.",
       "passwordChanged": "Parol yangilandi",
+      "passwordUpdated": "Sizning parolingiz o'zgartirildi.",
       "changePasswordFailed": "Parolni o'zgartirib bo'lmadi."
     }
   },
@@ -444,7 +438,7 @@
     "errorMessage": "Chekni o'qib bo'lmadi. Qayta urinib ko'ring yoki qo'lda kiriting."
   },
   "dashboard": {
-    "magicSplit": "Tezkor bo'lish",
+    "magicSplit": "Magic Split",
     "smartSplit": "Oson bo'lish",
     "recentActivity": "So'nggi harakatlar",
     "emptyState": "Boshlash uchun seans yarating!",
@@ -469,7 +463,7 @@
     "activeBalances": "Faol balanslar"
   },
   "itemsSplit": {
-    "magicSplit": "Tezkor bo'lish",
+    "magicSplit": "Magic Split",
     "assignProgress": "Biriktirish jarayoni",
     "savingBtn": "Saqlanmoqda...",
     "continueBtn": "Davom etish",
@@ -578,7 +572,7 @@
     "useMock": "Namuna chek"
   },
   "aiSplit": {
-    "title": "Sehrli AI bo'lish",
+    "title": "Magic Split",
     "description": "Diktofon orqali ayting yoki yozing. Masalan:\n\"Ali kabob yedi, choyni men va Vali ichdik.\"",
     "placeholder": "Gapiring (klaviatura diktofoni) yoki yozing...",
     "recording": "Yozilmoqda...",

@@ -100,21 +100,7 @@ const darkTheme = createTheme({
 // Light theme mirrors dark — Tamagui requires both.
 const lightTheme = createTheme({ ...darkTheme })
 
-const shorthands = {
-  f: 'flex', ai: 'alignItems', jc: 'justifyContent',
-  w: 'width', h: 'height', m: 'margin', p: 'padding',
-  mx: 'marginHorizontal', my: 'marginVertical',
-  px: 'paddingHorizontal', py: 'paddingVertical',
-  br: 'borderRadius', bg: 'backgroundColor',
-  bw: 'borderWidth', bc: 'borderColor',
-  o: 'opacity', zi: 'zIndex',
-  maw: 'maxWidth', mah: 'maxHeight',
-  miw: 'minWidth', mih: 'minHeight',
-  mt: 'marginTop', mb: 'marginBottom', ml: 'marginLeft', mr: 'marginRight',
-  pt: 'paddingTop', pb: 'paddingBottom', pl: 'paddingLeft', pr: 'paddingRight',
-  col: 'color', fos: 'fontSize', fow: 'fontWeight', ta: 'textAlign',
-  lh: 'lineHeight', ls: 'letterSpacing',
-} as const
+import { shorthands } from '@tamagui/shorthands'
 
 const fonts = {
   body: {

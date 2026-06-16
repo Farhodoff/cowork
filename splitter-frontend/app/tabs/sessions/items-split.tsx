@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Pressable, Alert } from 'react-native';
+import { Pressable, Alert, FlatList } from 'react-native';
 import { YStack, XStack, Text, Button, Circle, ScrollView, Spinner, Input, Sheet } from 'tamagui';
 import { Users as UsersIcon, Check, Plus, Minus, Package as PackageIcon, Pencil, Sparkles, X, Mic, Square } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
@@ -840,14 +840,15 @@ export default function ItemsSplitScreen() {
       </YStack>
 
       {/* Content */}
-      <ScrollView
-        style={{ flex: 1 } as any}
+      <FlatList
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: gapBottom }}
-      >
-        <YStack style={{ paddingHorizontal: 16, gap: 12 } as any}>
-          {/* Participants */}
-          <YStack>
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: gapBottom }}
+        data={items}
+        keyExtractor={(it) => it.id}
+        ItemSeparatorComponent={() => <YStack height={12} />}
+        ListHeaderComponent={
+          <YStack style={{ marginBottom: 12 }}>
             <XStack style={{ width: '100%', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 8 } as any}>
               <XStack style={{ alignItems: 'center', gap: 8 } as any}>
                 <UsersIcon size={18} color="$gray10" />
@@ -874,10 +875,8 @@ export default function ItemsSplitScreen() {
               </XStack>
             </ScrollView>
           </YStack>
-
-          {/* Items */}
-          <YStack style={{ gap: 12, marginTop: 8 } as any}>
-            {items.map((it) => {
+        }
+        renderItem={({ item: it }) => {
               const total =
                 typeof it.totalPrice === 'number' ? it.totalPrice : it.price * it.quantity;
               const assigned = isPartiallyAssigned(it);
@@ -981,10 +980,8 @@ export default function ItemsSplitScreen() {
                   </XStack>
                 </YStack>
               );
-            })}
-          </YStack>
-
-          {/* Add Item Button */}
+        }}
+        ListFooterComponent={
           <Button
             unstyled
             onPress={handleAddNewItem}
@@ -1008,8 +1005,8 @@ export default function ItemsSplitScreen() {
               </Text>
             </XStack>
           </Button>
-        </YStack >
-      </ScrollView >
+        }
+      />
 
       {/* Bottom progress -> button */}
       < YStack

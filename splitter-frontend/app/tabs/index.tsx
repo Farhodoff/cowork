@@ -22,6 +22,7 @@ import type { SessionHistoryEntry } from '@/features/sessions/api/history.api';
 import { useSessionsHistoryStore } from '@/features/sessions/model/history.store';
 import { useAppStore } from '@/shared/lib/stores/app-store';
 import { useGroupsStore } from '@/features/groups/model/groups.store';
+import { convertItemPrice } from '@/shared/lib/utils/currency';
 
 const HOME_HISTORY_LIMIT = 10;
 const DEFAULT_CURRENCY = 'UZS';
@@ -134,7 +135,8 @@ function BillCard({
         borderColor="rgba(255,255,255,0.08)"
         backgroundColor="rgba(255,255,255,0.04)"
         pressStyle={{ scale: 0.98 }}
-        animation="quick"
+        animation="bouncy"
+        enterStyle={{ opacity: 0, scale: 0.95, y: 10 }}
       >
         <XStack justifyContent="space-between" alignItems="center">
           <YStack space="$1" flex={1} marginRight="$2">
@@ -179,7 +181,7 @@ export default function HomePage() {
   const { t } = useTranslation();
   
   // App store states
-  const { user } = useAppStore();
+  const { user, dashboardCurrency, setDashboardCurrency } = useAppStore();
   const myUniqueId = user?.uniqueId;
 
   // Groups store states
@@ -236,27 +238,31 @@ export default function HomePage() {
     sessions.forEach(session => {
       const byParticipant = session.totals?.byParticipant || [];
       const grandTotal = session.grandTotal || 0;
+      const sessionCurrency = session.currency || session.payload?.totals?.currency || 'USD';
 
       if (session.isCreator) {
         let othersOwed = 0;
         byParticipant.forEach(p => {
           if (p.uniqueId !== myUniqueId) {
-            owed += p.amountOwed;
-            othersOwed += p.amountOwed;
+            const converted = convertItemPrice(p.amountOwed, sessionCurrency, dashboardCurrency);
+            owed += converted;
+            othersOwed += p.amountOwed; // original currency for spent calculation
           }
         });
-        spent += Math.max(0, grandTotal - othersOwed);
+        const spentInSessionCurrency = Math.max(0, grandTotal - othersOwed);
+        spent += convertItemPrice(spentInSessionCurrency, sessionCurrency, dashboardCurrency);
       } else {
         const myEntry = byParticipant.find(p => p.uniqueId === myUniqueId);
         if (myEntry) {
-          owe += myEntry.amountOwed;
-          spent += myEntry.amountOwed;
+          const converted = convertItemPrice(myEntry.amountOwed, sessionCurrency, dashboardCurrency);
+          owe += converted;
+          spent += converted;
         }
       }
     });
 
     return { totalOwe: owe, totalOwed: owed, totalSpent: spent };
-  }, [sessions, myUniqueId]);
+  }, [sessions, myUniqueId, dashboardCurrency]);
 
   // Aggregate individual debt list for interactive settle-up display
   const debtList = useMemo(() => {
@@ -264,11 +270,14 @@ export default function HomePage() {
 
     sessions.forEach(session => {
       const byParticipant = session.totals?.byParticipant || [];
+      const sessionCurrency = session.currency || session.payload?.totals?.currency || 'USD';
+
       if (session.isCreator) {
         byParticipant.forEach(p => {
           if (p.uniqueId !== myUniqueId) {
             const current = balanceMap.get(p.uniqueId) || { username: p.username || p.uniqueId, amount: 0 };
-            current.amount += p.amountOwed;
+            const converted = convertItemPrice(p.amountOwed, sessionCurrency, dashboardCurrency);
+            current.amount += converted;
             balanceMap.set(p.uniqueId, current);
           }
         });
@@ -278,7 +287,8 @@ export default function HomePage() {
           const creatorUid = 'creator';
           const creatorName = t('common.creator', 'Creator');
           const current = balanceMap.get(creatorUid) || { username: creatorName, amount: 0 };
-          current.amount -= myEntry.amountOwed;
+          const converted = convertItemPrice(myEntry.amountOwed, sessionCurrency, dashboardCurrency);
+          current.amount -= converted;
           balanceMap.set(creatorUid, current);
         }
       }
@@ -291,7 +301,7 @@ export default function HomePage() {
       }
     });
     return list;
-  }, [sessions, myUniqueId]);
+  }, [sessions, myUniqueId, dashboardCurrency]);
 
   // Group name mapping
   const groupMap = useMemo(() => {
@@ -301,15 +311,7 @@ export default function HomePage() {
   }, [groups]);
 
   // Formatting currency dynamically
-  const currencySymbol = useMemo(() => {
-    if (sessions.length > 0) {
-      const c = sessions[0]?.currency || sessions[0]?.payload?.totals?.currency;
-      if (c === 'USD') return '$';
-      if (c === 'UZS') return 'UZS';
-      if (c) return c;
-    }
-    return '$'; // default to $ for premium/mockup feel
-  }, [sessions]);
+  const currencySymbol = dashboardCurrency === 'USD' ? '$' : 'UZS';
 
   const formatCurrencyValue = (val: number) => {
     if (currencySymbol === '$') {
@@ -359,6 +361,8 @@ export default function HomePage() {
 
               {/* Total Spent Card - Glassmorphism */}
               <YStack
+                animation="bouncy"
+                enterStyle={{ opacity: 0, scale: 0.9, y: 10 }}
                 width="100%"
                 backgroundColor="rgba(255, 255, 255, 0.04)"
                 borderWidth={0.5}
@@ -368,9 +372,36 @@ export default function HomePage() {
                 marginBottom="$4"
                 gap="$1"
               >
-                <Text fontSize={11} color="rgba(255, 255, 255, 0.4)" fontWeight="700" letterSpacing={0.8} textTransform="uppercase">
-                  {t('dashboard.totalSpent', 'Jami shaxsiy xarajatlar')}
-                </Text>
+                <XStack jc="space-between" ai="center">
+                  <Text fontSize={11} color="rgba(255, 255, 255, 0.4)" fontWeight="700" letterSpacing={0.8} textTransform="uppercase">
+                    {t('dashboard.totalSpent', 'Jami shaxsiy xarajatlar')}
+                  </Text>
+                  
+                  <XStack bg="rgba(255,255,255,0.06)" br={100} p={2} ai="center">
+                    <Pressable
+                      onPress={() => setDashboardCurrency('UZS')}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 4,
+                        backgroundColor: dashboardCurrency === 'UZS' ? '#7c4dff' : 'transparent',
+                        borderRadius: 100,
+                      }}
+                    >
+                      <Text fontSize={10} color={dashboardCurrency === 'UZS' ? 'white' : 'rgba(255,255,255,0.4)'} fontWeight="bold">UZS</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setDashboardCurrency('USD')}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 4,
+                        backgroundColor: dashboardCurrency === 'USD' ? '#7c4dff' : 'transparent',
+                        borderRadius: 100,
+                      }}
+                    >
+                      <Text fontSize={10} color={dashboardCurrency === 'USD' ? 'white' : 'rgba(255,255,255,0.4)'} fontWeight="bold">USD</Text>
+                    </Pressable>
+                  </XStack>
+                </XStack>
                 <Text fontSize={28} fontWeight="700" color="rgba(255,255,255,0.88)">
                   {formatCurrencyValue(totalSpent)}
                 </Text>
@@ -378,7 +409,11 @@ export default function HomePage() {
 
               {/* Balance & Settle Up Panel */}
               {debtList.length > 0 && (
-                <View width="100%">
+                <YStack
+                  animation="lazy"
+                  enterStyle={{ opacity: 0, y: 15 }}
+                  width="100%"
+                >
                   <YStack gap="$2" width="100%">
                     <Text fontSize={11} color="rgba(255, 255, 255, 0.4)" fontWeight="700" letterSpacing={0.8} textTransform="uppercase" marginBottom="$1">
                       {t('dashboard.activeBalances', 'Faol balanslar')}
@@ -417,12 +452,14 @@ export default function HomePage() {
                       })}
                     </ScrollView>
                   </YStack>
-                </View>
+                </YStack>
               )}
             </YStack>
 
             {/* Floating Actions Card - Glassmorphism */}
             <XStack
+              animation="bouncy"
+              enterStyle={{ opacity: 0, scale: 0.9, y: 20 }}
               width="90%"
               backgroundColor="rgba(255, 255, 255, 0.04)"
               borderRadius={24}
@@ -437,7 +474,7 @@ export default function HomePage() {
               {/* Scan Receipt */}
               <XStack
                 flex={1}
-                height={68}
+                minHeight={68}
                 borderRadius={18}
                 backgroundColor="rgba(255, 255, 255, 0.02)"
                 alignItems="center"
@@ -450,11 +487,11 @@ export default function HomePage() {
                 <Circle size={40} backgroundColor="rgba(124, 77, 255, 0.28)" ai="center" jc="center" marginRight="$2">
                   <Receipt size={20} color="#b39dff" />
                 </Circle>
-                <YStack>
-                  <Text fontSize={13} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                <YStack flex={1}>
+                  <Text fontSize={13} fontWeight="700" color="rgba(255, 255, 255, 0.88)" flexWrap="wrap" lineHeight={16}>
                     {t('dashboard.scanReceipt')}
                   </Text>
-                  <Text fontSize={10} color="rgba(255, 255, 255, 0.4)">
+                  <Text fontSize={10} color="rgba(255, 255, 255, 0.4)" marginTop={2}>
                     {t('dashboard.aiPowered')}
                   </Text>
                 </YStack>
@@ -463,7 +500,7 @@ export default function HomePage() {
               {/* Magic Split */}
               <XStack
                 flex={1}
-                height={68}
+                minHeight={68}
                 borderRadius={18}
                 backgroundColor="rgba(255, 255, 255, 0.02)"
                 alignItems="center"
@@ -476,11 +513,11 @@ export default function HomePage() {
                 <Circle size={40} backgroundColor="rgba(124, 77, 255, 0.28)" ai="center" jc="center" marginRight="$2">
                   <Sparkles size={20} color="#b39dff" />
                 </Circle>
-                <YStack>
-                  <Text fontSize={13} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                <YStack flex={1}>
+                  <Text fontSize={13} fontWeight="700" color="rgba(255, 255, 255, 0.88)" flexWrap="wrap" lineHeight={16}>
                     {t('dashboard.magicSplit')}
                   </Text>
-                  <Text fontSize={10} color="rgba(255, 255, 255, 0.4)">
+                  <Text fontSize={10} color="rgba(255, 255, 255, 0.4)" marginTop={2}>
                     {t('dashboard.smartSplit')}
                   </Text>
                 </YStack>

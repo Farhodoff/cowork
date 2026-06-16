@@ -7,6 +7,7 @@ interface CustomButtonProps {
   size?: 'small' | 'medium' | 'large'
   disabled?: boolean
   onPress?: () => void
+  [key: string]: any
 }
 
 export const Button: React.FC<CustomButtonProps> = ({ 
@@ -15,6 +16,7 @@ export const Button: React.FC<CustomButtonProps> = ({
   size = 'medium',
   disabled = false,
   onPress,
+  ...rest
 }) => {
   const getStyles = () => {
     const baseStyles = {
@@ -23,9 +25,9 @@ export const Button: React.FC<CustomButtonProps> = ({
     }
 
     const sizeStyles = {
-      small: { height: '$3', paddingHorizontal: '$4' },
-      medium: { height: '$4', paddingHorizontal: '$6' },
-      large: { height: 52, paddingHorizontal: '$8' }, // taller
+      small: { height: 36, paddingHorizontal: 16 },
+      medium: { height: 44, paddingHorizontal: 24 },
+      large: { height: 52, paddingHorizontal: 32 },
     }
 
     const variantStyles = {
@@ -57,13 +59,17 @@ export const Button: React.FC<CustomButtonProps> = ({
   return (
     <TamaguiButton
       {...styles}
+      {...rest}
       disabled={disabled}
       onPress={onPress}
+      justifyContent="center"
+      alignItems="center"
     >
       <Text 
         color={styles.color}
         fontWeight="600"
-        fontSize="$4"
+        fontSize={16}
+        lineHeight={20}
       >
         {title}
       </Text>

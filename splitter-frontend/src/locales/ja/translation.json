@@ -1,20 +1,20 @@
 {
-  "hello": "{{name}}さん、こんにちは！ 👋",
-  "expenses": "割り勘の概要はこちらです",
-  "total": "個人支出合計",
+  "hello": "こんにちは、{{name}} 👋",
+  "expenses": "経費の概要",
+  "total": "合計支出",
   "scan": "レシートをスキャン",
   "quick_add": "クイック追加",
   "recent": "最近の活動",
   "see_all": "すべて見る",
   "no_activity": "まだ活動はありません",
-  "ai_insights": "AIのおすすめ",
+  "ai_insights": "AIの推奨事項",
   "login": "ログイン",
-  "register": "新規登録",
+  "register": "登録",
   "email": "メールアドレス",
   "password": "パスワード",
-  "forgot_pass": "パスワードをお忘れですか？",
-  "no_account": "アカウントをお持ちでないですか？",
-  "sign_up": "新規登録はこちら",
+  "forgot_pass": "パスワードを忘れた場合",
+  "no_account": "アカウントをお持ちではありませんか？",
+  "sign_up": "サインアップ",
   "groups": {
     "title": "グループ",
     "details": {
@@ -35,40 +35,46 @@
   "profile": "プロフィール",
   "logout": "ログアウト",
   "app": {
-    "name": "レシートスプリッター",
-    "subtitle": "友だちと簡単に割り勘"
+    "name": "Receipt Splitter",
+    "subtitle": "友達と簡単に割り勘"
   },
   "features": {
     "scan": "スキャン",
-    "scanDesc": "レシートを撮影しましょう",
+    "scanDesc": "レシートの写真を撮る",
     "split": "割り勘",
-    "splitDesc": "友だちと費用を分ける",
+    "splitDesc": "友達と費用を分ける",
     "calculate": "計算",
-    "calculateDesc": "誰がいくら支払うかを把握"
+    "calculateDesc": "誰がいくら払うか計算する"
   },
   "welcome": {
-    "message": "ようこそ！さっそく始めましょう",
-    "newUser": "レシートスプリッターは初めてですか？",
-    "newUserDesc": "アカウントを作成して割り勘を始めましょう",
+    "message": "ようこそ！始めましょう",
+    "newUser": "Receipt Splitterは初めてですか？",
+    "newUserDesc": "割り勘を始めるためにアカウントを作成してください",
     "existingUser": "すでにアカウントをお持ちですか？"
   },
   "auth": {
-    "signIn": "ログイン",
-    "signInDesc": "お帰りなさい！ログインして続けてください",
+    "signIn": "サインイン",
+    "signInDesc": "おかえりなさい！サインインして続行してください",
     "createAccount": "アカウントを作成",
-    "createAccountDesc": "友だちと割り勘を始めましょう",
+    "createAccountDesc": "友達と割り勘を始めましょう",
     "email": "メールアドレス",
     "emailPlaceholder": "メールアドレスを入力",
     "password": "パスワード",
     "passwordPlaceholder": "パスワードを入力",
-    "confirmPassword": "パスワードを確認",
+    "confirmPassword": "パスワード（確認用）",
     "username": "ユーザー名",
     "usernamePlaceholder": "ユーザー名を入力",
     "forgotPassword": "パスワードをお忘れですか？",
-    "noAccount": "アカウントをお持ちでないですか？",
+    "noAccount": "アカウントをお持ちではありませんか？",
     "haveAccount": "すでにアカウントをお持ちですか？",
     "loginError": "ログイン中にエラーが発生しました",
-    "registerError": "登録中にエラーが発生しました"
+    "registerError": "登録中にエラーが発生しました",
+    "validation": {
+      "emailInvalid": "無効なメール形式です",
+      "passwordMin": "最低6文字必要です",
+      "usernameMin": "ユーザー名は最低2文字必要です",
+      "passwordMismatch": "パスワードが一致しません"
+    }
   },
   "common": {
     "welcome": "ようこそ",
@@ -77,11 +83,13 @@
     "success": "成功",
     "cancel": "キャンセル",
     "confirm": "確認",
-    "continue": "続ける",
+    "continue": "続行",
     "back": "戻る",
     "delete": "削除",
     "retry": "再試行",
     "creator": "作成者",
+    "search": "検索...",
+    "next": "次へ",
     "months": {
       "jan": "1月", "feb": "2月", "mar": "3月", "apr": "4月",
       "may": "5月", "jun": "6月", "jul": "7月", "aug": "8月",
@@ -89,47 +97,51 @@
     }
   },
   "friends": {
-    "title": "友だち",
+    "title": "友達",
     "requests": "リクエスト",
-    "add": "友だちを追加",
-    "empty": "まだ友だちがいません。",
-    "searchPlaceholder": "ID を入力してください",
+    "add": "友達を追加",
+    "empty": "まだ友達がいません。",
+    "searchPlaceholder": "固有IDを入力",
     "send": "リクエストを送信",
     "remove": "削除",
     "loading": "読み込み中...",
     "error": "読み込みに失敗しました",
     "myFriends": "マイフレンド",
-    "manageFriends": "友だちリストとリクエストを管理します",
-    "scanQr": "QRスキャン",
+    "manageFriends": "友達リストとリクエストを管理",
+    "scanQr": "QRをスキャン",
     "myQr": "マイQR",
     "pendingRequests": "保留中のリクエスト",
-    "noFriends": "友だちが見つかりませんでした",
-    "noFriendsDesc": "検索アイコンを使用するか、QRコードをスキャンして友だちを追加してください。",
+    "noFriends": "友達が見つかりません",
+    "noFriendsDesc": "検索アイコンを使用するか、QRコードをスキャンして友達を追加してください。",
     "delete": {
-      "title": "友だちを削除",
-      "confirm": "本当に{{name}}さんを削除しますか？",
-      "success": "友だちを正常に削除しました",
-      "error": "友だちを削除できませんでした"
+      "title": "友達を削除",
+      "confirm": "{{name}}を削除してもよろしいですか？",
+      "success": "友達を削除しました",
+      "error": "友達を削除できませんでした"
     },
     "invite": {
       "title": "マイフレンドQR",
-      "description": "他の人にこのQRコードを共有して、友だちに追加してもらいましょう",
+      "description": "このQRコードを他の人と共有",
       "back": "戻る",
-      "newQr": "新規QR",
+      "newQr": "新しいQR",
       "generating": "生成中...",
       "error": "QRの生成に失敗しました",
       "new": "新規"
     },
     "requests": {
       "tabIncoming": "受信",
-      "tabOutgoing": "送信済み",
-      "emptyIncoming": "受信リクエストはありません",
-      "emptyOutgoing": "送信リクエストはありません",
+      "tabOutgoing": "送信",
+      "emptyIncoming": "受信したリクエストはありません",
+      "emptyOutgoing": "送信したリクエストはありません",
       "accepted": "承認済み",
       "rejected": "拒否済み",
       "requestedLabel": "リクエスト済み",
       "scanInvite": "招待をスキャン",
-      "showMyQr": "マイQRを表示"
+      "showMyQr": "マイQRを表示",
+      "accept": "承認",
+      "reject": "拒否",
+      "acceptedLabel": "{{name}}を承認しました",
+      "rejectedLabel": "{{name}}を拒否しました"
     },
     "search": {
       "button": "検索",
@@ -138,47 +150,47 @@
       "inviteFailed": "招待の送信に失敗しました",
       "inviteSent": "招待を送信しました！",
       "noResults": "結果が見つかりません",
-      "placeholder": "友だちを検索..."
+      "placeholder": "友達を検索..."
     },
     "status": {
       "add": "追加",
-      "friend": "友だち",
+      "friend": "友達",
       "incoming": "受信",
       "requested": "リクエスト済み",
       "you": "あなた"
     },
     "common": {
-      "error": "エラーが発生しました",
+      "error": "問題が発生しました",
       "unknownUser": "不明なユーザー"
     }
   },
   "home": {
     "header": {
-      "greeting": "{{name}}さん、こんにちは！",
-      "friendFallback": "友だち"
+      "greeting": "こんにちは、{{name}}さん！",
+      "friendFallback": "友達"
     },
     "scan": {
-      "cta": "招待をスキャンする"
+      "cta": "招待をスキャン"
     },
     "actions": {
-      "friends": "友だち",
+      "friends": "友達",
       "groups": "グループ"
     },
     "recent": {
-      "title": "最近の明細",
+      "title": "最近の請求書",
       "showMore": "もっと見る",
-      "loading": "最近の明細を読み込み中...",
-      "empty": "まだ明細がありません",
+      "loading": "最近の請求書を読み込み中...",
+      "empty": "まだ請求書はありません",
       "summary": "{{date}} • {{participants}}",
-      "fallbackName": "明細",
-      "participants": "{{count}} 人",
+      "fallbackName": "請求書",
+      "participants": "参加者{{count}}人",
       "amount": "{{currency}} {{amount}}"
     }
   },
   "profile": {
     "title": "プロフィール",
     "status": {
-      "saved": "保存しました"
+      "saved": "保存済み"
     },
     "actions": {
       "copy": "コピー"
@@ -198,10 +210,10 @@
     "logout": "ログアウト",
     "stats": {
       "groups": "グループ",
-      "expenses": "支出",
-      "friends": "友だち"
+      "expenses": "経費",
+      "friends": "友達"
     },
-    "memberSince": "登録日: {{month}} {{year}}"
+    "memberSince": "{{year}}年{{month}}からのメンバー"
   },
   "navigation": {
     "mainMenu": "メインメニュー",
@@ -216,70 +228,14 @@
       "details": "グループ"
     },
     "scanInvite": "招待をスキャン",
-    "friendQr": "友だちのQRコード",
-    "groupQr": "グループQRコード",
+    "friendQr": "マイフレンドQR",
+    "groupQr": "グループQR",
     "scanReceipt": "レシートをスキャン",
     "participants": "参加者",
-    "itemsSplit": "アイテムの分割",
+    "itemsSplit": "商品の割り勘",
     "finish": "完了",
-    "history": "最近 of 明細",
-    "historyDetails": "明細の詳細"
-  },
-  "settings": {
-    "language": {
-      "title": "言語"
-    }
-  },
-  "dashboard": {
-    "magicSplit": "マジックスプリット",
-    "smartSplit": "スマート割り勘",
-    "recentActivity": "最近のアクティビティ",
-    "emptyState": "割り勘セッションを作成して始めましょう！",
-    "viewDetails": "詳細を表示",
-    "hello": "こんにちは、{{name}} 👋",
-    "expenseSummary": "あなたの支出サマリー",
-    "youOwe": "あなたの支払い",
-    "youAreOwed": "あなたへの支払い",
-    "scanReceipt": "レシートをスキャン",
-    "aiPowered": "AI搭載",
-    "viewAll": "すべて表示",
-    "loadingActivity": "アクティビティを読み込み中...",
-    "noActivity": "まだアクティビティがありません",
-    "personalSplit": "個人割り勘",
-    "splitBill": "割り勘",
-    "today": "今日",
-    "yesterday": "昨日",
-    "daysAgo": "{{count}}日前",
-    "totalSpent": "個人の累計支出額",
-    "allSettled": "すべての精算が完了しました！ 🎉",
-    "noActiveDebts": "有効な貸し借りは現在のところありません",
-    "activeBalances": "アクティブな残高"
-  },
-  "splitSession": {
-    "orders": "注文",
-    "addItem": "+ 項目を追加",
-    "billConfirmed": "請求書確認済み",
-    "save": "保存",
-    "assignTo": "割り当て先",
-    "all": "全員",
-    "clear": "クリア",
-    "change": "変更",
-    "progress": "割り当て進捗",
-    "participants": "参加者",
-    "magicSplit": "マジック分割",
-    "changeCurrency": "通貨を変更",
-    "assigned": "割り当て済み",
-    "unit": "個",
-    "assignedTo": "{{count}} 人に割り当て済み",
-    "priceSplitEqually": "価格は均等に分割されます",
-    "each": "ずつ",
-    "unitsAssigned": "{{count}} 個割り当て済み",
-    "perUnit": "単価",
-    "saving": "保存中...",
-    "editItem": "項目を編集",
-    "itemName": "項目名",
-    "price": "価格",
-    "quantity": "数量"
+    "history": "最近の請求書",
+    "historyDetails": "請求書の詳細"
   },
   "settings": {
     "title": "設定",
@@ -288,22 +244,22 @@
     "password": "パスワード",
     "currentPassword": "現在のパスワード",
     "newPassword": "新しいパスワード",
-    "confirmPassword": "パスワードを確認",
+    "confirmPassword": "パスワード（確認用）",
     "changePassword": "パスワードを変更",
     "saveUsername": "ユーザー名を保存",
     "enterNewUsername": "新しいユーザー名を入力",
-    "updateDescription": "プロフィール情報を更新します",
-    "passwordReq": "パスワードは8文字以上である必要があります",
+    "updateDescription": "プロフィール情報を更新",
+    "passwordReq": "パスワードは最低8文字必要です",
     "reset": "リセット",
     "saving": "保存中...",
     "updating": "更新中...",
     "language": {
       "title": "言語",
-      "description": "お好みの言語を選択してください"
+      "description": "希望の言語を選択してください"
     },
     "theme": {
       "title": "テーマ",
-      "description": "アプリの外観を選択します",
+      "description": "アプリの外観を選択",
       "options": {
         "dark": "ダーク",
         "light": "ライト",
@@ -324,20 +280,73 @@
     },
     "validation": {
       "usernameRequired": "ユーザー名は空にできません",
-      "usernameMin": "ユーザー名は2文字以上である必要があります",
+      "usernameMin": "ユーザー名は最低2文字必要です",
       "passwordCurrent": "現在のパスワードを入力してください",
-      "passwordLength": "パスワードは8文字以上である必要があります",
+      "passwordLength": "パスワードは最低8文字必要です",
       "passwordComplexity": "パスワードには文字と数字を含める必要があります",
-      "passwordDifferent": "新しいパスワードは現在のパスワードと異なる必要があります",
+      "passwordDifferent": "新しいパスワードは現在のものと異なる必要があります",
       "passwordMismatch": "パスワードが一致しません"
     }
   },
+  "dashboard": {
+    "magicSplit": "マジック割り勘",
+    "smartSplit": "スマート割り勘",
+    "recentActivity": "最近の活動",
+    "emptyState": "セッションを作成して始めましょう！",
+    "viewDetails": "詳細を見る",
+    "hello": "こんにちは、{{name}} 👋",
+    "expenseSummary": "経費の概要",
+    "youOwe": "あなたの借入",
+    "youAreOwed": "あなたの貸付",
+    "scanReceipt": "レシートをスキャン",
+    "aiPowered": "AI搭載",
+    "viewAll": "すべて見る",
+    "loadingActivity": "最近の活動を読み込み中...",
+    "noActivity": "まだ活動はありません",
+    "personalSplit": "個人の割り勘",
+    "splitBill": "割り勘",
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{{count}}日前",
+    "totalSpent": "個人の合計支出",
+    "allSettled": "すべて精算済みです！🎉",
+    "noActiveDebts": "友達とのアクティブな貸し借りはありません",
+    "activeBalances": "アクティブな残高"
+  },
+  "splitSession": {
+    "orders": "注文",
+    "addItem": "+ 商品を追加",
+    "billConfirmed": "請求書を確認しました",
+    "save": "保存",
+    "assignTo": "割り当て",
+    "all": "すべて",
+    "clear": "クリア",
+    "change": "変更",
+    "progress": "割り当ての進捗",
+    "participants": "参加者",
+    "magicSplit": "マジック割り勘",
+    "changeCurrency": "通貨を変更",
+    "assigned": "割り当て済み",
+    "unit": "個",
+    "assignedTo": "{{count}}人に割り当て済み",
+    "priceSplitEqually": "価格を均等に分割",
+    "each": "各自",
+    "unitsAssigned": "{{count}}個割り当て済み",
+    "perUnit": "1個あたり",
+    "saving": "保存中...",
+    "editItem": "商品を編集",
+    "itemName": "商品名",
+    "price": "価格",
+    "quantity": "数量",
+    "select": "選択",
+    "selected": "選択済み"
+  },
   "insights": {
-    "smartSplit": "スマート分割の提案",
-    "smartSplitDesc": "グループの食事をアリとバリと均等に分けることができます",
-    "savings": "貯蓄トラッカー",
-    "savingsDesc": "今週は平均週間支出と比較して12%多く節約できています",
-    "aiInsight": "AIインサイト",
+    "smartSplit": "スマート割り勘の提案",
+    "smartSplitDesc": "アリさんとバリさんとグループの食事を均等に割り勘できます",
+    "savings": "節約トラッカー",
+    "savingsDesc": "今週は平均的な週の支出と比べて12%多く節約しています",
+    "aiInsight": "AI インサイト",
     "tip": "ヒント"
   },
   "groupDetail": {
@@ -347,13 +356,26 @@
     "history": "履歴",
     "members": "メンバー",
     "noMembers": "まだメンバーがいません",
-    "addFromFriends": "友だちから追加",
-    "searchFriends": "友だちを検索...",
-    "noFriendsToAdd": "追加できる友だちがいません",
+    "addFromFriends": "友達から追加",
+    "searchFriends": "友達を検索...",
+    "noFriendsToAdd": "追加する友達がいません",
     "add": "追加",
     "remove": "削除",
     "deleteGroup": "グループを削除",
-    "deleteConfirm": "このグループを削除しますか？この操作は元に戻せません。",
+    "deleteConfirm": "本当にこのグループを削除しますか？この操作は元に戻せません。",
     "noGroup": "グループが見つかりません"
+  },
+  "finish": {
+    "title": "請求書の概要",
+    "totalAmount": "合計金額",
+    "splitByParticipant": "参加者別の割り勘:",
+    "noParticipantData": "参加者データがまだありません。",
+    "splitByItem": "商品別の割り勘:",
+    "noAllocationDetails": "割り当ての詳細がありません。",
+    "share": "共有",
+    "completeSettlement": "精算を完了する",
+    "receiptLabel": "レシート #{{id}}",
+    "shareTemplate": "📊 **{{title}}**\nレシート #{{receiptId}}\n合計金額: {{total}}\n\n割り勘の詳細:\n{{details}}\n\nReceipt Splitterで共有されました",
+    "shareTemplateNoReceipt": "📊 **{{title}}**\n合計金額: {{total}}\n\n割り勘の詳細:\n{{details}}\n\nReceipt Splitterで共有されました"
   }
 }

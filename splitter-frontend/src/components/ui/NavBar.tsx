@@ -67,7 +67,6 @@ export function NavBar({ currentRouteName }: NavBarProps) {
                   backgroundColor="#7c4dff"
                   alignItems="center"
                   justifyContent="center"
-                  pressStyle={{ scale: 0.95 }}
                   style={{
                     shadowColor: '#7c4dff',
                     shadowOffset: { width: 0, height: 4 },

@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import { YStack, XStack, Text, Button, Separator, Spinner, Card, View, ScrollView } from 'tamagui';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Copy,
   LogOut,
@@ -25,6 +26,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import UserAvatar from '@/shared/ui/UserAvatar';
 import { ScreenContainer } from '@/shared/ui/ScreenContainer';
+import { Button as SharedButton } from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
 import PasswordInput from '@/shared/ui/PasswordInput';
 import { useAppStore } from '@/shared/lib/stores/app-store';
@@ -798,22 +800,24 @@ export default function ProfileScreen() {
   if (activeSubScreen === 'settings') {
     return (
       <YStack f={1} bg="$background">
-        <View bg="#312E81" pt="$5" pb="$4" px="$4" borderBottomLeftRadius={24} borderBottomRightRadius={24}>
-          <XStack ai="center" mt="$2">
-            <Button
-              onPress={() => setActiveSubScreen(null)}
-              circular
-              size="$3.5"
-              bg="rgba(255,255,255,0.15)"
-              pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
-              borderWidth={0}
-              icon={<ArrowLeft color="white" size={20} />}
-            />
-            <Text color="white" fontSize={22} fontWeight="700" ml="$3">
-              {t('settings.title', 'Settings')}
-            </Text>
-          </XStack>
-        </View>
+        <SafeAreaView edges={['top']} style={{ backgroundColor: '#312E81', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+          <View pb="$4" px="$4" pt="$2">
+            <XStack ai="center" mt="$2">
+              <Button
+                onPress={() => setActiveSubScreen(null)}
+                circular
+                size="$3.5"
+                bg="rgba(255,255,255,0.15)"
+                pressStyle={{ bg: 'rgba(255,255,255,0.25)', scale: 0.95 }}
+                borderWidth={0}
+                icon={<ArrowLeft color="white" size={20} />}
+              />
+              <Text color="white" fontSize={22} fontWeight="700" ml="$3">
+                {t('settings.title', 'Settings')}
+              </Text>
+            </XStack>
+          </View>
+        </SafeAreaView>
 
         <ScrollView showsVerticalScrollIndicator={false} f={1} bg="$background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}>
           {/* Language */}
@@ -868,19 +872,14 @@ export default function ProfileScreen() {
                 error={passwordError || undefined}
                 textInputProps={{ returnKeyType: 'done' }}
               />
-              <Button
-                size="$4"
-                bg="#312E81"
-                color="white"
-                pressStyle={{ bg: '#1E1B4B' }}
+              <SharedButton
+                title={isChangingPassword ? passwordUpdatingLabel : passwordSubmitLabel}
+                variant="primary"
+                size="large"
+                width="100%"
                 disabled={isChangingPassword}
                 onPress={handleChangePassword}
-                br={12}
-              >
-                <Text color="white" fontWeight="700">
-                  {isChangingPassword ? passwordUpdatingLabel : passwordSubmitLabel}
-                </Text>
-              </Button>
+              />
             </YStack>
           </SectionCard>
         </ScrollView>

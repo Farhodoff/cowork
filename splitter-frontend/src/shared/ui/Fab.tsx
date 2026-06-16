@@ -1,30 +1,32 @@
 // src/shared/ui/Fab.tsx
-import { Button } from 'tamagui';
+import { Button, View } from 'tamagui';
 import { Plus } from '@tamagui/lucide-icons';
 
 type Props = { onPress: () => void };
 
 export default function Fab({ onPress }: Props) {
   return (
-    <Button
-      onPress={onPress}
-      pressStyle={{ backgroundColor: '#27AE60' }}
-      icon={<Plus size={24} color="white" />}
-      aria-label="Add Friend"
-      style={{
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: '#2ECC71',
-        position: 'absolute',
-        bottom: 24,
-        right: 16,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-      } as any}
-    />
+    <View
+      position="absolute"
+      bottom={110}
+      right={24}
+      zIndex={100}
+    >
+      <Button
+        onPress={onPress}
+        circular
+        size="$6"
+        backgroundColor="#7c4dff"
+        pressStyle={{ backgroundColor: '#651fff', scale: 0.95 }}
+        icon={<Plus size={24} color="white" />}
+        aria-label="Add Friend"
+        elevation={4}
+        shadowColor="#000"
+        shadowOpacity={0.3}
+        shadowRadius={8}
+        shadowOffset={{ width: 0, height: 4 }}
+        borderWidth={0}
+      />
+    </View>
   );
 }

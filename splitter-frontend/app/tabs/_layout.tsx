@@ -9,6 +9,7 @@ import { Home, Settings, Bell, ChevronLeft, Users, Scan, Contact, User as UserIc
 import { useTranslation } from 'react-i18next';
 import { AppState } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
 
 import { useAppStore } from '@/shared/lib/stores/app-store';
 import UserAvatar from '@/shared/ui/UserAvatar';
@@ -33,85 +34,20 @@ function DotBadge({ value }: { value?: number }) {
   );
 }
 
-// --- Global Header for all Tabs ---
-function GlobalTabsHeader(props: any) {
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const { user } = useAppStore();
-  const fetchAll = useFriendsStore((s) => s.fetchAll);
-  const { t } = useTranslation();
-  const routeName = props?.route?.name ?? '';
-  const showHomeShortcut =
-    routeName === 'profile' ||
-    routeName.startsWith('friends') ||
-    routeName.startsWith('groups') ||
-    routeName.startsWith('sessions');
-  const onBackToHome = () => router.replace({ pathname: '/tabs' });
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchAll();
-    }, [fetchAll])
-  );
-
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'active') fetchAll();
-    });
-    return () => sub.remove();
-  }, [fetchAll]);
-
-  const requestsCount = useFriendsStore((s) => s.requestsRaw?.incoming?.length ?? 0);
-  const displayName = user?.username || t('profile.labels.guest', 'Guest');
-  const userInitial = displayName.slice(0, 1).toUpperCase();
-
-  const handleOpenProfile = useCallback(() => {
-    router.push({ pathname: '/tabs/profile' });
-  }, [router]);
-
-  return (
-    <YStack bg="$background" pt={insets.top}>
-      <XStack h={50} ai="center" jc="space-between" px="$4">
-        <XStack ai="center" gap="$2">
-          {showHomeShortcut && (
-            <Pressable onPress={onBackToHome} hitSlop={10}>
-              <XStack ai="center" gap="$1">
-                <ChevronLeft size={20} color="$gray11" />
-                <Text fontSize={14} color="$gray11">
-                  {t('navigation.mainMenu', 'Main menu')}
-                </Text>
-              </XStack>
-            </Pressable>
-          )}
-          <Text fontSize={18} fontWeight="600" numberOfLines={1} miw={150}>
-            {props.options.title}
-          </Text>
-        </XStack>
-
-        <XStack ai="center" gap="$3">
-          <Pressable onPress={() => router.push('/tabs/friends/requests')}>
-            <View>
-              <Bell size={22} color="$gray11" />
-              <DotBadge value={requestsCount} />
-            </View>
-          </Pressable>
-
-          <Pressable onPress={handleOpenProfile} hitSlop={10}>
-            <UserAvatar uri={user?.avatarUrl ?? undefined} label={userInitial} size={36} textSize={14} />
-          </Pressable>
-        </XStack>
-      </XStack>
-    </YStack>
-  );
-}
 
 function CustomTabBar({ state }: any) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { t } = useTranslation();
 
-  // Find active route index based on active route name
+  // Find active route name
   const currentRouteName = state.routes[state.index]?.name || '';
+
+  // Only show the tab bar on the main 4 root tabs
+  const visibleRoutes = ['index', 'groups/index', 'friends/index', 'profile'];
+  if (!visibleRoutes.includes(currentRouteName)) {
+    return null;
+  }
 
   const activeIndex = useMemo(() => {
     if (currentRouteName === 'index') return 0;
@@ -131,21 +67,36 @@ function CustomTabBar({ state }: any) {
   ], [t]);
 
   return (
-    <XStack
-      backgroundColor="rgba(10, 10, 15, 0.92)"
-      pt="$2.5"
-      pb={Math.max(insets.bottom, 12)}
-      px="$2"
-      borderTopWidth={0.5}
-      borderTopColor="rgba(255,255,255,0.06)"
-      shadowColor="#000"
-      shadowOffset={{ width: 0, height: -4 }}
-      shadowOpacity={0.05}
-      shadowRadius={10}
-      elevation={8}
-      jc="space-between"
-      ai="center"
+    <View
+      position="absolute"
+      bottom={Math.max(insets.bottom, 12)}
+      left={16}
+      right={16}
+      borderRadius={24}
+      overflow="hidden"
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.25,
+        shadowRadius: 16,
+        elevation: 10,
+      } as any}
     >
+      <BlurView
+        intensity={80}
+        tint="dark"
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'rgba(10, 10, 15, 0.65)',
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingHorizontal: 8,
+          borderWidth: 0.5,
+          borderColor: 'rgba(255,255,255,0.1)',
+        }}
+      >
       {tabs.map((tab, idx) => {
         const isActive = activeIndex === idx;
         const Icon = tab.icon;
@@ -209,7 +160,8 @@ function CustomTabBar({ state }: any) {
           </Pressable>
         );
       })}
-    </XStack>
+      </BlurView>
+    </View>
   );
 }
 
@@ -282,10 +234,7 @@ export default function TabLayout() {
         options={{
           href: null,
           title: settingsTitle,
-          headerShown: true,
-          headerStyle: { backgroundColor: '#0a0a0f' },
-          headerTintColor: 'rgba(255,255,255,0.88)',
-          headerShadowVisible: false,
+          headerShown: false,
         }}
       />
       <Tabs.Screen name="friends/search" options={{ href: null, title: t('friends.search', 'Search') }} />

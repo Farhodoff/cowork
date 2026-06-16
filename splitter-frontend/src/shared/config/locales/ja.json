@@ -48,9 +48,19 @@
   },
   "friends": {
     "title": "友だち",
-    "requests": "リクエスト",
+    "requests": {
+      "title": "友だちリクエスト",
+      "description": "受信および送信したリクエスト招待を管理します",
+      "back": "友だち一覧に戻る",
+      "empty": "友だちリクエストはありません",
+      "emptyDesc": "友だち申請を受信すると、ここに表示されます。",
+      "incoming": "受信したリクエスト",
+      "outgoing": "送信したリクエスト",
+      "accept": "承認",
+      "reject": "却下"
+    },
     "add": "友だちを追加",
-    "empty": "まだ友だちがいません。+ をタップして追加しましょう。",
+    "empty": "友達を追加して、割り勘や共有経費の記録を簡単にしましょう。",
     "searchPlaceholder": "ID を入力してください (例: USER#1234)",
     "send": "リクエストを送信",
     "remove": "削除",
@@ -80,18 +90,9 @@
       },
       "success": {
         "sent": "{{username}}さんに友だち申請を送信しました！"
-      }
-    },
-    "requests": {
-      "title": "友だちリクエスト",
-      "description": "受信および送信したリクエスト招待を管理します",
-      "back": "友だち一覧に戻る",
-      "empty": "友だちリクエストはありません",
-      "emptyDesc": "友だち申請を受信すると、ここに表示されます。",
-      "incoming": "受信したリクエスト",
-      "outgoing": "送信したリクエスト",
-      "accept": "承認",
-      "reject": "却下"
+      },
+      "noResults": "友達が見つかりません",
+      "noResultsDesc": "別の名前やIDで検索してみてください。"
     },
     "myFriends": "マイフレンド",
     "manageFriends": "友だちリストとリクエストを管理します",
@@ -112,7 +113,8 @@
       "back": "戻る",
       "newQr": "新規QR",
       "generating": "生成中..."
-    }
+    },
+    "emptyTitle": "まだ友達がいません"
   },
   "home": {
     "header": {
@@ -177,8 +179,8 @@
       "newLabel": "新しいパスワード",
       "newPlaceholder": "新しいパスワードを入力",
       "confirmLabel": "新しいパスワードを確認",
-      "confirmPlaceholder": "新しいパスワードを再入力",
-      "requirements": "パスワードは8文字以上で、大文字・小文字・数字・記号を含めてください。",
+      "confirmPlaceholder": "新しいパスワードを確認",
+      "requirements": "パスワードは8文字以上で、大文字、小文字、数字、および特殊文字を含める必要があります。",
       "submit": "パスワードを変更",
       "updating": "更新中..."
     },
@@ -284,7 +286,6 @@
     "splitByUnits": "個数で分割",
     "clearAssignments": "割り当てをクリア",
     "selected": "選択済み",
-    "assigned": "割り当て済み",
     "calculationMethod": "計算方法",
     "equalSplit": "均等分割",
     "equalSplitDesc": "選択された参加者間で価格を均等に分割します",
@@ -327,57 +328,50 @@
     "totalPrefix": "合計: "
   },
   "settings": {
+    "accountSettings": "設定",
     "language": {
       "title": "言語",
-      "description": "アプリ全体で使用する言語を選択してください。",
-      "options": {
-        "en": "英語",
-        "ja": "日本語",
-        "uz": "ウズベク語"
-      }
+      "description": "希望の言語を選択してください"
     },
     "theme": {
       "title": "外観",
-      "description": "ライト、ダーク、またはシステム設定を選択します。",
+      "description": "ライト、ダーク、またはシステムテーマを選択してください",
       "options": {
-        "light": "ライトモード",
-        "dark": "ダークモード",
-        "system": "システム設定"
+        "light": "ライト",
+        "dark": "ダーク",
+        "system": "システム"
       }
     },
-    "accountSettings": "アカウント設定",
-    "updateDescription": "以下のフォームを使用して、ユーザー名とパスワードを更新します。",
     "username": "ユーザー名",
     "enterNewUsername": "新しいユーザー名を入力",
     "saving": "保存中...",
     "saveUsername": "ユーザー名を保存",
     "reset": "リセット",
-    "password": "パスワード",
-    "currentPassword": "現在のパスワード",
-    "newPassword": "新しいパスワード",
-    "passwordReq": "パスワードは8文字以上で、大文字、小文字、数字、特殊記号を含める必要があります。",
+    "password": "パスワードを変更",
+    "currentPassword": "現在のパスワードを入力",
+    "newPassword": "新しいパスワードを入力",
+    "passwordReq": "パスワードは8文字以上で、大文字、小文字、数字、および特殊文字を含める必要があります。",
     "confirmPassword": "新しいパスワードを確認",
-    "updating": "更新中...",
     "changePassword": "パスワードを変更",
     "validation": {
-      "usernameRequired": "ユーザー名は必須です",
+      "usernameRequired": "ユーザー名は空にできません",
       "usernameMin": "ユーザー名は2文字以上である必要があります",
       "passwordCurrent": "現在のパスワードを入力してください",
       "passwordLength": "新しいパスワードは8文字以上である必要があります",
-      "passwordComplexity": "パスワードには大文字、小文字、数字、特殊記号を含める必要があります",
-      "passwordMismatch": "パスワードが一致していません",
+      "passwordComplexity": "パスワードには大文字、小文字、数字、特殊文字を含める必要があります",
+      "passwordMismatch": "パスワードが一致しません",
       "passwordDifferent": "別のパスワードを選択してください"
     },
     "alerts": {
-      "loginToUpdateUsername": "ユーザー名を更新するにはサインインしてください。",
       "unavailable": "利用不可",
-      "usernameUpdated": "ユーザー名を更新しました。",
+      "loginToUpdateUsername": "ユーザー名を更新するにはサインインしてください。",
       "success": "成功",
+      "usernameUpdated": "ユーザー名が更新されました。",
       "updateUsernameFailed": "ユーザー名を更新できませんでした。",
       "error": "エラー",
       "loginToChangePassword": "パスワードを変更するにはサインインしてください。",
+      "passwordChanged": "パスワードが更新されました",
       "passwordUpdated": "パスワードが変更されました。",
-      "passwordChanged": "パスワードを更新しました",
       "changePasswordFailed": "パスワードを変更できませんでした。"
     }
   },

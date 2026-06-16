@@ -257,6 +257,25 @@ export async function updateUsername(
   return getCurrentUser();
 }
 
+export interface UpdatePushTokenPayload {
+  token: string;
+}
+
+/**
+ * PATCH /users/me/push-token
+ * Updates the user's push token for notifications.
+ */
+export async function updatePushToken(
+  payload: UpdatePushTokenPayload,
+): Promise<void> {
+  try {
+    await apiClient.patch("/users/me/push-token", payload);
+    console.log("[API] Successfully updated push token.");
+  } catch (e) {
+    console.warn("[API] Failed to update push token. Backend might not support it yet.", e);
+  }
+}
+
 export interface UpdateEmailPayload {
   email: string;
 }

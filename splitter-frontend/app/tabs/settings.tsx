@@ -1,9 +1,11 @@
 // app/tabs/settings.tsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { YStack, Text, Separator, XStack, useTheme } from 'tamagui';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
+import { YStack, Text, Separator, XStack, useTheme, View } from 'tamagui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { ChevronLeft, Globe, Lock, User as UserIcon, Palette } from '@tamagui/lucide-icons';
+import { useRouter } from 'expo-router';
 
 import { Button } from '@/shared/ui/Button';
 import { ScreenContainer } from '@/shared/ui/ScreenContainer';
@@ -17,6 +19,7 @@ export default function SettingsScreen() {
   const { user, setUser, language, setLanguage, theme: appTheme, setTheme: setAppTheme } = useAppStore();
   const { t } = useTranslation();
   const theme = useTheme();
+  const router = useRouter();
   const bg = '#0a0a0f';
   const isLoggedIn = !!user;
 
@@ -147,34 +150,43 @@ export default function SettingsScreen() {
       >
         <ScrollView
           style={{ flex: 1, backgroundColor: '#0a0a0f' }}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
           keyboardShouldPersistTaps="handled"
         >
           <ScreenContainer>
             <YStack space="$5">
-              {/* Header */}
-              <YStack space="$3" style={{ marginTop: 16 } as any}>
-                <Text fontSize={20} fontWeight="700">
-                  {t('settings.accountSettings', 'Account settings')}
+              {/* Custom Header */}
+              <XStack alignItems="center" marginBottom="$4" marginTop={16}>
+                <Pressable onPress={() => router.back()} style={{ padding: 8, marginLeft: -8 }}>
+                  <ChevronLeft size={24} color="rgba(255,255,255,0.88)" />
+                </Pressable>
+                <Text fontSize={24} fontWeight="800" color="rgba(255,255,255,0.88)" marginLeft="$2">
+                  {t('settings.accountSettings', 'Settings')}
                 </Text>
-                <Text color="$gray10">
-                  {t('settings.updateDescription', 'Update your username and password using the forms below.')}
-                </Text>
-              </YStack>
+              </XStack>
 
-              {/* LANGUAGE */}
-              <YStack space="$3">
-                <Text fontSize={16} fontWeight="600">
-                  {t('settings.language.title', 'Language')}
-                </Text>
-                <Text fontSize={14} color="$gray10">
-                  {t('settings.language.description', 'Choose the language used across the app.')}
+              {/* LANGUAGE CARD */}
+              <YStack
+                backgroundColor="rgba(255, 255, 255, 0.04)"
+                borderRadius={20}
+                borderWidth={0.5}
+                borderColor="rgba(255, 255, 255, 0.08)"
+                padding="$4"
+                space="$3"
+              >
+                <XStack alignItems="center" space="$2">
+                  <Globe size={18} color="#7c4dff" />
+                  <Text fontSize={18} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                    {t('settings.language.title', 'Language')}
+                  </Text>
+                </XStack>
+                <Text fontSize={13} color="$gray10" marginBottom="$2">
+                  {t('settings.language.description', 'Choose your preferred language')}
                 </Text>
 
                 <XStack
-                  space="$2"
-                  backgroundColor="$gray3"
-                  borderRadius="$8"
+                  backgroundColor="rgba(0,0,0,0.4)"
+                  borderRadius={24}
                   padding="$1"
                   flexWrap="wrap"
                 >
@@ -185,13 +197,27 @@ export default function SettingsScreen() {
                       option.shortLabel
                     );
                     return (
-                      <Button
+                      <Pressable
                         key={option.code}
-                        title={label}
-                        variant={isActive ? 'primary' : 'outline'}
-                        size="small"
                         onPress={() => handleLanguageChange(option.code)}
-                      />
+                        style={{ flex: 1 }}
+                      >
+                        <View
+                          backgroundColor={isActive ? '#ffffff' : 'transparent'}
+                          borderRadius={20}
+                          paddingVertical={10}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Text
+                            fontSize={12}
+                            fontWeight="800"
+                            color={isActive ? '#000000' : '$gray10'}
+                          >
+                            {label}
+                          </Text>
+                        </View>
+                      </Pressable>
                     );
                   })}
                 </XStack>
@@ -199,48 +225,81 @@ export default function SettingsScreen() {
 
               <Separator />
 
-              {/* THEME */}
-              <YStack space="$3">
-                <Text fontSize={16} fontWeight="600">
-                  {t('settings.theme.title', 'Appearance')}
-                </Text>
-                <Text fontSize={14} color="$gray10">
-                  {t('settings.theme.description', 'Choose between Light, Dark, or System theme.')}
+              {/* THEME CARD */}
+              <YStack
+                backgroundColor="rgba(255, 255, 255, 0.04)"
+                borderRadius={20}
+                borderWidth={0.5}
+                borderColor="rgba(255, 255, 255, 0.08)"
+                padding="$4"
+                space="$3"
+              >
+                <XStack alignItems="center" space="$2">
+                  <Palette size={18} color="#7c4dff" />
+                  <Text fontSize={18} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                    {t('settings.theme.title', 'Appearance')}
+                  </Text>
+                </XStack>
+                <Text fontSize={13} color="$gray10" marginBottom="$2">
+                  {t('settings.theme.description', 'Choose between Light, Dark, or System theme')}
                 </Text>
 
                 <XStack
-                  space="$2"
-                  backgroundColor="$gray3"
-                  borderRadius="$8"
+                  backgroundColor="rgba(0,0,0,0.4)"
+                  borderRadius={24}
                   padding="$1"
                   flexWrap="wrap"
                 >
-                  <Button
-                    title={t('settings.theme.options.light', 'Light')}
-                    variant={appTheme === 'light' ? 'primary' : 'outline'}
-                    size="small"
-                    onPress={() => setAppTheme('light')}
-                  />
-                  <Button
-                    title={t('settings.theme.options.dark', 'Dark')}
-                    variant={appTheme === 'dark' ? 'primary' : 'outline'}
-                    size="small"
-                    onPress={() => setAppTheme('dark')}
-                  />
-                  <Button
-                    title={t('settings.theme.options.system', 'System')}
-                    variant={appTheme === 'system' ? 'primary' : 'outline'}
-                    size="small"
-                    onPress={() => setAppTheme('system')}
-                  />
+                  {([
+                    { code: 'light', label: t('settings.theme.options.light', 'Light') },
+                    { code: 'dark', label: t('settings.theme.options.dark', 'Dark') },
+                    { code: 'system', label: t('settings.theme.options.system', 'System') },
+                  ] as const).map((option) => {
+                    const isActive = appTheme === option.code;
+                    return (
+                      <Pressable
+                        key={option.code}
+                        onPress={() => setAppTheme(option.code as any)}
+                        style={{ flex: 1 }}
+                      >
+                        <View
+                          backgroundColor={isActive ? '#ffffff' : 'transparent'}
+                          borderRadius={20}
+                          paddingVertical={10}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Text
+                            fontSize={12}
+                            fontWeight="800"
+                            color={isActive ? '#000000' : '$gray10'}
+                          >
+                            {option.label}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    );
+                  })}
                 </XStack>
               </YStack>
 
               <Separator />
 
-              {/* USERNAME */}
-              <YStack space="$3">
-                <Text fontSize={16} fontWeight="600">{t('settings.username', 'Username')}</Text>
+              {/* USERNAME CARD */}
+              <YStack
+                backgroundColor="rgba(255, 255, 255, 0.04)"
+                borderRadius={20}
+                borderWidth={0.5}
+                borderColor="rgba(255, 255, 255, 0.08)"
+                padding="$4"
+                space="$3"
+              >
+                <XStack alignItems="center" space="$2">
+                  <UserIcon size={18} color="#7c4dff" />
+                  <Text fontSize={18} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                    {t('settings.username', 'Username')}
+                  </Text>
+                </XStack>
                 <Input
                   value={usernameValue}
                   onChangeText={setUsernameValue}
@@ -248,7 +307,7 @@ export default function SettingsScreen() {
                   textInputProps={{ autoCapitalize: 'none', autoCorrect: false }}
                   error={usernameError || undefined}
                 />
-                <XStack space="$2">
+                <XStack space="$2" marginTop="$2">
                   <Button
                     title={isUpdatingUsername ? t('settings.saving', 'Saving...') : t('settings.saveUsername', 'Save username')}
                     variant="primary"
@@ -268,19 +327,31 @@ export default function SettingsScreen() {
 
               <Separator />
 
-              {/* PASSWORD */}
-              <YStack space="$3">
-                <Text fontSize={16} fontWeight="600">{t('settings.password', 'Password')}</Text>
+              {/* PASSWORD CARD */}
+              <YStack
+                backgroundColor="rgba(255, 255, 255, 0.04)"
+                borderRadius={20}
+                borderWidth={0.5}
+                borderColor="rgba(255, 255, 255, 0.08)"
+                padding="$4"
+                space="$3"
+              >
+                <XStack alignItems="center" space="$2">
+                  <Lock size={18} color="#7c4dff" />
+                  <Text fontSize={18} fontWeight="700" color="rgba(255, 255, 255, 0.88)">
+                    {t('settings.password', 'Change password')}
+                  </Text>
+                </XStack>
                 <PasswordInput
                   value={currentPassword}
                   onChangeText={setCurrentPassword}
-                  placeholder={t('settings.currentPassword', 'Current password')}
+                  placeholder={t('settings.currentPassword', 'Enter current password')}
                   textInputProps={{ returnKeyType: 'next' }}
                 />
                 <PasswordInput
                   value={newPassword}
                   onChangeText={setNewPassword}
-                  placeholder={t('settings.newPassword', 'New password')}
+                  placeholder={t('settings.newPassword', 'Enter new password')}
                   textInputProps={{ returnKeyType: 'next' }}
                 />
                 <Text fontSize={12} color="$gray10">
@@ -290,16 +361,19 @@ export default function SettingsScreen() {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   placeholder={t('settings.confirmPassword', 'Confirm new password')}
-                  error={passwordError || undefined}
                   textInputProps={{ returnKeyType: 'done' }}
+                  error={passwordError || undefined}
                 />
-                <Button
-                  title={isChangingPassword ? t('settings.updating', 'Updating...') : t('settings.changePassword', 'Change password')}
-                  variant="primary"
-                  size="medium"
-                  disabled={isChangingPassword}
-                  onPress={handleChangePassword}
-                />
+                <YStack marginTop={8}>
+                  <Button
+                    title={isChangingPassword ? t('settings.saving', 'Saving...') : t('settings.changePassword', 'Change password')}
+                    variant="primary"
+                    size="large"
+                    width="100%"
+                    disabled={!currentPassword || !newPassword || !confirmPassword || isChangingPassword}
+                    onPress={handleChangePassword}
+                  />
+                </YStack>
               </YStack>
             </YStack>
           </ScreenContainer>

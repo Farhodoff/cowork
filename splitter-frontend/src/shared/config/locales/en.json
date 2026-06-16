@@ -20,6 +20,8 @@
   "auth": {
     "signIn": "Sign In",
     "signInDesc": "Welcome back! Please sign in to continue",
+    "signUp": "Sign Up",
+    "signUpDesc": "Create an account to start splitting",
     "createAccount": "Create Account",
     "createAccountDesc": "Join us to start splitting bills with friends",
     "email": "Email",
@@ -29,6 +31,7 @@
     "confirmPassword": "Confirm Password",
     "username": "Username",
     "usernamePlaceholder": "Enter your username",
+    "fullNamePlaceholder": "Full Name",
     "forgotPassword": "Forgot Password?",
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
@@ -44,14 +47,34 @@
     "confirm": "Confirm",
     "continue": "Continue",
     "back": "Back",
-    "delete": "Delete"
+    "delete": "Delete",
+    "retry": "Retry"
   },
   "friends": {
     "title": "Friends",
-    "requests": "Requests",
+    "requests": {
+      "title": "Friend Requests",
+      "description": "Manage incoming and outgoing request invitations",
+      "back": "Back to Friends",
+      "empty": "No friend requests",
+      "emptyDesc": "When people send you request invites, they will appear here.",
+      "incoming": "Incoming Requests",
+      "outgoing": "Outgoing Requests",
+      "accept": "Accept",
+      "reject": "Reject",
+      "tabOutgoing": "Outgoing",
+      "tabIncoming": "Incoming",
+      "emptyIncoming": "No incoming requests",
+      "emptyOutgoing": "No outgoing requests",
+      "scanInvite": "Scan invite",
+      "showMyQr": "Show my QR",
+      "requestedLabel": "Requested",
+      "accepted": "{{target}} accepted!",
+      "rejected": "{{target}} rejected!"
+    },
     "add": "Add Friend",
-    "empty": "No friends yet. Tap + to add.",
-    "searchPlaceholder": "Enter uniqueId, e.g. USER#1234",
+    "empty": "Add friends to easily split bills and track shared expenses together.",
+    "searchPlaceholder": "Search friends...",
     "send": "Send request",
     "remove": "Remove",
     "loading": "Loading...",
@@ -59,11 +82,16 @@
     "search": {
       "title": "Search Friend",
       "description": "Search for friends by username or email",
-      "placeholder": "Search by username/email...",
+      "placeholder": "Enter uniqueId, e.g. USER#1234",
       "button": "Search",
       "searching": "Searching...",
       "noUsers": "No users found",
+      "noResults": "No friends found",
       "tryDifferent": "Try searching for a different username or email address.",
+      "hint": "Search by uniqueId to find someone",
+      "error": "Search failed",
+      "inviteSent": "Friend request sent to {{target}}!",
+      "inviteFailed": "Could not send invite",
       "status": {
         "you": "You",
         "friend": "Friend",
@@ -80,18 +108,19 @@
       },
       "success": {
         "sent": "Friend request sent to {{username}}!"
-      }
+      },
+      "noResultsDesc": "Try searching with a different name or ID."
     },
-    "requests": {
-      "title": "Friend Requests",
-      "description": "Manage incoming and outgoing request invitations",
-      "back": "Back to Friends",
-      "empty": "No friend requests",
-      "emptyDesc": "When people send you request invites, they will appear here.",
-      "incoming": "Incoming Requests",
-      "outgoing": "Outgoing Requests",
-      "accept": "Accept",
-      "reject": "Reject"
+    "status": {
+      "add": "Add",
+      "you": "You",
+      "friend": "Friend",
+      "requested": "Requested",
+      "incoming": "Incoming"
+    },
+    "common": {
+      "unknownUser": "Unknown user",
+      "error": "Something went wrong"
     },
     "myFriends": "My Friends",
     "manageFriends": "Manage your friends list and requests",
@@ -111,8 +140,11 @@
       "description": "Share this QR code with others to add you as a friend",
       "back": "Back",
       "newQr": "New QR",
-      "generating": "Generating..."
-    }
+      "new": "New QR",
+      "generating": "Generating...",
+      "error": "Failed to get invite"
+    },
+    "emptyTitle": "No friends yet"
   },
   "home": {
     "header": {
@@ -258,7 +290,7 @@
     "each": "each",
     "unitsAssigned": "{{count}} unit(s) assigned",
     "perUnit": "Per unit:",
-    "assigned": "assigned",
+    "assigned": "Assigned",
     "unit": "1x",
     "addItem": "Add Item",
     "addNewItem": "Add new item",
@@ -284,7 +316,6 @@
     "splitByUnits": "Split By Units",
     "clearAssignments": "Clear Assignments",
     "selected": "Selected",
-    "assigned": "Assigned",
     "calculationMethod": "Calculation method",
     "equalSplit": "Equal Split",
     "equalSplitDesc": "Split the price equally among selected",
@@ -327,37 +358,30 @@
     "totalPrefix": "Total: "
   },
   "settings": {
+    "accountSettings": "Settings",
     "language": {
       "title": "Language",
-      "description": "Choose the language used across the app.",
-      "options": {
-        "en": "English",
-        "ja": "Japanese",
-        "uz": "Uzbek"
-      }
+      "description": "Choose your preferred language"
     },
     "theme": {
       "title": "Appearance",
-      "description": "Choose between Light, Dark, or System theme.",
+      "description": "Choose between Light, Dark, or System theme",
       "options": {
         "light": "Light",
         "dark": "Dark",
         "system": "System"
       }
     },
-    "accountSettings": "Account settings",
-    "updateDescription": "Update your username and password using the forms below.",
     "username": "Username",
     "enterNewUsername": "Enter a new username",
     "saving": "Saving...",
     "saveUsername": "Save username",
     "reset": "Reset",
-    "password": "Password",
-    "currentPassword": "Current password",
-    "newPassword": "New password",
+    "password": "Change password",
+    "currentPassword": "Enter current password",
+    "newPassword": "Enter new password",
     "passwordReq": "Password must be at least 8 characters and include uppercase, lowercase, number, and special symbol.",
     "confirmPassword": "Confirm new password",
-    "updating": "Updating...",
     "changePassword": "Change password",
     "validation": {
       "usernameRequired": "Username cannot be empty",
@@ -369,26 +393,34 @@
       "passwordDifferent": "Choose a different password"
     },
     "alerts": {
-      "loginToUpdateUsername": "Sign in to update your username.",
       "unavailable": "Unavailable",
-      "usernameUpdated": "Username updated.",
+      "loginToUpdateUsername": "Sign in to update your username.",
       "success": "Success",
+      "usernameUpdated": "Username updated.",
       "updateUsernameFailed": "Could not update the username.",
       "error": "Error",
       "loginToChangePassword": "Sign in to change your password.",
-      "passwordUpdated": "Your password has been changed.",
       "passwordChanged": "Password updated",
+      "passwordUpdated": "Your password has been changed.",
       "changePasswordFailed": "Could not change the password."
     }
   },
   "groups": {
+    "title": "Groups",
     "myGroups": "My Groups",
     "manageGroups": "Manage your expense sharing groups",
     "scanInvite": "Scan invite",
     "noGroups": "No groups found",
     "noGroupsDesc": "Create a group using the floating plus button to start sharing expenses.",
+    "empty": "No groups yet. Tap + to create.",
     "membersCount": "Members: {{count}}",
     "createdBy": "Created by: {{name}}",
+    "common": {
+      "untitled": "Group"
+    },
+    "list": {
+      "members_zero": "No members yet"
+    },
     "create": {
       "title": "Create Group",
       "description": "Create a new sharing group and add participants",
@@ -400,7 +432,21 @@
       "selectedMembers": "Selected Members",
       "createBtn": "Create",
       "creating": "Creating...",
-      "failed": "Failed to create group"
+      "failed": "Failed to create group",
+      "validation": {
+        "emptyQuery": "Enter Email or ID.",
+        "selfAdd": "You are already the owner of the group.",
+        "duplicate": "User already added to list.",
+        "nameEmpty": "Please enter a group name."
+      },
+      "notice": {
+        "memberAddedList": "Added to group list!",
+        "notFound": "User not found. They must be registered.",
+        "memberRemovedList": "Removed from list",
+        "inviteCopied": "Invite link copied to clipboard!",
+        "success": "Group created successfully!",
+        "error": "Failed to create group"
+      }
     },
     "details": {
       "activity": "Activity",
@@ -587,192 +633,5 @@
     "micPermDenied": "Microphone permission denied",
     "startError": "Error starting recording",
     "stopError": "Error stopping recording"
-  },
-  "auth": {
-    "signIn": "Sign In",
-    "signInDesc": "Welcome back! Please sign in to continue",
-    "signUp": "Sign Up",
-    "signUpDesc": "Create an account to start splitting",
-    "createAccount": "Create Account",
-    "createAccountDesc": "Join us to start splitting bills with friends",
-    "email": "Email",
-    "emailPlaceholder": "Enter your email",
-    "password": "Password",
-    "passwordPlaceholder": "Enter your password",
-    "confirmPassword": "Confirm Password",
-    "username": "Username",
-    "usernamePlaceholder": "Enter your username",
-    "fullNamePlaceholder": "Full Name",
-    "forgotPassword": "Forgot Password?",
-    "noAccount": "Don't have an account?",
-    "haveAccount": "Already have an account?",
-    "loginError": "An error occurred during login",
-    "registerError": "An error occurred during registration"
-  },
-  "friends": {
-    "title": "Friends",
-    "requests": "Requests",
-    "add": "Add Friend",
-    "empty": "No friends yet. Tap + to add.",
-    "searchPlaceholder": "Search friends...",
-    "send": "Send request",
-    "remove": "Remove",
-    "loading": "Loading...",
-    "error": "Failed to load",
-    "search": {
-      "title": "Search Friend",
-      "description": "Search for friends by username or email",
-      "placeholder": "Enter uniqueId, e.g. USER#1234",
-      "button": "Search",
-      "searching": "Searching...",
-      "noUsers": "No users found",
-      "noResults": "No results found",
-      "tryDifferent": "Try searching for a different username or email address.",
-      "hint": "Search by uniqueId to find someone",
-      "error": "Search failed",
-      "inviteSent": "Friend request sent to {{target}}!",
-      "inviteFailed": "Could not send invite",
-      "status": {
-        "you": "You",
-        "friend": "Friend",
-        "requested": "Requested",
-        "incoming": "Incoming"
-      },
-      "action": {
-        "add": "Add",
-        "adding": "Adding..."
-      },
-      "errors": {
-        "cannotAddSelf": "Cannot add yourself",
-        "cannotSend": "Could not send request"
-      },
-      "success": {
-        "sent": "Friend request sent to {{username}}!"
-      }
-    },
-    "requests": {
-      "title": "Friend Requests",
-      "description": "Manage incoming and outgoing request invitations",
-      "back": "Back to Friends",
-      "empty": "No friend requests",
-      "emptyDesc": "When people send you request invites, they will appear here.",
-      "incoming": "Incoming Requests",
-      "outgoing": "Outgoing Requests",
-      "accept": "Accept",
-      "reject": "Reject",
-      "tabOutgoing": "Outgoing",
-      "tabIncoming": "Incoming",
-      "emptyIncoming": "No incoming requests",
-      "emptyOutgoing": "No outgoing requests",
-      "scanInvite": "Scan invite",
-      "showMyQr": "Show my QR",
-      "requestedLabel": "Requested",
-      "accepted": "{{target}} accepted!",
-      "rejected": "{{target}} rejected!"
-    },
-    "status": {
-      "add": "Add",
-      "you": "You",
-      "friend": "Friend",
-      "requested": "Requested",
-      "incoming": "Incoming"
-    },
-    "common": {
-      "unknownUser": "Unknown user",
-      "error": "Something went wrong"
-    },
-    "myFriends": "My Friends",
-    "manageFriends": "Manage your friends list and requests",
-    "scanQr": "Scan QR",
-    "myQr": "My QR",
-    "pendingRequests": "Pending Requests",
-    "noFriends": "No friends found",
-    "noFriendsDesc": "Use the search icon or scan a QR code to add friends.",
-    "delete": {
-      "title": "Delete Friend",
-      "confirm": "Are you sure you want to delete {{name}} from your friends list?",
-      "success": "Friend deleted successfully",
-      "error": "Could not delete friend"
-    },
-    "invite": {
-      "title": "My Friend QR",
-      "description": "Share this QR code with others to add you as a friend",
-      "back": "Back",
-      "newQr": "New QR",
-      "new": "New QR",
-      "generating": "Generating...",
-      "error": "Failed to get invite"
-    }
-  },
-  "groups": {
-    "title": "Groups",
-    "myGroups": "My Groups",
-    "manageGroups": "Manage your expense sharing groups",
-    "scanInvite": "Scan invite",
-    "noGroups": "No groups found",
-    "noGroupsDesc": "Create a group using the floating plus button to start sharing expenses.",
-    "empty": "No groups yet. Tap + to create.",
-    "membersCount": "Members: {{count}}",
-    "createdBy": "Created by: {{name}}",
-    "common": {
-      "untitled": "Group"
-    },
-    "list": {
-      "members_zero": "No members yet"
-    },
-    "create": {
-      "title": "Create Group",
-      "description": "Create a new sharing group and add participants",
-      "groupName": "Group Name",
-      "placeholder": "Enter group name",
-      "addMembers": "Add Members",
-      "selectFriends": "Select friends to add to this group",
-      "add": "Add",
-      "selectedMembers": "Selected Members",
-      "createBtn": "Create",
-      "creating": "Creating...",
-      "failed": "Failed to create group",
-      "validation": {
-        "emptyQuery": "Enter Email or ID.",
-        "selfAdd": "You are already the owner of the group.",
-        "duplicate": "User already added to list.",
-        "nameEmpty": "Please enter a group name."
-      },
-      "notice": {
-        "memberAddedList": "Added to group list!",
-        "notFound": "User not found. They must be registered.",
-        "memberRemovedList": "Removed from list",
-        "inviteCopied": "Invite link copied to clipboard!",
-        "success": "Group created successfully!",
-        "error": "Failed to create group"
-      }
-    },
-    "details": {
-      "activity": "Activity",
-      "invite": "Invite",
-      "totalMembers": "Total Members",
-      "expenses": "Expenses",
-      "title": "Group Details",
-      "description": "Group name, owner and participant list",
-      "owner": "Created By",
-      "you": "You",
-      "members": "Members"
-    },
-    "invite": {
-      "title": "Group Invite QR",
-      "description": "Others can scan this QR to join this group"
-    }
-  },
-  "common": {
-    "welcome": "Welcome",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "continue": "Continue",
-    "back": "Back",
-    "delete": "Delete",
-    "retry": "Retry"
   }
 }

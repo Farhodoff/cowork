@@ -23,6 +23,7 @@ interface AppStore {
   // App settings
   theme: 'light' | 'dark' | 'system';
   language: LanguageCode;
+  dashboardCurrency: 'UZS' | 'USD';
   
   // Actions
   setToken: (token: string) => void;
@@ -32,6 +33,7 @@ interface AppStore {
   initializeAuth: () => Promise<void>;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setLanguage: (language: LanguageCode) => void;
+  setDashboardCurrency: (currency: 'UZS' | 'USD') => void;
 }
 
 export const useAppStore = create<AppStore>()(
@@ -43,6 +45,7 @@ export const useAppStore = create<AppStore>()(
       isLoading: false,
       theme: 'system',
       language: DEFAULT_LANGUAGE,
+      dashboardCurrency: 'UZS',
 
       // Auth actions
       setToken: (token: string) => {
@@ -100,6 +103,7 @@ export const useAppStore = create<AppStore>()(
       // App settings actions
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => set({ language }),
+      setDashboardCurrency: (dashboardCurrency) => set({ dashboardCurrency }),
     }),
     {
       name: 'app-store',
@@ -107,6 +111,7 @@ export const useAppStore = create<AppStore>()(
       partialize: (state) => ({
         theme: state.theme,
         language: state.language,
+        dashboardCurrency: state.dashboardCurrency,
         // Не сохраняем токен и пользователя в AsyncStorage, 
         // так как токен сохраняется отдельно в SecureStore
       }),
@@ -118,6 +123,8 @@ export const useAppStore = create<AppStore>()(
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { onUnauthorized } from '@/shared/api/auth-events';
+import { registerForPushNotificationsAsync } from '@/shared/lib/notifications';
+import { updatePushToken } from '@/features/auth/api';
 
 export function AppStoreProvider({ children }: { children: ReactNode }) {
   const initializeAuth = useAppStore((s) => s.initializeAuth);
@@ -159,6 +166,20 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     });
     return unsubscribe;
   }, [logout, router]);
+
+  useEffect(() => {
+    if (isAuthReady && user) {
+      registerForPushNotificationsAsync()
+        .then((pushToken) => {
+          if (pushToken) {
+            updatePushToken({ token: pushToken }).catch(() => {
+              // Ignore failure, logged inside api
+            });
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isAuthReady, user]);
   
   if (!isAuthReady) {
     return null;
