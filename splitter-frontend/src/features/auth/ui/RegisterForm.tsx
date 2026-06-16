@@ -1,35 +1,46 @@
-import React, { useState } from 'react';
-import { useRouter, Link } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { YStack, XStack, Text, View } from 'tamagui';
-import { useTranslation } from 'react-i18next';
-import { Alert, Pressable } from 'react-native';
-import { Button } from '@/shared/ui/Button';
-import { Input } from '@/shared/ui/Input';
-import { Card } from '@/shared/ui/Card';
-import ScreenFormContainer from '@/shared/ui/ScreenFormContainer';
-import PasswordInput from '@/shared/ui/PasswordInput';
-import { register as registerUser, RegisterRequest, getCurrentUser } from '../api';
-import { saveToken } from '@/shared/lib/utils/token-storage';
-import { useAppStore } from '@/shared/lib/stores/app-store';
-import { User, Mail, Lock } from '@tamagui/lucide-icons';
-import { LanguageSegmentedControl } from '@/shared/ui/LanguageSegmentedControl';
+import React, { useState } from "react";
+import { useRouter, Link } from "expo-router";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { YStack, XStack, Text, View } from "tamagui";
+import { useTranslation } from "react-i18next";
+import { Alert, Pressable } from "react-native";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import { Card } from "@/shared/ui/Card";
+import ScreenFormContainer from "@/shared/ui/ScreenFormContainer";
+import PasswordInput from "@/shared/ui/PasswordInput";
+import { register as registerUser, getCurrentUser } from "../api";
+import { saveToken } from "@/shared/lib/utils/token-storage";
+import { useAppStore } from "@/shared/lib/stores/app-store";
+import { User } from "@tamagui/lucide-icons";
+import { LanguageSegmentedControl } from "@/shared/ui/LanguageSegmentedControl";
 
-const schema = z.object({
-  username: z.string().min(2, 'Username must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+const schema = z
+  .object({
+    username: z.string().min(2, "Username must be at least 2 characters"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
 
 type FormData = z.infer<typeof schema>;
 
 export default function RegisterForm() {
   const { t } = useTranslation();
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { username: '', email: '', password: '' },
+    defaultValues: { username: "", password: "", confirmPassword: "" },
   });
   const setAuth = useAppStore((s) => s.setAuth);
   const language = useAppStore((s) => s.language);
@@ -37,25 +48,35 @@ export default function RegisterForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (values: RegisterRequest) => {
+  const onSubmit = async (values: FormData) => {
     try {
       setIsLoading(true);
-      const res = await registerUser(values);
-      await saveToken(res.token);
+      const { password, confirmPassword, username } = values;
+      // Ensure passwords match before sending to backend
+      if (password !== confirmPassword) {
+        Alert.alert(
+          t("common.error"),
+          t("auth.passwordMismatch", "Passwords do not match"),
+        );
+        setIsLoading(false);
+        return;
+      }
+      const res = await registerUser({ username, password });
 
       let profile = res.user;
       try {
         profile = await getCurrentUser(res.token);
       } catch (fetchError) {
-        console.warn('Registration profile refresh failed:', fetchError);
+        console.warn("Registration profile refresh failed:", fetchError);
       }
 
       setAuth(res.token, profile);
-      router.replace('/');
+      router.replace("/");
     } catch (error: any) {
       Alert.alert(
-        t('common.error', 'Error'),
-        error.message || t('auth.registerError', 'An error occurred during registration')
+        t("common.error", "Error"),
+        error.message ||
+          t("auth.registerError", "An error occurred during registration"),
       );
     } finally {
       setIsLoading(false);
@@ -66,15 +87,20 @@ export default function RegisterForm() {
     <ScreenFormContainer>
       <YStack space="$5" width="100%">
         {/* Language Selector */}
-        <XStack justifyContent="center" alignItems="center" marginTop="$2" marginBottom="$-2">
+        <XStack
+          justifyContent="center"
+          alignItems="center"
+          marginTop="$2"
+          marginBottom="$-2"
+        >
           <View width={180}>
             <LanguageSegmentedControl
               value={language}
               onChange={(code) => setLanguage(code)}
-              bg="#F3F4F6"
-              activeBgColor="#2ECC71"
+              bg="rgba(255, 255, 255, 0.06)"
+              activeBgColor="#00bc8c"
               activeTextColor="white"
-              inactiveTextColor="#6B7280"
+              inactiveTextColor="rgba(255, 255, 255, 0.4)"
             />
           </View>
         </XStack>
@@ -84,7 +110,7 @@ export default function RegisterForm() {
           <YStack
             width={64}
             height={64}
-            backgroundColor="#312E81"
+            backgroundColor="rgba(124, 77, 255, 0.15)"
             borderRadius={18}
             alignItems="center"
             justifyContent="center"
@@ -93,11 +119,19 @@ export default function RegisterForm() {
           >
             <Text fontSize={32}>💰</Text>
           </YStack>
-          <Text fontSize={30} fontWeight="800" color="$gray12">
-            {t('auth.signUp', 'Sign Up')}
+          <Text
+            fontSize={30}
+            fontWeight="800"
+            color="rgba(255, 255, 255, 0.88)"
+          >
+            {t("auth.signUp", "Sign Up")}
           </Text>
-          <Text fontSize="$4" color="$gray10" textAlign="center">
-            {t('auth.signUpDesc', 'Create an account to start splitting')}
+          <Text
+            fontSize="$4"
+            color="rgba(255, 255, 255, 0.4)"
+            textAlign="center"
+          >
+            {t("auth.signUpDesc", "Create an account to start splitting")}
           </Text>
         </YStack>
 
@@ -110,50 +144,38 @@ export default function RegisterForm() {
               name="username"
               render={({ field: { onChange, value } }) => (
                 <Input
-                  placeholder={t('auth.fullNamePlaceholder', 'Full Name')}
+                  placeholder={t("auth.fullNamePlaceholder", "Full Name")}
                   value={value}
                   onChangeText={onChange}
                   error={errors.username?.message}
-                  leftAdornment={<User size={20} color="rgba(0,0,0,0.35)" />}
+                  leftAdornment={
+                    <User size={20} color="rgba(255, 255, 255, 0.4)" />
+                  }
                 />
               )}
             />
 
-            {/* Email */}
+            {/* Confirm Password */}
             <Controller
               control={control}
-              name="email"
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  placeholder={t('auth.email', 'Email')}
-                  value={value}
-                  onChangeText={onChange}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  error={errors.email?.message}
-                  leftAdornment={<Mail size={20} color="rgba(0,0,0,0.35)" />}
-                />
-              )}
-            />
-
-            {/* Password */}
-            <Controller
-              control={control}
-              name="password"
+              name="confirmPassword"
               render={({ field: { onChange, value } }) => (
                 <PasswordInput
-                  placeholder={t('auth.password', 'Password')}
+                  placeholder={t("auth.confirmPassword", "Confirm Password")}
                   value={value}
                   onChangeText={onChange}
-                  error={errors.password?.message}
-                  leftAdornment={<Lock size={20} color="rgba(0,0,0,0.35)" />}
+                  error={errors.confirmPassword?.message}
                 />
               )}
             />
 
             {/* Submit */}
             <Button
-              title={isLoading ? t('common.loading', 'Creating Account...') : t('auth.createAccount', 'Create Account')}
+              title={
+                isLoading
+                  ? t("common.loading", "Creating Account...")
+                  : t("auth.createAccount", "Create Account")
+              }
               variant="primary"
               size="large"
               onPress={handleSubmit(onSubmit)}
@@ -164,13 +186,13 @@ export default function RegisterForm() {
 
         {/* Footer (Sign In link) */}
         <XStack justifyContent="center" space="$2" marginTop="$3">
-          <Text fontSize="$4" color="$gray10">
-            {t('auth.haveAccount', 'Already have an account?')}
+          <Text fontSize="$4" color="rgba(255, 255, 255, 0.4)">
+            {t("auth.haveAccount", "Already have an account?")}
           </Text>
           <Link href="/login" asChild>
             <Pressable>
-              <Text fontSize="$4" color="#312E81" fontWeight="700">
-                {t('auth.signIn', 'Sign In')}
+              <Text fontSize="$4" color="#7c4dff" fontWeight="700">
+                {t("auth.signIn", "Sign In")}
               </Text>
             </Pressable>
           </Link>

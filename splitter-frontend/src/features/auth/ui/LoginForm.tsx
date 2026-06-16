@@ -70,10 +70,10 @@ export default function LoginForm() {
             <LanguageSegmentedControl
               value={language}
               onChange={(code) => setLanguage(code)}
-              bg="#F3F4F6"
-              activeBgColor="#2ECC71"
+              bg="rgba(255, 255, 255, 0.06)"
+              activeBgColor="#00bc8c"
               activeTextColor="white"
-              inactiveTextColor="#6B7280"
+              inactiveTextColor="rgba(255, 255, 255, 0.4)"
             />
           </View>
         </XStack>
@@ -83,7 +83,7 @@ export default function LoginForm() {
           <YStack
             width={64}
             height={64}
-            backgroundColor="#312E81"
+            backgroundColor="rgba(124, 77, 255, 0.15)"
             borderRadius={18}
             alignItems="center"
             justifyContent="center"
@@ -92,10 +92,10 @@ export default function LoginForm() {
           >
             <Text fontSize={32}>💰</Text>
           </YStack>
-          <Text fontSize={30} fontWeight="800" color="$gray12">
+          <Text fontSize={30} fontWeight="800" color="rgba(255, 255, 255, 0.88)">
             {t('auth.signIn', 'Sign In')}
           </Text>
-          <Text fontSize="$4" color="$gray10" textAlign="center">
+          <Text fontSize="$4" color="rgba(255, 255, 255, 0.4)" textAlign="center">
             {t('auth.signInDesc', 'Sign in to continue splitting bills')}
           </Text>
         </YStack>
@@ -115,7 +115,7 @@ export default function LoginForm() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   error={errors.email?.message}
-                  leftAdornment={<Mail size={20} color="rgba(0,0,0,0.35)" />}
+                  leftAdornment={<Mail size={20} color="rgba(255, 255, 255, 0.4)" />}
                 />
               )}
             />
@@ -130,19 +130,12 @@ export default function LoginForm() {
                   value={value}
                   onChangeText={onChange}
                   error={errors.password?.message}
-                  leftAdornment={<Lock size={20} color="rgba(0,0,0,0.35)" />}
+                  leftAdornment={<Lock size={20} color="rgba(255, 255, 255, 0.4)" />}
                 />
               )}
             />
 
-            {/* Forgot Password */}
-            <XStack justifyContent="flex-end" marginTop="$-1">
-              <Pressable onPress={() => {}}>
-                <Text fontSize="$3" color="#312E81" fontWeight="600">
-                  {t('auth.forgotPassword', 'Forgot password?')}
-                </Text>
-              </Pressable>
-            </XStack>
+
 
             {/* Submit */}
             <Button
@@ -155,16 +148,14 @@ export default function LoginForm() {
           </YStack>
         </Card>
 
-
-
         {/* Footer (Sign Up link) */}
         <XStack justifyContent="center" space="$2" marginTop="$3">
-          <Text fontSize="$4" color="$gray10">
+          <Text fontSize="$4" color="rgba(255, 255, 255, 0.4)">
             {t('auth.noAccount', "Don't have an account?")}
           </Text>
           <Link href="/register" asChild>
             <Pressable>
-              <Text fontSize="$4" color="#312E81" fontWeight="700">
+              <Text fontSize="$4" color="#7c4dff" fontWeight="700">
                 {t('auth.signUp', 'Sign Up')}
               </Text>
             </Pressable>

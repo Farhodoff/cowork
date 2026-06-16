@@ -1,12 +1,12 @@
-import axios, { AxiosError } from 'axios';
-import { getToken } from '@/shared/lib/utils/token-storage';
-import { emitUnauthorized } from '@/shared/api/auth-events';
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
+import axios, { AxiosError } from "axios";
+import { getToken } from "@/shared/lib/utils/token-storage";
+import { emitUnauthorized } from "@/shared/api/auth-events";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3001";
 
 export const apiClient = axios.create({
   baseURL: API_URL,
   timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { "Content-Type": "application/json" },
 });
 
 apiClient.interceptors.request.use(async (config) => {
@@ -14,14 +14,17 @@ apiClient.interceptors.request.use(async (config) => {
     const token = await getToken();
     if (token) {
       const headers: any = config.headers ?? {};
-      if (typeof headers.set === 'function') {
-        headers.set('Authorization', `Bearer ${token}`);
-        headers.set('Content-Type', headers.get?.('Content-Type') ?? 'application/json');
+      if (typeof headers.set === "function") {
+        headers.set("Authorization", `Bearer ${token}`);
+        headers.set(
+          "Content-Type",
+          headers.get?.("Content-Type") ?? "application/json",
+        );
       } else {
         config.headers = {
           ...headers,
           Authorization: `Bearer ${token}`,
-          'Content-Type': headers['Content-Type'] ?? 'application/json',
+          "Content-Type": headers["Content-Type"] ?? "application/json",
         };
       }
     }
@@ -30,11 +33,11 @@ apiClient.interceptors.request.use(async (config) => {
   }
 
   if (__DEV__) {
-    const method = (config.method || 'GET').toUpperCase();
+    const method = (config.method || "GET").toUpperCase();
     const url = `${config.baseURL}${config.url}`;
     console.log(`[API] ${method} ${url}`);
-    if (config.params) console.log('[API] Params:', config.params);
-    if (config.data) console.log('[API] Request data:', config.data);
+    if (config.params) console.log("[API] Params:", config.params);
+    if (config.data) console.log("[API] Request data:", config.data);
   }
 
   return config;
@@ -43,14 +46,14 @@ apiClient.interceptors.request.use(async (config) => {
 apiClient.interceptors.response.use(
   (response) => {
     if (__DEV__) {
-      console.log('[API] Response:', response.data);
-      console.log('[API] Status:', response.status);
+      console.log("[API] Response:", response.data);
+      console.log("[API] Status:", response.status);
     }
     return response;
   },
   (error: AxiosError<any>) => {
     if (__DEV__) {
-      console.error('[API] Error details:', {
+      console.error("[API] Error details:", {
         message: error.message,
         code: (error as any).code,
         response: error.response?.data,
@@ -63,30 +66,40 @@ apiClient.interceptors.response.use(
       const status = error.response.status;
       const data = error.response.data as any;
       const serverMsg: string | undefined =
-        typeof data === 'string' ? data : data?.message || data?.error;
+        typeof data === "string" ? data : data?.message || data?.error;
 
       switch (status) {
         case 401:
           emitUnauthorized();
-          throw new Error(serverMsg || 'Authorization failed');
+          throw new Error(serverMsg || "Authorization failed");
         case 422:
-          throw new Error(serverMsg || 'Validation error');
+          throw new Error(serverMsg || "Validation error");
         case 500:
-          throw new Error(serverMsg || 'Server error. Please try again later.');
-        default:
-          throw new Error(serverMsg || `Request failed (${status})`);
+          throw new Error(serverMsg || "Server error. Please try again later.");
+        case 404:
+          // User not found – token may be stale (e.g., after DB reset)
+          // Treat as unauthorized to trigger logout flow.
+          emitUnauthorized();
+          throw new Error(serverMsg || "User not found");
       }
-    } else if (error.code === 'ECONNABORTED' || String(error.message).toLowerCase().includes('timeout')) {
-      throw new Error('Request timed out. Please check your network or API server.');
+    } else if (
+      error.code === "ECONNABORTED" ||
+      String(error.message).toLowerCase().includes("timeout")
+    ) {
+      throw new Error(
+        "Request timed out. Please check your network or API server.",
+      );
     } else if (error.request) {
-      if (String(error.message).toLowerCase().includes('network')) {
-        throw new Error('Network error. Please check your connection.');
+      if (String(error.message).toLowerCase().includes("network")) {
+        throw new Error("Network error. Please check your connection.");
       }
-      throw new Error('No response received. Possible CORS issue or unreachable API server.');
+      throw new Error(
+        "No response received. Possible CORS issue or unreachable API server.",
+      );
     }
 
-    throw new Error('Unexpected error while performing the request.');
-  }
+    throw new Error("Unexpected error while performing the request.");
+  },
 );
 export interface LoginRequest {
   email: string;
@@ -95,8 +108,8 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
   username: string;
-  email: string;
   password: string;
+  email?: string;
 }
 
 export interface AuthResponse {
@@ -122,13 +135,18 @@ export interface User {
 
 /** POST /auth/login */
 export async function login(payload: LoginRequest): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/login', payload);
+  const { data } = await apiClient.post<AuthResponse>("/auth/login", payload);
   return data;
 }
 
 /** POST /auth/register */
-export async function register(payload: RegisterRequest): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/register', payload);
+export async function register(
+  payload: RegisterRequest,
+): Promise<AuthResponse> {
+  const { data } = await apiClient.post<AuthResponse>(
+    "/auth/register",
+    payload,
+  );
   return data;
 }
 
@@ -138,12 +156,12 @@ export async function register(payload: RegisterRequest): Promise<AuthResponse> 
  * Оставлен для обратной совместимости: если передан, мы явно проставим header.
  */
 export async function getCurrentUser(token?: string): Promise<User> {
-  const { data } = await apiClient.get<User>('/auth/me', {
+  const { data } = await apiClient.get<User>("/auth/me", {
     headers: token
-      ? (h => {
+      ? ((h) => {
           // тот же трюк с AxiosHeaders
-          if (typeof (h as any).set === 'function') {
-            (h as any).set('Authorization', `Bearer ${token}`);
+          if (typeof (h as any).set === "function") {
+            (h as any).set("Authorization", `Bearer ${token}`);
             return h;
           }
           return { ...(h || {}), Authorization: `Bearer ${token}` };
@@ -159,19 +177,19 @@ export async function getCurrentUser(token?: string): Promise<User> {
  */
 export async function logout(token?: string): Promise<void> {
   await apiClient.post(
-    '/auth/logout',
+    "/auth/logout",
     {},
     {
       headers: token
-        ? (h => {
-            if (typeof (h as any).set === 'function') {
-              (h as any).set('Authorization', `Bearer ${token}`);
+        ? ((h) => {
+            if (typeof (h as any).set === "function") {
+              (h as any).set("Authorization", `Bearer ${token}`);
               return h;
             }
             return { ...(h || {}), Authorization: `Bearer ${token}` };
           })((apiClient.defaults.headers.common as any) ?? {})
         : undefined,
-    }
+    },
   );
 }
 /**
@@ -184,10 +202,16 @@ export interface UploadAvatarResponse {
   key: string;
 }
 
-export async function uploadAvatar(formData: FormData): Promise<UploadAvatarResponse> {
-  const { data } = await apiClient.post<UploadAvatarResponse>('/uploads/avatar', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+export async function uploadAvatar(
+  formData: FormData,
+): Promise<UploadAvatarResponse> {
+  const { data } = await apiClient.post<UploadAvatarResponse>(
+    "/uploads/avatar",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
   return data;
 }
 
@@ -199,8 +223,13 @@ export interface UpdateAvatarPayload {
  * PATCH /users/me/avatar
  * Updates the current user's avatar URL.
  */
-export async function updateAvatar(payload: UpdateAvatarPayload): Promise<User> {
-  const response = await apiClient.patch<User | null>('/users/me/avatar', payload);
+export async function updateAvatar(
+  payload: UpdateAvatarPayload,
+): Promise<User> {
+  const response = await apiClient.patch<User | null>(
+    "/users/me/avatar",
+    payload,
+  );
   if (response.data) {
     return response.data;
   }
@@ -215,8 +244,13 @@ export interface UpdateUsernamePayload {
  * PATCH /user/username
  * Updates the current user's username.
  */
-export async function updateUsername(payload: UpdateUsernamePayload): Promise<User> {
-  const response = await apiClient.patch<User | null>('/user/username', payload);
+export async function updateUsername(
+  payload: UpdateUsernamePayload,
+): Promise<User> {
+  const response = await apiClient.patch<User | null>(
+    "/user/username",
+    payload,
+  );
   if (response.data) {
     return response.data;
   }
@@ -232,7 +266,7 @@ export interface UpdateEmailPayload {
  * Updates the current user's email address.
  */
 export async function updateEmail(payload: UpdateEmailPayload): Promise<User> {
-  const response = await apiClient.patch<User | null>('/user/email', payload);
+  const response = await apiClient.patch<User | null>("/user/email", payload);
   if (response.data) {
     return response.data;
   }
@@ -248,8 +282,10 @@ export interface ChangePasswordPayload {
  * PATCH /user/password
  * Changes the current user's password.
  */
-export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
-  await apiClient.patch('/user/password', payload);
+export async function changePassword(
+  payload: ChangePasswordPayload,
+): Promise<void> {
+  await apiClient.patch("/user/password", payload);
 }
 
 /**
@@ -257,7 +293,7 @@ export async function changePassword(payload: ChangePasswordPayload): Promise<vo
  * Resets the current user's avatar to default (null in DB).
  */
 export async function resetAvatar(): Promise<User> {
-  const response = await apiClient.delete<User | null>('/users/me/avatar');
+  const response = await apiClient.delete<User | null>("/users/me/avatar");
   if (response.data) {
     return response.data;
   }
