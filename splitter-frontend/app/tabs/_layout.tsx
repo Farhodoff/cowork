@@ -108,6 +108,7 @@ function GlobalTabsHeader(props: any) {
 function CustomTabBar({ state }: any) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
 
   // Find active route index based on active route name
   const currentRouteName = state.routes[state.index]?.name || '';
@@ -121,26 +122,26 @@ function CustomTabBar({ state }: any) {
     return 0;
   }, [currentRouteName]);
 
-  const tabs = [
-    { key: 'home', label: 'Home', route: '/tabs', icon: Home },
-    { key: 'groups', label: 'Groups', route: '/tabs/groups', icon: Users },
-    { key: 'scan', label: 'Scan', route: '/tabs/scan-receipt', icon: Scan, isSpecial: true },
-    { key: 'contacts', label: 'Contacts', route: '/tabs/friends', icon: Contact },
-    { key: 'profile', label: 'Profile', route: '/tabs/profile', icon: UserIcon },
-  ];
+  const tabs = useMemo(() => [
+    { key: 'home', label: t('navigation.tabs.home', 'Home'), route: '/tabs', icon: Home },
+    { key: 'groups', label: t('navigation.groups.title', 'Groups'), route: '/tabs/groups', icon: Users },
+    { key: 'scan', label: t('navigation.scanReceipt', 'Scan'), route: '/tabs/scan-receipt', icon: Scan, isSpecial: true },
+    { key: 'contacts', label: t('friends.title', 'Contacts'), route: '/tabs/friends', icon: Contact },
+    { key: 'profile', label: t('profile.title', 'Profile'), route: '/tabs/profile', icon: UserIcon },
+  ], [t]);
 
   return (
     <XStack
-      bg="$background"
+      backgroundColor="rgba(10, 10, 15, 0.92)"
       pt="$2.5"
       pb={Math.max(insets.bottom, 12)}
       px="$2"
       borderTopWidth={0.5}
-      borderTopColor="$borderColor"
+      borderTopColor="rgba(255,255,255,0.06)"
       shadowColor="#000"
       shadowOffset={{ width: 0, height: -4 }}
-      shadowOpacity={0.03}
-      shadowRadius={8}
+      shadowOpacity={0.05}
+      shadowRadius={10}
       elevation={8}
       jc="space-between"
       ai="center"
@@ -148,8 +149,8 @@ function CustomTabBar({ state }: any) {
       {tabs.map((tab, idx) => {
         const isActive = activeIndex === idx;
         const Icon = tab.icon;
-        const activeColor = '#312E81';
-        const inactiveColor = '#9CA3AF';
+        const activeColor = '#7c4dff';
+        const inactiveColor = 'rgba(255,255,255,0.4)';
 
         if (tab.isSpecial) {
           return (
@@ -163,14 +164,20 @@ function CustomTabBar({ state }: any) {
                   w={48}
                   h={48}
                   br={24}
-                  bg="rgba(49, 46, 129, 0.08)"
+                  backgroundColor="#7c4dff"
                   ai="center"
                   jc="center"
                   pressStyle={{ scale: 0.95 }}
+                  style={{
+                    shadowColor: '#7c4dff',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.35,
+                    shadowRadius: 10,
+                    elevation: 5,
+                  }}
                 >
-                  <Icon size={26} color={activeColor} />
+                  <Icon size={24} color="white" />
                 </View>
-                <View w={4} h={4} br={2} bg={isActive ? activeColor : 'transparent'} />
               </YStack>
             </Pressable>
           );
@@ -182,10 +189,17 @@ function CustomTabBar({ state }: any) {
             onPress={() => router.push(tab.route as any)}
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
           >
-            <YStack ai="center" gap="$1">
-              <Icon size={22} color={isActive ? activeColor : inactiveColor} />
+            <YStack
+              ai="center"
+              gap="$1"
+              px="$3"
+              py="$1.5"
+              br={14}
+              backgroundColor={isActive ? 'rgba(124, 77, 255, 0.14)' : 'transparent'}
+            >
+              <Icon size={20} color={isActive ? activeColor : inactiveColor} />
               <Text
-                fontSize={12}
+                fontSize={11}
                 fontWeight={isActive ? '700' : '500'}
                 color={isActive ? activeColor : inactiveColor}
               >
@@ -225,7 +239,7 @@ export default function TabLayout() {
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
-        header: (props) => <GlobalTabsHeader {...props} />,
+        headerShown: false,
       }}
     >
       {/* 5 Main Tab Screens */}
@@ -234,6 +248,7 @@ export default function TabLayout() {
         options={{
           title: homeTitle,
           tabBarLabel: homeLabel,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -267,6 +282,10 @@ export default function TabLayout() {
         options={{
           href: null,
           title: settingsTitle,
+          headerShown: true,
+          headerStyle: { backgroundColor: '#0a0a0f' },
+          headerTintColor: 'rgba(255,255,255,0.88)',
+          headerShadowVisible: false,
         }}
       />
       <Tabs.Screen name="friends/search" options={{ href: null, title: t('friends.search', 'Search') }} />

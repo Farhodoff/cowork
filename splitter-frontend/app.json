@@ -6,19 +6,28 @@
     "scheme": "receipt-splitter",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "assetBundlePatterns": [
       "**/*"
     ],
+    "backgroundColor": "#0a0a0f",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "backgroundColor": "#0a0a0f",
+      "bundleIdentifier": "com.jduapp.receiptsplitter"
     },
     "android": {
       "package": "com.jduapp.receiptsplitter",
+      "backgroundColor": "#0a0a0f",
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#0a0a0f"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -35,13 +44,9 @@
         }
       ],
       "expo-localization",
-      "expo-secure-store",
-      [
-        "expo-av",
-        {
-          "microphonePermission": "Guruh chekini ajratishda ovozli xabarlarni yozish va aniqlash uchun mikrofonga ruxsat bering."
-        }
-      ]
+      "expo-font",
+      "expo-audio",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

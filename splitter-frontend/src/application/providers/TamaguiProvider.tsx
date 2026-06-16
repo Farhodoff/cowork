@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { TamaguiProvider as Provider, Theme } from '@tamagui/core'
 import { PortalProvider } from '@tamagui/portal'
 import { useFonts } from 'expo-font'
-import { useColorScheme } from 'react-native'
 import config from '../../../tamagui.config'
 import { useAppStore } from '@/shared/lib/stores/app-store'
 
@@ -10,10 +9,10 @@ interface TamaguiProviderProps {
   children: React.ReactNode
 }
 
+// Force dark theme only — no useColorScheme
+const THEME = 'dark'
+
 export const TamaguiProvider: React.FC<TamaguiProviderProps> = ({ children }) => {
-  const theme = useAppStore((s) => s.theme)
-  const systemScheme = useColorScheme()
-  const resolvedTheme = theme === 'system' ? (systemScheme || 'light') : theme
   const [isHydrated, setIsHydrated] = useState(false)
 
   const [fontsLoaded] = useFonts({
@@ -39,9 +38,9 @@ export const TamaguiProvider: React.FC<TamaguiProviderProps> = ({ children }) =>
   }
 
   return (
-    <Provider config={config} defaultTheme={resolvedTheme}>
+    <Provider config={config} defaultTheme={THEME}>
       <PortalProvider>
-        <Theme name={resolvedTheme}>
+        <Theme name={THEME}>
           {children}
         </Theme>
       </PortalProvider>

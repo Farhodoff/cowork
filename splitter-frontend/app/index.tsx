@@ -1,11 +1,10 @@
 import React from 'react';
 import { Redirect } from 'expo-router';
-import { useAppStore } from '@/shared/lib/stores/app-store';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Welcome() {
-  const token = useAppStore((state) => state.token);
+  const token = useAuthStore((state) => state.token);
 
-  // Если уже залогинен — сразу в табы, иначе на логин
   if (token) return <Redirect href="/tabs" />;
-  return <Redirect href="/login" />;
+  return <Redirect href="/(auth)/login" />;
 }

@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useAppStore } from '@/shared/lib/stores/app-store';
 import { LANGUAGE_CODES, type LanguageCode } from '@/shared/config/languages';
-import i18n from '../../shared/config/i18n';
+import i18n from '@/lib/i18n';
 
 const supportedLanguages = LANGUAGE_CODES;
 
