@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 import {
   YStack, XStack, Paragraph, Separator, Button, Input, Spinner, Text
@@ -10,6 +11,7 @@ import { useGroupsStore } from '@/features/groups/model/groups.store';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
 import UserAvatar from '@/shared/ui/UserAvatar';
 import { useAppStore } from '@/shared/lib/stores/app-store';
+import { ScreenContainer } from '@/shared/ui/ScreenContainer';
 
 const fmtUid = (uid?: string) => (uid ? `@${uid.toLowerCase().replace('user#', 'user')}` : '');
 
@@ -29,6 +31,7 @@ export default function GroupDetailsScreen() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
   const gid = Number(groupId);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const { current, loading, error, openGroup, renameGroup, deleteGroup, addMember, removeMember } = useGroupsStore();
   const { friends, fetchAll: fetchFriends } = useFriendsStore();
@@ -47,7 +50,7 @@ export default function GroupDetailsScreen() {
   }, [current?.group?.name]);
 
   const canManage = useMemo(() => computeIsOwner(current, me), [current, me]);
-  const title = current?.group?.name ?? 'Group';
+  const title = current?.group?.name ?? t('groupDetail.group', 'Group');
   const members = useMemo(() => current?.members ?? [], [current]);
   const ownerId = current?.group?.ownerId;
 
@@ -84,12 +87,12 @@ export default function GroupDetailsScreen() {
 
   function onDeleteAsk() {
     Alert.alert(
-      'Delete group',
-      'Are you sure you want to delete this group? This action cannot be undone.',
+      t('groupDetail.deleteGroup'),
+      t('groupDetail.deleteConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             if (!gid) return;
@@ -132,34 +135,33 @@ export default function GroupDetailsScreen() {
     router.push({ pathname: '/tabs/groups/activity', params: { groupId } });
   };
 
-  if (loading && !current) return <YStack f={1} ai="center" jc="center"><Spinner /></YStack>;
-  if (error) return <YStack f={1} p="$4"><Paragraph col="$red10">{error}</Paragraph></YStack>;
-  if (!current) return <YStack f={1} p="$4"><Paragraph>No group</Paragraph></YStack>;
+  if (loading && !current) return <YStack style={{ flex: 1, alignItems: 'center', justifyContent: 'center' } as any}><Spinner /></YStack>;
+  if (error) return <YStack style={{ flex: 1, padding: 16 } as any}><Paragraph style={{ color: '$red10' } as any}>{error}</Paragraph></YStack>;
+  if (!current) return <YStack style={{ flex: 1, padding: 16 } as any}><Paragraph>{t('groupDetail.noGroup')}</Paragraph></YStack>;
 
   return (
-    <YStack f={1} p="$4" gap="$3" bg="$background">
-      {/* Back (text-only) with chevron) */}
+    <ScreenContainer paddingHorizontal={0}>
+      <YStack style={{ flex: 1, paddingHorizontal: 16, gap: 12 } as any}>
+        {/* Back (text-only) with chevron) */}
       <XStack>
         <Button
           onPress={() => router.replace('/tabs/groups' as never)}
           size="$2"
-          h={22}
-          px={0}
+          style={{ height: 22, paddingHorizontal: 0, backgroundColor: 'transparent' } as any}
           unstyled
           chromeless
-          bg="transparent"
           borderWidth={0}
           color="$gray12"
           pressStyle={{ opacity: 0.6 }}
           icon={<ChevronLeft size={18} color="$gray12" />}
         >
-          Back to Groups
+          {t('groupDetail.backToGroups')}
         </Button>
       </XStack>
 
       {/* Title row: title + inline actions */}
-      <XStack ai="center" gap="$2">
-        <XStack f={1} ai="center" gap="$2" minHeight={22}>
+      <XStack style={{ alignItems: 'center', gap: 8 } as any}>
+        <XStack style={{ flex: 1, alignItems: 'center', gap: 8, minHeight: 22 } as any}>
           {!editing ? (
             <Text numberOfLines={1} fontSize={14} fontWeight="400">
               {title}
@@ -169,12 +171,9 @@ export default function GroupDetailsScreen() {
               value={newName}
               onChangeText={setNewName}
               autoFocus
-              f={1}
-              h={38}
-              px={10}
+              style={{ flex: 1, height: 38, paddingHorizontal: 10, backgroundColor: '$backgroundPress' } as any}
               borderRadius={8}
               fontSize={14}
-              bg="$backgroundPress"
               color="$gray12"
               placeholderTextColor="$gray10"
               borderWidth={0}
@@ -185,7 +184,7 @@ export default function GroupDetailsScreen() {
         </XStack>
 
         {canManage && !editing && (
-          <XStack ai="center" gap="$1">
+          <XStack style={{ alignItems: 'center', gap: 4 } as any}>
             <Button
               chromeless
               circular
@@ -207,7 +206,7 @@ export default function GroupDetailsScreen() {
         )}
 
         {canManage && editing && (
-          <XStack ai="center" gap="$1">
+          <XStack style={{ alignItems: 'center', gap: 4 } as any}>
             <Button
               chromeless
               circular
@@ -232,28 +231,34 @@ export default function GroupDetailsScreen() {
       {/* ACTIONS: QR, Analytics, Activity */}
       {canManage && (
         <>
-          <XStack jc="flex-end" ai="center" py="$2" gap="$2" flexWrap="wrap">
+          <XStack style={{ justifyContent: 'flex-end', alignItems: 'center', paddingVertical: 8, gap: 8, flexWrap: 'wrap' } as any}>
             <Button
               onPress={openAnalytics}
-              theme="gray"
+              theme="dark"
+              backgroundColor="rgba(255,255,255,0.07)"
+              color="white"
               size="$3"
               borderRadius="$3"
               icon={<BarChart3 size={18} color="#8A2BE2" />}
             >
-              Statistika
+              {t('groupDetail.statistics')}
             </Button>
             <Button
               onPress={openActivity}
-              theme="gray"
+              theme="dark"
+              backgroundColor="rgba(255,255,255,0.07)"
+              color="white"
               size="$3"
               borderRadius="$3"
               icon={<Clock size={18} color="#8A2BE2" />}
             >
-              Tarix
+              {t('groupDetail.history')}
             </Button>
             <Button
               onPress={openGroupQR}
-              theme="gray"
+              theme="dark"
+              backgroundColor="rgba(255,255,255,0.07)"
+              color="white"
               size="$3"
               borderRadius="$3"
               icon={<QrCode size={18} />}
@@ -266,9 +271,9 @@ export default function GroupDetailsScreen() {
       )}
 
       {/* MEMBERS */}
-      <Paragraph fow="700" fos="$6">Members</Paragraph>
+      <Paragraph style={{ fontWeight: '700', fontSize: 18 } as any}>{t('groupDetail.members')}</Paragraph>
       {members.length === 0 ? (
-        <Paragraph col="$gray10">No members yet</Paragraph>
+        <Paragraph style={{ color: '$gray10' } as any}>{t('groupDetail.noMembers')}</Paragraph>
       ) : (
         <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden">
           {members.map((m, idx) => {
@@ -282,8 +287,8 @@ export default function GroupDetailsScreen() {
 
             return (
               <React.Fragment key={uid ?? `${label}-${idx}`}>
-                <XStack h={60} ai="center" jc="space-between" px="$4" bg="$green3">
-                  <XStack ai="center" gap="$3">
+                <XStack style={{ height: 60, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, backgroundColor: 'rgba(255,255,255,0.04)' } as any}>
+                  <XStack style={{ alignItems: 'center', gap: 12 } as any}>
                     <UserAvatar uri={avatarUrl ?? undefined} label={(label || "U").slice(0, 1).toUpperCase()} size={36} textSize={14} backgroundColor="$gray5" />
                     <YStack>
                       <Text fontSize={17} fontWeight="600">{label}</Text>
@@ -291,11 +296,11 @@ export default function GroupDetailsScreen() {
                     </YStack>
                   </XStack>
 
-                  <XStack ai="center" gap="$2">
+                  <XStack style={{ alignItems: 'center', gap: 8 } as any}>
                     {isOwnerMember && <Crown size={18} color="$yellow10" />}
                     {canManage && !isOwnerMember && (
-                      <Button size="$2" theme="red" onPress={() => uid && onRemove(uid)} disabled={!uid || busy}>
-                        {busy ? '...' : 'Remove'}
+                      <Button size="$2" theme="dark" backgroundColor="rgba(239,83,80,0.15)" color="#ef5350" onPress={() => uid && onRemove(uid)} disabled={!uid || busy}>
+                        {busy ? '...' : t('groupDetail.remove')}
                       </Button>
                     )}
                   </XStack>
@@ -310,27 +315,25 @@ export default function GroupDetailsScreen() {
       <Separator />
 
       {/* ADD FROM FRIENDS */}
-      <Paragraph fow="700" fos="$6">Add from friends</Paragraph>
+      <Paragraph style={{ fontWeight: '700', fontSize: 18 } as any}>{t('groupDetail.addFromFriends')}</Paragraph>
       <Input
         value={filter}
         onChangeText={setFilter}
-        placeholder="Search friends…"
-        h={41}
-        px={16}
+        placeholder={t('groupDetail.searchFriends')}
+        style={{ height: 41, paddingHorizontal: 16, backgroundColor: '$backgroundPress' } as any}
         borderRadius={10}
         fontSize={14}
         fontWeight="500"
         color="$gray12"
         placeholderTextColor="$gray10"
-        bg="$backgroundPress"
         borderWidth={0}
         returnKeyType="search"
       />
 
       {(candidates ?? []).length === 0 ? (
-        <Paragraph col="$gray10" mt="$2">No friends to add</Paragraph>
+        <Paragraph style={{ color: '$gray10', marginTop: 8 } as any}>{t('groupDetail.noFriendsToAdd')}</Paragraph>
       ) : (
-        <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden" mt="$2">
+        <YStack borderWidth={1} borderColor="$gray5" borderRadius={8} overflow="hidden" style={{ marginTop: 8 } as any}>
           {candidates.map((u, idx) => {
             const uid = u.uniqueId;
             const label = u.displayName || u.username || uid;
@@ -340,8 +343,8 @@ export default function GroupDetailsScreen() {
 
             return (
               <React.Fragment key={uid ?? `${label}-${idx}`}>
-                <XStack h={60} ai="center" jc="space-between" px="$4">
-                  <XStack ai="center" gap="$3">
+                <XStack style={{ height: 60, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 } as any}>
+                  <XStack style={{ alignItems: 'center', gap: 12 } as any}>
                     <UserAvatar uri={avatarUrl ?? undefined} label={(label || "U").slice(0, 1).toUpperCase()} size={36} textSize={14} backgroundColor="$gray5" />
                     <YStack>
                       <Text fontSize={17} fontWeight="600">{label}</Text>
@@ -351,7 +354,7 @@ export default function GroupDetailsScreen() {
 
                   {canManage && (
                     <Button size="$2" onPress={() => uid && onAdd(uid)} disabled={!uid || busy}>
-                      {busy ? '...' : 'Add'}
+                      {busy ? '...' : t('groupDetail.add')}
                     </Button>
                   )}
                 </XStack>
@@ -361,6 +364,7 @@ export default function GroupDetailsScreen() {
           })}
         </YStack>
       )}
-    </YStack>
+      </YStack>
+    </ScreenContainer>
   );
 }

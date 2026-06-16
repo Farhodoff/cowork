@@ -17,6 +17,7 @@ import {
 import { useGroupsStore } from '@/features/groups/model/groups.store';
 import type { GroupMember } from '@/features/groups/api/groups.api';
 import UserAvatar from '@/shared/ui/UserAvatar';
+import { ScreenContainer } from '@/shared/ui/ScreenContainer';
 
 function getRelativeTime(dateString?: string) {
   if (!dateString) return 'Recently';
@@ -148,35 +149,30 @@ export default function GroupsListScreen() {
                 params: { groupId: String(group.id) },
               } as never)
             }
-            bg="$background"
-            br={16}
+            bg="rgba(255, 255, 255, 0.04)"
+            br={18}
             p="$4"
             bw={0.5}
-            bc="$borderColor"
-            shadowColor="#000"
-            shadowOffset={{ width: 0, height: 2 }}
-            shadowOpacity={0.03}
-            shadowRadius={8}
-            elevation={2}
+            bc="rgba(255, 255, 255, 0.08)"
             gap="$2.5"
           >
             <XStack jc="space-between" ai="center">
-              <Text fontSize={18} fontWeight="700" color="$color">
+              <Text fontSize={18} fontWeight="700" color="rgba(255,255,255,0.88)">
                 {groupName}
               </Text>
-              <View bg="#EBFDF5" px="$2.5" py="$1" br={12}>
-                <Text fontSize={13} fontWeight="600" color="#10B981">
-                  Settled
+              <View bg="rgba(0,188,140,0.18)" px="$2.5" py="$1" br={12}>
+                <Text fontSize={12} fontWeight="600" color="#00d4a0" textTransform="uppercase" letterSpacing={0.5}>
+                  {t('groups.list.settled', 'Settled')}
                 </Text>
               </View>
             </XStack>
 
-            <Text fontSize={14} color="$gray11" mt={-2}>
+            <Text fontSize={13} color="rgba(255,255,255,0.4)" mt={-2}>
               {memberCount === 0 ? emptyMembersLabel : `${memberCount} members • ${relativeTime}`}
             </Text>
 
             <XStack ai="center" gap="$2.5" mt="$1">
-              <Users size={16} color="#9CA3AF" />
+              <Users size={16} color="rgba(255,255,255,0.4)" />
               <AvatarStack members={members} totalCount={memberCount} />
             </XStack>
           </Card>
@@ -186,10 +182,10 @@ export default function GroupsListScreen() {
   );
 
   return (
-    <YStack f={1} bg="$background" px="$4">
+    <ScreenContainer>
       {/* Custom Header Row */}
-      <XStack jc="space-between" ai="center" mt="$4" mb="$3">
-        <Text fontSize={32} fontWeight="800" color="$color">
+      <XStack jc="space-between" ai="center" mb="$3">
+        <Text fontSize={28} fontWeight="800" color="rgba(255,255,255,0.88)">
           {t('groups.title', 'Groups')}
         </Text>
         <Button
@@ -197,19 +193,26 @@ export default function GroupsListScreen() {
           w={42}
           h={42}
           br={21}
-          bg="#312E81"
-          pressStyle={{ bg: '#1E1B4B', scale: 0.95 }}
+          bg="#7c4dff"
+          pressStyle={{ bg: '#448aff', scale: 0.95 }}
           ai="center"
           jc="center"
           p={0}
+          style={{
+            shadowColor: '#7c4dff',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 10,
+            elevation: 4,
+          }}
         >
           <Plus size={24} color="white" />
         </Button>
       </XStack>
 
       {error && (
-        <View bg="#FEE2E2" p="$3" br={12} mb="$3">
-          <Text color="#B91C1C" fontSize={14}>
+        <View bg="rgba(239, 83, 80, 0.15)" p="$3" br={12} mb="$3" borderWidth={0.5} borderColor="rgba(239, 83, 80, 0.3)">
+          <Text color="#ef5350" fontSize={14}>
             {error}
           </Text>
         </View>
@@ -217,11 +220,11 @@ export default function GroupsListScreen() {
 
       {loading && hasNoGroups ? (
         <YStack f={1} ai="center" jc="center">
-          <Spinner size="large" color="#312E81" />
+          <Spinner size="large" color="#7c4dff" />
         </YStack>
       ) : hasNoGroups ? (
         <YStack f={1} ai="center" jc="center" gap="$3">
-          <Text color="#6B7280" fontSize={16} textAlign="center">
+          <Text color="rgba(255,255,255,0.4)" fontSize={15} textAlign="center">
             {t('groups.empty', 'No groups yet. Tap + to create.')}
           </Text>
         </YStack>
@@ -233,8 +236,8 @@ export default function GroupsListScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#312E81"
-              colors={["#312E81"]}
+              tintColor="#7c4dff"
+              colors={["#7c4dff"]}
             />
           }
         >
@@ -243,6 +246,6 @@ export default function GroupsListScreen() {
           </YStack>
         </ScrollView>
       )}
-    </YStack>
+    </ScreenContainer>
   );
 }

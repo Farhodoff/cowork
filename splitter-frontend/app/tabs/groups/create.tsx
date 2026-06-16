@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { ArrowLeft, Users, X as XIcon } from '@tamagui/lucide-icons';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useGroupsStore } from '@/features/groups/model/groups.store';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
@@ -68,6 +69,7 @@ export default function GroupCreateScreen() {
   const router = useRouter();
   const notice = useAutoNotice();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const { createGroup, addMember, clearCurrent } = useGroupsStore();
   const { search: searchFriends } = useFriendsStore();
@@ -144,7 +146,7 @@ export default function GroupCreateScreen() {
         notice.err(t('groups.create.notice.notFound', 'User not found. They must be registered.'));
       }
     } catch (err: any) {
-      notice.err(err?.message ?? 'Search failed');
+      notice.err(err?.message ?? t('friends.search.error', 'Search failed'));
     } finally {
       setSearching(false);
     }
@@ -196,7 +198,7 @@ export default function GroupCreateScreen() {
       {/* Curved Header Banner */}
       <View
         bg="#312E81"
-        pt="$5"
+        paddingTop={insets.top > 0 ? insets.top + 8 : 20}
         pb="$6"
         px="$4"
         borderBottomLeftRadius={30}
@@ -253,12 +255,12 @@ export default function GroupCreateScreen() {
           bc="$borderColor"
         >
           <Text fontSize={13} fontWeight="600" color="$gray11" mb="$2">
-            Group Name
+            {t('groupCreate.groupNameLabel', 'Group Name')}
           </Text>
           <Input
             value={name}
             onChangeText={setName}
-            placeholder="e.g., Weekend Squad, Roommates, Trip 20"
+            placeholder={t('groupCreate.groupNamePlaceholder', 'e.g., Weekend Squad, Roommates, Trip 20')}
             h={52}
             br={12}
             borderWidth={1}
@@ -272,7 +274,7 @@ export default function GroupCreateScreen() {
         {/* Add Members Section */}
         <YStack px="$4" mt="$4" gap="$2.5">
           <Text fontSize={18} fontWeight="700" color="$color">
-            Add Members
+            {t('groupCreate.addMembers', 'Add Members')}
           </Text>
 
           {notice.node && (
@@ -286,7 +288,7 @@ export default function GroupCreateScreen() {
               f={2}
               value={emailOrId}
               onChangeText={setEmailOrId}
-              placeholder="Email or ID"
+              placeholder={t('groupCreate.emailOrId', 'Email or ID')}
               h={50}
               br={12}
               borderWidth={1}
@@ -300,7 +302,7 @@ export default function GroupCreateScreen() {
               f={1.5}
               value={optionalName}
               onChangeText={setOptionalName}
-              placeholder="Name (optional)"
+              placeholder={t('groupCreate.nameOptional', 'Name (optional)')}
               h={50}
               br={12}
               borderWidth={1}
@@ -322,7 +324,7 @@ export default function GroupCreateScreen() {
                 <Spinner size="small" color="white" />
               ) : (
                 <Text color="white" fontWeight="700" fontSize={14}>
-                  Add
+                  {t('groupCreate.add', 'Add')}
                 </Text>
               )}
             </Button>
@@ -338,7 +340,7 @@ export default function GroupCreateScreen() {
             pressStyle={{ opacity: 0.7 }}
           >
             <Text color="#312E81" fontWeight="600" fontSize={14}>
-              + Invite via email or phone
+              {t('groupCreate.inviteVia', '+ Invite via email or phone')}
             </Text>
           </Button>
 
@@ -346,7 +348,7 @@ export default function GroupCreateScreen() {
           {draftMembers.length > 0 && (
             <YStack gap="$2" mt="$2">
               <Text fontSize={14} fontWeight="600" color="$gray11" mb="$1">
-                Members to add ({draftMembers.length})
+                {t('groupCreate.membersToAdd', { count: draftMembers.length })}
               </Text>
               {draftMembers.map((member, idx) => {
                 const avatarLabel = (member.displayName || member.username || 'U').slice(0, 1).toUpperCase();
@@ -415,12 +417,12 @@ export default function GroupCreateScreen() {
               <XStack gap="$2" ai="center">
                 <Spinner size="small" color="white" />
                 <Text color="white" fontWeight="700" fontSize={16}>
-                  Creating...
+                  {t('groupCreate.creating', 'Creating...')}
                 </Text>
               </XStack>
             ) : (
               <Text color="white" fontWeight="700" fontSize={16}>
-                Create Group
+                {t('groupCreate.createGroup', 'Create Group')}
               </Text>
             )}
           </Button>
