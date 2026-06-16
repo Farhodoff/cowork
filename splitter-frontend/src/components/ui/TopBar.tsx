@@ -27,7 +27,7 @@ export function TopBar({
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(tabs)' as any);
+      router.replace('/tabs' as any);
     }
   };
 
@@ -92,7 +92,7 @@ export function TopBar({
         )}
         {showAvatar && (
           <View
-            onPress={() => router.push('/(tabs)/profile' as any)}
+            onPress={() => router.push('/tabs/profile' as any)}
             pressStyle={{ scale: 0.95 }}
           >
             <UserAvatar

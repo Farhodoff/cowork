@@ -12,7 +12,7 @@ export function NavBar({ currentRouteName }: NavBarProps) {
   const router = useRouter();
 
   const getActiveIndex = () => {
-    if (currentRouteName === 'index' || currentRouteName === '/(tabs)' || currentRouteName === 'tabs') return 0;
+    if (currentRouteName === 'index' || currentRouteName === '/tabs' || currentRouteName === 'tabs') return 0;
     if (currentRouteName.startsWith('groups')) return 1;
     if (currentRouteName.startsWith('scan') || currentRouteName.includes('scan-check')) return 2;
     if (currentRouteName.includes('contacts')) return 3;
@@ -23,11 +23,11 @@ export function NavBar({ currentRouteName }: NavBarProps) {
   const activeIndex = getActiveIndex();
 
   const tabs = [
-    { key: 'home', label: 'Home', route: '/(tabs)', icon: Home },
-    { key: 'groups', label: 'Groups', route: '/(tabs)/groups', icon: Users },
+    { key: 'home', label: 'Home', route: '/tabs', icon: Home },
+    { key: 'groups', label: 'Groups', route: '/tabs/groups', icon: Users },
     { key: 'scan', label: 'Scan', route: '/modals/scan-check', icon: ScanLine, isSpecial: true },
-    { key: 'contacts', label: 'Contacts', route: '/(tabs)/contacts', icon: BookUser },
-    { key: 'profile', label: 'Profile', route: '/(tabs)/profile', icon: User },
+    { key: 'contacts', label: 'Contacts', route: '/tabs/friends', icon: BookUser },
+    { key: 'profile', label: 'Profile', route: '/tabs/profile', icon: User },
   ];
 
   return (

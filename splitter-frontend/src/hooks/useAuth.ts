@@ -26,7 +26,7 @@ export function useAuth() {
       } catch (e) {}
       await setToken(data.token);
       setUser(data.user);
-      router.replace('/(tabs)' as any);
+      router.replace('/tabs' as any);
     },
   });
 
@@ -42,7 +42,7 @@ export function useAuth() {
       } catch (e) {}
       await setToken(data.token);
       setUser(data.user);
-      router.replace('/(tabs)' as any);
+      router.replace('/tabs' as any);
     },
   });
 
