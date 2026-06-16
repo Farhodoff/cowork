@@ -1,0 +1,386 @@
+{
+  "hello": "Salom, {{name}} 👋",
+  "expenses": "Xarajatlar xulosangiz",
+  "total": "Jami shaxsiy xarajatlar",
+  "scan": "Chekni skanerlash",
+  "quick_add": "Tezkor qo'shish",
+  "recent": "So'nggi harakatlar",
+  "see_all": "Hammasini ko'rish",
+  "no_activity": "Hali faollik yo'q",
+  "ai_insights": "AI tavsiyalar",
+  "login": "Kirish",
+  "register": "Ro'yxatdan o'tish",
+  "email": "Email",
+  "password": "Parol",
+  "forgot_pass": "Parolni unutdingizmi?",
+  "no_account": "Hisobingiz yo'qmi?",
+  "sign_up": "Ro'yxatdan o'ting",
+  "groups": {
+    "title": "Guruhlar",
+    "details": {
+      "title": "Guruh",
+      "members": "A'zolar",
+      "addBill": "Bill qo'shish",
+      "roleMember": "A'zo"
+    },
+    "create": {
+      "title": "Guruh yaratish",
+      "groupName": "Guruh nomi",
+      "failed": "Guruh yaratib bo'lmadi"
+    }
+  },
+  "new_group": "Yangi guruh",
+  "create_group": "Guruh yaratish",
+  "add_member": "A'zo qo'shish",
+  "profile": "Profil",
+  "logout": "Chiqish",
+  "app": {
+    "name": "Chek Bo'lish",
+    "subtitle": "Do'stlar bilan oson hisob-kitob"
+  },
+  "features": {
+    "scan": "Chek skanerlash",
+    "scanDesc": "Cheklaringizni suratga oling",
+    "split": "Pulni bo'lish",
+    "splitDesc": "Do'stlar bilan xarajatni taqsimlang",
+    "calculate": "Avtomatik hisoblash",
+    "calculateDesc": "Kim qancha to'lashini biling"
+  },
+  "welcome": {
+    "message": "Xush kelibsiz! Boshlaymiz",
+    "newUser": "Hisob yarating",
+    "newUserDesc": "Hisob yarating va pulni bo'lishni boshlang",
+    "existingUser": "Hisobingiz bormi?"
+  },
+  "auth": {
+    "signIn": "Kirish",
+    "signInDesc": "Xush kelibsiz! Davom etish uchun tizimga kiring",
+    "createAccount": "Hisob yaratish",
+    "createAccountDesc": "Do'stlar bilan hisob-kitobni hoziroq boshlang",
+    "email": "Email",
+    "emailPlaceholder": "Email kiriting",
+    "password": "Parol",
+    "passwordPlaceholder": "Parolingizni kiriting",
+    "confirmPassword": "Parolni tasdiqlash",
+    "username": "Foydalanuvchi nomi",
+    "usernamePlaceholder": "Foydalanuvchi nomini kiriting",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "noAccount": "Hisobingiz yo'qmi?",
+    "haveAccount": "Hisobingiz bormi?",
+    "loginError": "Tizimga kirishda xatolik yuz berdi",
+    "registerError": "Ro'yxatdan o'tishda xatolik yuz berdi",
+    "validation": {
+      "emailInvalid": "Noto'g'ri email formati",
+      "passwordMin": "Kamida 6 ta belgi",
+      "usernameMin": "Ism kamida 2 ta harfdan iborat bo'lishi kerak",
+      "passwordMismatch": "Parollar mos kelmadi"
+    }
+  },
+  "common": {
+    "welcome": "Xush kelibsiz",
+    "loading": "Yuklanmoqda...",
+    "error": "Xato",
+    "success": "Muvaffaqiyat",
+    "cancel": "Bekor qilish",
+    "confirm": "Tasdiqlash",
+    "continue": "Davom etish",
+    "back": "Orqaga",
+    "delete": "O'chirish",
+    "retry": "Qayta urinish",
+    "creator": "Yaratuvchi",
+    "search": "Qidirish...",
+    "next": "Keyingi",
+    "months": {
+      "jan": "Yan", "feb": "Fev", "mar": "Mar", "apr": "Apr",
+      "may": "May", "jun": "Iyun", "jul": "Iyul", "aug": "Avg",
+      "sep": "Sen", "oct": "Okt", "nov": "Noy", "dec": "Dek"
+    }
+  },
+  "friends": {
+    "title": "Do'stlar",
+    "requests": "So'rovlar",
+    "add": "Do'st qo'shish",
+    "empty": "Hali do'stlar yo'q.",
+    "searchPlaceholder": "Foydalanuvchi ID kiriting",
+    "send": "So'rov yuborish",
+    "remove": "O'chirish",
+    "loading": "Yuklanmoqda...",
+    "error": "Yuklab bo'lmadi",
+    "myFriends": "Do'stlarim",
+    "manageFriends": "Do'stlar ro'yxati va so'rovlarni boshqarish",
+    "scanQr": "QR skaner",
+    "myQr": "Mening QR",
+    "pendingRequests": "Kutilayotgan so'rovlar",
+    "noFriends": "Do'stlar topilmadi",
+    "noFriendsDesc": "Do'stlarni qo'shish uchun qidiruv belgisidan foydalaning.",
+    "delete": {
+      "title": "Do'stni o'chirish",
+      "confirm": "{{name}}ni o'chirishni xohlaysizmi?",
+      "success": "Do'st muvaffaqiyatli o'chirildi",
+      "error": "Do'stni o'chirib bo'lmadi"
+    },
+    "invite": {
+      "title": "Do'stlik QR kodim",
+      "description": "Do'stlik QR kodi",
+      "back": "Orqaga",
+      "newQr": "Yangi QR",
+      "generating": "Yaratilmoqda...",
+      "error": "QR yaratib bo'lmadi",
+      "new": "Yangi"
+    },
+    "requests": {
+      "tabIncoming": "Kiruvchi",
+      "tabOutgoing": "Chiquvchi",
+      "emptyIncoming": "Kiruvchi so'rovlar yo'q",
+      "emptyOutgoing": "Chiquvchi so'rovlar yo'q",
+      "accepted": "Qabul qilindi",
+      "rejected": "Rad etildi",
+      "requestedLabel": "So'rov yuborildi",
+      "scanInvite": "Taklifni skanerlash",
+      "showMyQr": "QR kodimni ko'rsatish",
+      "accept": "Qabul qilish",
+      "reject": "Rad etish",
+      "acceptedLabel": "{{name}} qabul qilindi",
+      "rejectedLabel": "{{name}} rad etildi"
+    },
+    "search": {
+      "button": "Qidirish",
+      "error": "Qidirishda xato",
+      "hint": "Foydalanuvchi nomi yoki ID bo'yicha qidirish",
+      "inviteFailed": "Taklif yuborib bo'lmadi",
+      "inviteSent": "Taklif yuborildi!",
+      "noResults": "Natija topilmadi",
+      "placeholder": "Do'stlarni qidirish..."
+    },
+    "status": {
+      "add": "Qo'shish",
+      "friend": "Do'st",
+      "incoming": "Kiruvchi",
+      "requested": "So'rov yuborildi",
+      "you": "Siz"
+    },
+    "common": {
+      "error": "Xatolik yuz berdi",
+      "unknownUser": "Noma'lum foydalanuvchi"
+    }
+  },
+  "home": {
+    "header": {
+      "greeting": "Salom, {{name}}!",
+      "friendFallback": "do'stim"
+    },
+    "scan": {
+      "cta": "Taklifni skanerlang"
+    },
+    "actions": {
+      "friends": "Do'stlar",
+      "groups": "Guruhlar"
+    },
+    "recent": {
+      "title": "Oxirgi hisoblar",
+      "showMore": "Ko'proq ko'rish",
+      "loading": "Hisoblar yuklanmoqda...",
+      "empty": "Hali hisoblar mavjud emas",
+      "summary": "{{date}} • {{participants}}",
+      "fallbackName": "Hisob",
+      "participants": "{{count}} ishtirokchi",
+      "amount": "{{currency}} {{amount}}"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "status": {
+      "saved": "Saqlandi"
+    },
+    "actions": {
+      "copy": "Nusxa olish"
+    },
+    "labels": {
+      "guest": "Mehmon",
+      "notAvailable": "Mavjud emas"
+    },
+    "info": {
+      "title": "Foydalanuvchi ma'lumotlari",
+      "usernameLabel": "Foydalanuvchi nomi",
+      "usernamePlaceholder": "Yangi foydalanuvchi nomini kiriting",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Yangi email kiriting",
+      "userId": "Foydalanuvchi ID"
+    },
+    "logout": "Chiqish",
+    "stats": {
+      "groups": "Guruhlar",
+      "expenses": "Xarajatlar",
+      "friends": "Do'stlar"
+    },
+    "memberSince": "A'zolik sanasi: {{month}} {{year}}"
+  },
+  "navigation": {
+    "mainMenu": "Bosh menyu",
+    "tabs": {
+      "home": "Bosh sahifa",
+      "settings": "Sozlamalar",
+      "profile": "Profil"
+    },
+    "groups": {
+      "title": "Guruhlar",
+      "create": "Yangi guruh",
+      "details": "Guruh"
+    },
+    "scanInvite": "Taklifni skanerlash",
+    "friendQr": "Do'st QR kodi",
+    "groupQr": "Guruh QR kodi",
+    "scanReceipt": "Chekni skanerlash",
+    "participants": "Ishtirokchilar",
+    "itemsSplit": "Xarajatlarni bo'lish",
+    "finish": "Yakunlash",
+    "history": "So'nggi hisoblar",
+    "historyDetails": "Hisob tafsilotlari"
+  },
+  "settings": {
+    "language": {
+      "title": "Til"
+    }
+  },
+  "dashboard": {
+    "magicSplit": "Tezkor bo'lish",
+    "smartSplit": "Oson bo'lish",
+    "recentActivity": "So'nggi harakatlar",
+    "emptyState": "Boshlash uchun seans yarating!",
+    "viewDetails": "Tafsilotlarni ko'rish",
+    "hello": "Salom, {{name}} 👋",
+    "expenseSummary": "Xarajatlar xulosangiz",
+    "youOwe": "Siz qarzdasiz",
+    "youAreOwed": "Sizga qarz",
+    "scanReceipt": "Chekni skanerlash",
+    "aiPowered": "AI yordamida",
+    "viewAll": "Hammasini ko'rish",
+    "loadingActivity": "Faollik yuklanmoqda...",
+    "noActivity": "Hali faollik yo'q",
+    "personalSplit": "Shaxsiy bo'lish",
+    "splitBill": "Hisobni bo'lish",
+    "today": "Bugun",
+    "yesterday": "Kecha",
+    "daysAgo": "{{count}} kun oldin",
+    "totalSpent": "Jami shaxsiy xarajatlar",
+    "allSettled": "Barcha hisoblar yopilgan! 🎉",
+    "noActiveDebts": "Sizda faol qarzlar yo'q",
+    "activeBalances": "Faol balanslar"
+  },
+  "splitSession": {
+    "orders": "Buyurtmalar",
+    "addItem": "+ Mahsulot qo'shish",
+    "billConfirmed": "Hisob tasdiqlandi",
+    "save": "Saqlash",
+    "assignTo": "Kimga tegishli",
+    "all": "Barchaga",
+    "clear": "Tozalash",
+    "change": "O'zgartirish",
+    "progress": "Belgilash jarayoni",
+    "participants": "Ishtirokchilar",
+    "magicSplit": "Aqlli bo'lish",
+    "changeCurrency": "Valyutani o'zgartirish",
+    "assigned": "belgilangan",
+    "unit": "dona",
+    "assignedTo": "{{count}} kishiga biriktirilgan",
+    "priceSplitEqually": "Narx teng bo'linadi",
+    "each": "har biriga",
+    "unitsAssigned": "{{count}} dona biriktirilgan",
+    "perUnit": "donasi",
+    "saving": "Saqlanmoqda...",
+    "editItem": "Elementni tahrirlash",
+    "itemName": "Element nomi",
+    "price": "Narxi",
+    "quantity": "Soni",
+    "select": "Tanlash",
+    "selected": "Tanlandi"
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "accountSettings": "Hisob sozlamalari",
+    "username": "Foydalanuvchi nomi",
+    "password": "Parol",
+    "currentPassword": "Joriy parol",
+    "newPassword": "Yangi parol",
+    "confirmPassword": "Parolni tasdiqlash",
+    "changePassword": "Parolni o'zgartirish",
+    "saveUsername": "Foydalanuvchi nomini saqlash",
+    "enterNewUsername": "Yangi foydalanuvchi nomini kiriting",
+    "updateDescription": "Profil ma'lumotlarini yangilash",
+    "passwordReq": "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
+    "reset": "Tiklash",
+    "saving": "Saqlanmoqda...",
+    "updating": "Yangilanmoqda...",
+    "language": {
+      "title": "Til",
+      "description": "Qulay tilni tanlang"
+    },
+    "theme": {
+      "title": "Mavzu",
+      "description": "Ilova ko'rinishini tanlang",
+      "options": {
+        "dark": "Qorong'i",
+        "light": "Yorug'",
+        "system": "Tizim"
+      }
+    },
+    "alerts": {
+      "success": "Muvaffaqiyat",
+      "error": "Xato",
+      "unavailable": "Bu funksiya hozir mavjud emas",
+      "loginToChangePassword": "Parolni o'zgartirish uchun tizimga kiring",
+      "loginToUpdateUsername": "Foydalanuvchi nomini yangilash uchun tizimga kiring",
+      "passwordChanged": "Parol muvaffaqiyatli o'zgartirildi",
+      "passwordUpdated": "Parol muvaffaqiyatli yangilandi",
+      "usernameUpdated": "Foydalanuvchi nomi muvaffaqiyatli yangilandi",
+      "updateUsernameFailed": "Foydalanuvchi nomini yangilab bo'lmadi",
+      "changePasswordFailed": "Parolni o'zgartirib bo'lmadi"
+    },
+    "validation": {
+      "usernameRequired": "Foydalanuvchi nomi bo'sh bo'lmasligi kerak",
+      "usernameMin": "Foydalanuvchi nomi kamida 2 ta belgidan iborat bo'lishi kerak",
+      "passwordCurrent": "Joriy parolingizni kiriting",
+      "passwordLength": "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
+      "passwordComplexity": "Parolda harflar va raqamlar bo'lishi kerak",
+      "passwordDifferent": "Yangi parol joriy paroldan farq qilishi kerak",
+      "passwordMismatch": "Parollar mos kelmaydi"
+    }
+  },
+  "insights": {
+    "smartSplit": "Aqlli bo'lish tavsiyasi",
+    "smartSplitDesc": "Guruh ovqatlarini Ali va Vali bilan teng bo'lishingiz mumkin",
+    "savings": "Tejash hisoblagichi",
+    "savingsDesc": "Bu hafta o'rtacha haftalik xarajatlaringizga nisbatan 12% ko'proq tejayapsiz",
+    "aiInsight": "AI TAVSIYA",
+    "tip": "MASLAHAT"
+  },
+  "groupDetail": {
+    "group": "Guruh",
+    "backToGroups": "Guruhlarga qaytish",
+    "statistics": "Statistika",
+    "history": "Tarix",
+    "members": "A'zolar",
+    "noMembers": "Hali a'zolar yo'q",
+    "addFromFriends": "Do'stlardan qo'shish",
+    "searchFriends": "Do'stlarni qidirish...",
+    "noFriendsToAdd": "Qo'shish uchun do'stlar yo'q",
+    "add": "Qo'shish",
+    "remove": "O'chirish",
+    "deleteGroup": "Guruhni o'chirish",
+    "deleteConfirm": "Bu guruhni o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "noGroup": "Guruh topilmadi"
+  },
+  "finish": {
+    "title": "Hisob xulosasi",
+    "totalAmount": "Jami summa",
+    "splitByParticipant": "Ishtirokchilar bo'yicha taqsimot:",
+    "noParticipantData": "Hali ishtirokchilar haqida ma'lumot yo'q.",
+    "splitByItem": "Mahsulotlar bo'yicha taqsimot:",
+    "noAllocationDetails": "Taqsimot tafsilotlari mavjud emas.",
+    "share": "Ulashish",
+    "completeSettlement": "Hisob-kitobni yakunlash",
+    "receiptLabel": "Chek #{{id}}",
+    "shareTemplate": "📊 **{{title}}**\nChek #{{receiptId}}\nJami summa: {{total}}\n\nBatafsil:\n{{details}}\n\nChek Bo'lish ilovasi orqali yuborildi",
+    "shareTemplateNoReceipt": "📊 **{{title}}**\nJami summa: {{total}}\n\nBatafsil:\n{{details}}\n\nChek Bo'lish ilovasi orqali yuborildi"
+  }
+}
