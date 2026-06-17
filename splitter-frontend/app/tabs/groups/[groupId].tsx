@@ -141,13 +141,13 @@ export default function GroupDetailsScreen() {
 
   return (
     <ScreenContainer paddingHorizontal={0}>
-      <YStack style={{ flex: 1, paddingHorizontal: 16, gap: 12 } as any}>
+      <YStack style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16, gap: 12 } as any}>
         {/* Back (text-only) with chevron) */}
       <XStack>
         <Button
           onPress={() => router.replace('/tabs/groups' as never)}
           size="$2"
-          style={{ height: 22, paddingHorizontal: 0, backgroundColor: 'transparent' } as any}
+          style={{ paddingHorizontal: 0, backgroundColor: 'transparent' } as any}
           unstyled
           chromeless
           borderWidth={0}
@@ -184,7 +184,7 @@ export default function GroupDetailsScreen() {
         </XStack>
 
         {canManage && !editing && (
-          <XStack style={{ alignItems: 'center', gap: 4 } as any}>
+          <XStack ai="center" gap="$3">
             <Button
               chromeless
               circular
@@ -206,7 +206,7 @@ export default function GroupDetailsScreen() {
         )}
 
         {canManage && editing && (
-          <XStack style={{ alignItems: 'center', gap: 4 } as any}>
+          <XStack ai="center" gap="$3">
             <Button
               chromeless
               circular
@@ -271,7 +271,7 @@ export default function GroupDetailsScreen() {
       )}
 
       {/* MEMBERS */}
-      <Paragraph style={{ fontWeight: '700', fontSize: 18 } as any}>{t('groupDetail.members')}</Paragraph>
+      <Paragraph fontWeight="700" fontSize={18}>{t('groupDetail.members')}</Paragraph>
       {members.length === 0 ? (
         <Paragraph style={{ color: '$gray10' } as any}>{t('groupDetail.noMembers')}</Paragraph>
       ) : (
@@ -315,7 +315,7 @@ export default function GroupDetailsScreen() {
       <Separator />
 
       {/* ADD FROM FRIENDS */}
-      <Paragraph style={{ fontWeight: '700', fontSize: 18 } as any}>{t('groupDetail.addFromFriends')}</Paragraph>
+      <Paragraph fontWeight="700" fontSize={18}>{t('groupDetail.addFromFriends')}</Paragraph>
       <Input
         value={filter}
         onChangeText={setFilter}

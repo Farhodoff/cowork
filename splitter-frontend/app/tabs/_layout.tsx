@@ -43,12 +43,6 @@ function CustomTabBar({ state }: any) {
   // Find active route name
   const currentRouteName = state.routes[state.index]?.name || '';
 
-  // Only show the tab bar on the main 4 root tabs
-  const visibleRoutes = ['index', 'groups/index', 'friends/index', 'profile'];
-  if (!visibleRoutes.includes(currentRouteName)) {
-    return null;
-  }
-
   const activeIndex = useMemo(() => {
     if (currentRouteName === 'index') return 0;
     if (currentRouteName.startsWith('groups')) return 1;
@@ -65,6 +59,13 @@ function CustomTabBar({ state }: any) {
     { key: 'contacts', label: t('friends.title', 'Contacts'), route: '/tabs/friends', icon: Contact },
     { key: 'profile', label: t('profile.title', 'Profile'), route: '/tabs/profile', icon: UserIcon },
   ], [t]);
+
+  // Only show the tab bar on the main 4 root tabs
+  const visibleRoutes = ['index', 'groups/index', 'friends/index', 'profile'];
+  if (!visibleRoutes.includes(currentRouteName)) {
+    return null;
+  }
+
 
   return (
     <View

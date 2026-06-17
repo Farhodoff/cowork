@@ -176,14 +176,14 @@ export default function FriendsScreen() {
               </YStack>
               {!searchQuery && (
                 <Button
-                  icon={<UserPlus size={18} />}
+                  icon={<UserPlus size={18} color="white" />}
                   bg="#7c4dff"
-                  color="white"
-                  borderRadius={100}
-                  size="$4"
+                  height={48}
+                  borderRadius={24}
                   px="$6"
-                  pressStyle={{ bg: '#651fff', scale: 0.95 }}
+                  pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
                   onPress={() => router.push('/tabs/friends/requests')}
+                  borderWidth={0}
                 >
                   <Text color="white" fontWeight="600" fontSize={15}>
                     {t('friends.add', 'Add Friend')}

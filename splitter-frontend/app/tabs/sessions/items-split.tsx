@@ -809,14 +809,17 @@ export default function ItemsSplitScreen() {
               </Text>
               <Button
                 unstyled
-                style={{ backgroundColor: '$backgroundPress', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 } as any}
+                backgroundColor="$backgroundPress"
+                px={8}
+                py={2}
+                borderRadius={8}
                 borderWidth={0.5}
                 borderColor="$borderColor"
                 onPress={() => setCurrencySheetOpen(true)}
                 pressStyle={{ scale: 0.95 }}
                 animation="quick"
               >
-                <Text fontSize={12} fontWeight="600" color="#312E81">
+                <Text fontSize={12} fontWeight="600" color="#7c4dff">
                   {storeCurrency} ▾
                 </Text>
               </Button>

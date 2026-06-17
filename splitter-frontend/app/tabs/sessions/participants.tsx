@@ -4,7 +4,7 @@ import {
   YStack, XStack, Button, Spinner, Text, Input
 } from 'tamagui';
 import { FlatList } from 'react-native';
-import { Users as UsersIcon, Check } from '@tamagui/lucide-icons';
+import { Users as UsersIcon, Check, ArrowLeft } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFriendsStore } from '@/features/friends/model/friends.store';
@@ -298,7 +298,23 @@ export default function SessionParticipantsScreen() {
   const bottomPad = (insets?.bottom ?? 0) + 72;
 
   return (
-    <YStack style={{ flex: 1, backgroundColor: '#0a0a0f', padding: 16, position: 'relative' } as any}>
+    <YStack style={{ flex: 1, backgroundColor: '#0a0a0f', paddingHorizontal: 16, paddingTop: Math.max(insets.top, 16), position: 'relative' } as any}>
+
+      {/* Header */}
+      <XStack ai="center" jc="space-between" mb="$4" mt="$2">
+        <Button
+          size="$3"
+          circular
+          chromeless
+          onPress={() => router.back()}
+          icon={<ArrowLeft size={24} color="white" />}
+          ml={-12}
+        />
+        <Text fontSize={20} fontWeight="700" color="white">
+          {t('participants.title', 'Participants')}
+        </Text>
+        <YStack width={44} />
+      </XStack>
 
       {/* Groups */}
       {(groups ?? []).length > 0 && (

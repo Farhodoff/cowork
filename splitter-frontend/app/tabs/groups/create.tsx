@@ -199,11 +199,11 @@ export default function GroupCreateScreen() {
       <View
         bg="#312E81"
         paddingTop={insets.top > 0 ? insets.top + 8 : 20}
-        pb="$6"
+        pb="$7"
         px="$4"
         borderBottomLeftRadius={30}
         borderBottomRightRadius={30}
-        position="relative"
+        zIndex={1}
       >
         <XStack ai="center" mt="$2">
           <Button
@@ -237,24 +237,26 @@ export default function GroupCreateScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         f={1}
-        bg="$background"
+        bg="transparent"
         contentContainerStyle={{ pb: 30 }}
+        zIndex={10}
       >
         {/* Floating Card for Group Name */}
         <View
-          bg="$background"
+          bg="rgba(30, 30, 42, 1)"
           br={16}
           p="$4"
           mx="$4"
-          mt={-24}
+          mt={-30}
+          zIndex={100}
           shadowColor="#000"
-          shadowOffset={{ width: 0, height: 4 }}
-          shadowOpacity={0.06}
-          shadowRadius={10}
-          bw={0.5}
-          bc="$borderColor"
+          shadowOffset={{ width: 0, height: 6 }}
+          shadowOpacity={0.15}
+          shadowRadius={12}
+          bw={1}
+          bc="rgba(255,255,255,0.08)"
         >
-          <Text fontSize={13} fontWeight="600" color="$gray11" mb="$2">
+          <Text fontSize={13} fontWeight="600" color="rgba(255,255,255,0.7)" mb="$2">
             {t('groupCreate.groupNameLabel', 'Group Name')}
           </Text>
           <Input
@@ -264,16 +266,17 @@ export default function GroupCreateScreen() {
             h={52}
             br={12}
             borderWidth={1}
-            borderColor="$borderColor"
-            focusStyle={{ borderColor: '#312E81' }}
-            bg="$background"
+            borderColor="rgba(255,255,255,0.15)"
+            focusStyle={{ borderColor: '#7c4dff' }}
+            bg="rgba(255,255,255,0.06)"
+            color="white"
             fontSize={15}
           />
         </View>
 
         {/* Add Members Section */}
-        <YStack px="$4" mt="$4" gap="$2.5">
-          <Text fontSize={18} fontWeight="700" color="$color">
+        <YStack px="$4" mt="$5" gap="$3">
+          <Text fontSize={18} fontWeight="700" color="white">
             {t('groupCreate.addMembers', 'Add Members')}
           </Text>
 
@@ -292,9 +295,10 @@ export default function GroupCreateScreen() {
               h={50}
               br={12}
               borderWidth={1}
-              borderColor="$borderColor"
-              focusStyle={{ borderColor: '#312E81' }}
-              bg="$background"
+              borderColor="rgba(255,255,255,0.15)"
+              focusStyle={{ borderColor: '#7c4dff' }}
+              bg="rgba(255,255,255,0.06)"
+              color="white"
               fontSize={14}
               autoCapitalize="none"
             />
@@ -306,15 +310,16 @@ export default function GroupCreateScreen() {
               h={50}
               br={12}
               borderWidth={1}
-              borderColor="$borderColor"
-              focusStyle={{ borderColor: '#312E81' }}
-              bg="$background"
+              borderColor="rgba(255,255,255,0.15)"
+              focusStyle={{ borderColor: '#7c4dff' }}
+              bg="rgba(255,255,255,0.06)"
+              color="white"
               fontSize={14}
             />
             <Button
               onPress={onAddDraftMember}
-              bg="#312E81"
-              pressStyle={{ bg: '#1E1B4B', scale: 0.97 }}
+              bg="#7c4dff"
+              pressStyle={{ bg: '#5e35b1', scale: 0.97 }}
               h={50}
               br={12}
               px="$4"
@@ -339,7 +344,7 @@ export default function GroupCreateScreen() {
             alignSelf="center"
             pressStyle={{ opacity: 0.7 }}
           >
-            <Text color="#312E81" fontWeight="600" fontSize={14}>
+            <Text color="#7c4dff" fontWeight="600" fontSize={14}>
               {t('groupCreate.inviteVia', '+ Invite via email or phone')}
             </Text>
           </Button>
@@ -406,11 +411,11 @@ export default function GroupCreateScreen() {
           {/* Submit Button */}
           <Button
             onPress={handleCreateGroup}
-            bg="#312E81"
-            pressStyle={{ bg: '#1E1B4B', scale: 0.98 }}
+            bg="#7c4dff"
+            pressStyle={{ bg: '#5e35b1', scale: 0.98 }}
             h={52}
             br={14}
-            mt="$4"
+            mt="$5"
             disabled={creating}
           >
             {creating ? (

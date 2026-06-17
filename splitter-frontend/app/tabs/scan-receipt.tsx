@@ -277,48 +277,48 @@ export default function ScanReceiptScreen() {
 
       <YStack
         position="absolute"
-        bottom={Math.max(insets.bottom, 16)}
+        bottom={Math.max(insets.bottom + 10, 24)}
         left={16}
         right={16}
-        backgroundColor="rgba(10, 10, 15, 0.85)"
-        borderWidth={0.5}
-        borderColor="rgba(255,255,255,0.12)"
-        style={{ padding: 16, borderRadius: 16, overflow: 'hidden' } as any}
+        backgroundColor="rgba(20, 20, 28, 0.95)"
+        borderWidth={1}
+        borderColor="rgba(255,255,255,0.15)"
+        style={{ padding: 20, borderRadius: 24, overflow: 'hidden' } as any}
       >
-        <YStack gap="$3">
+        <YStack gap="$4">
           <YStack gap={8}>
-            <Paragraph color="$gray1" fontSize={12}>
+            <Paragraph color="rgba(255,255,255,0.7)" fontSize={13} fontWeight="500">
               {t('scanReceiptScreen.sessionName', 'Session name')}
             </Paragraph>
             <Input
               value={sessionName}
               onChangeText={handleSessionNameChange}
               placeholder={t('scanReceiptScreen.sessionPlaceholder', 'e.g. Cafe on October')}
-              height={41}
-              borderRadius={10}
+              height={44}
+              borderRadius={12}
               style={{ paddingHorizontal: 16 } as any}
-              backgroundColor="rgba(255,255,255,0.1)"
+              backgroundColor="rgba(255,255,255,0.08)"
               color="white"
               borderWidth={1}
-              borderColor="rgba(255,255,255,0.25)"
+              borderColor="rgba(255,255,255,0.2)"
             />
           </YStack>
 
-          <Paragraph color="$gray1" fontSize={12}>
+          <Paragraph color="rgba(255,255,255,0.7)" fontSize={13} fontWeight="500">
             {t('scanReceiptScreen.language', 'language:')} <Text fontWeight="700" color="white">{language}</Text>
           </Paragraph>
 
           {storedCapture?.uri && (
             <XStack style={{ alignItems: 'center', gap: 8 } as any}>
               <Image source={storedCapture.uri} style={{ width: 56, height: 56, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.5)' }} contentFit="cover" />
-              <Paragraph color="$gray1" fontSize={12}>
+              <Paragraph color="rgba(255,255,255,0.7)" fontSize={12}>
                 {t('scanReceiptScreen.photoStored', 'Last photo stored; capturing again will overwrite it.')}
               </Paragraph>
             </XStack>
           )}
 
           {errorMessage && (
-            <XStack style={{ alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,99,71,0.18)', paddingHorizontal: 8, paddingVertical: 8 } as any} borderRadius={8}>
+            <XStack style={{ alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,99,71,0.18)', paddingHorizontal: 12, paddingVertical: 10 } as any} borderRadius={10}>
               <AlertTriangle size={16} color="#FF6B6B" />
               <Paragraph color="#FF6B6B" flexShrink={1}>{errorMessage}</Paragraph>
             </XStack>
@@ -328,22 +328,24 @@ export default function ScanReceiptScreen() {
             <Button
               flex={1}
               size="$4"
-              borderRadius={12}
-              backgroundColor="rgba(255,255,255,0.06)"
+              height={48}
+              borderRadius={14}
+              backgroundColor="rgba(255,255,255,0.1)"
               pressStyle={{ bg: 'rgba(255,255,255,0.15)', scale: 0.96 }}
               borderWidth={0}
               onPress={goBack}
               disabled={parsing}
               opacity={parsing ? 0.6 : 1}
             >
-              <Text color="white" fontWeight="600" fontSize={14}>
+              <Text color="white" fontWeight="600" fontSize={15}>
                 {t('scanReceiptScreen.cancel', 'Cancel')}
               </Text>
             </Button>
             <Button
               flex={1}
               size="$4"
-              borderRadius={12}
+              height={48}
+              borderRadius={14}
               backgroundColor="#7c4dff"
               pressStyle={{ bg: '#5e35b1', scale: 0.96 }}
               borderWidth={0}
@@ -351,7 +353,7 @@ export default function ScanReceiptScreen() {
               disabled={disableAction}
               icon={parsing ? undefined : <CameraIcon size={18} color="white" />}
             >
-              <Text color="white" fontWeight="600" fontSize={14}>
+              <Text color="white" fontWeight="600" fontSize={15}>
                 {parsing ? t('scanReceiptScreen.processing', 'Processing...') : t('scanReceiptScreen.takePhoto', 'Take photo')}
               </Text>
             </Button>
@@ -359,34 +361,21 @@ export default function ScanReceiptScreen() {
 
           <Button
             size="$4"
-            borderRadius={12}
-            backgroundColor="rgba(255,255,255,0.04)"
+            height={48}
+            borderRadius={14}
+            backgroundColor="rgba(255,255,255,0.06)"
             pressStyle={{ bg: 'rgba(255,255,255,0.12)', scale: 0.96 }}
-            borderWidth={0.5}
-            borderColor="rgba(255,255,255,0.1)"
+            borderWidth={1}
+            borderColor="rgba(255,255,255,0.15)"
             onPress={handleGalleryPick}
             disabled={parsing}
             icon={parsing ? undefined : <ImageIcon size={18} color="white" />}
           >
-            <Text color="white" fontWeight="600" fontSize={14}>
+            <Text color="white" fontWeight="600" fontSize={15}>
               {parsing ? t('scanReceiptScreen.processing', 'Processing...') : t('scanReceiptScreen.uploadGallery', 'Upload from gallery')}
             </Text>
           </Button>
 
-          <Button
-            size="$3.5"
-            borderRadius={12}
-            backgroundColor="transparent"
-            pressStyle={{ scale: 0.96 }}
-            borderWidth={0.5}
-            borderColor="rgba(255,255,255,0.1)"
-            onPress={useMock}
-            disabled={parsing}
-          >
-            <Text color="rgba(255,255,255,0.45)" fontWeight="500" fontSize={13}>
-              {t('scanReceiptScreen.useMock', 'Use mock receipt')}
-            </Text>
-          </Button>
         </YStack>
       </YStack>
     </YStack>
